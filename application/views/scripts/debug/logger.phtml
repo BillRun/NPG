@@ -1,0 +1,21 @@
+<?php
+
+echo '<h1>' . Application_Model_General::getSettings("InternalProviderName") . ' Log Manager</h1>';
+echo $this->form;
+
+echo '<h2>The Requests Table</h2>';
+
+$this->printTable($this->requestsTable, 'Requests', true);
+// code prints out the transactions table
+
+echo '<h2>The Transaction Table</h2>';
+$this->printTable($this->transactionsTable);
+
+echo '<h2>The Logs Table</h2>';
+//print_R($this->logsTable);die;
+$this->printTable($this->logsTable);
+
+if (!empty($this->reqlog)):
+echo '<h2>Request Log</h2>';
+echo "<pre>" . htmlentities($this->reqlog) . "</pre>";
+endif;

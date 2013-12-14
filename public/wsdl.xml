@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Israel Number portability WSDL 2.0 --> 
+<!-- NOTE : PLEASE advance Versioning on every change on this WSDL -->
+<wsdl:definitions xmlns:s1="http://www.NPIsrael.co.il" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.npisrael.co.il/NP/2.0/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://www.npisrael.co.il/NP/2.0/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:types>
+		<s:schema elementFormDefault="qualified" targetNamespace="http://www.npisrael.co.il/NP/2.0/">
+			<s:import namespace="http://www.NPIsrael.co.il" />
+			<s:element name="sendMessage">
+				<s:complexType>
+					<s:sequence>
+						<s:element minOccurs="1" maxOccurs="1" name="NP_MESSAGE" type="s1:NP_MESSAGE" />
+					</s:sequence>
+				</s:complexType>
+			</s:element>
+			<s:element name="sendMessageResponse">
+				<s:complexType>
+					<s:sequence>
+						<s:element minOccurs="1" maxOccurs="1" name="NP_ACK" type="s1:NP_ACK" />
+					</s:sequence>
+				</s:complexType>
+			</s:element>
+		</s:schema>
+		<s:schema elementFormDefault="qualified" targetNamespace="http://www.NPIsrael.co.il">
+			<s:complexType name="NP_MESSAGE">
+				<s:sequence>
+					<s:element minOccurs="1" maxOccurs="1" name="HEADER" type="s1:HEADER" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="BODY" type="s:string" />
+				</s:sequence>
+			</s:complexType>
+			<s:complexType name="HEADER">
+				<s:sequence>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="REQUEST_ID">
+						<s:simpleType>
+							<s:restriction base="s:string">
+								<s:length value="21" />
+								<s:pattern value="NP[A-Z]{4}(\d{2}((0[1-9]|1[012])(0[1-9]|1\d|2[0-8])|(0[13456789]|1[012])(29|30)|(0[13578]|1[02])31)|([02468][048]|[13579][26])0229)[0-9]{9}" />
+							</s:restriction>
+						</s:simpleType>
+					</s:element>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="PROCESS_TYPE" type="s1:HEADERPROCESS_TYPE" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="MSG_TYPE" type="s1:HEADERMSG_TYPE" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="TRX_NO">
+						<s:simpleType>
+							<s:restriction base="s:string">
+								<s:length value="14" />
+								<s:pattern value="[A-Z]{2}[0-9]{12}" />
+							</s:restriction>
+						</s:simpleType>
+					</s:element>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="VERSION_NO">
+						<s:simpleType>
+							<s:restriction base="s:unsignedInt">
+								<s:maxInclusive value="999" />
+								<s:minInclusive value="1" />
+							</s:restriction>
+						</s:simpleType>
+					</s:element>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="RETRY_NO">
+						<s:simpleType>
+							<s:restriction base="s:unsignedInt">
+								<s:maxInclusive value="999" />
+								<s:minInclusive value="1" />
+							</s:restriction>
+						</s:simpleType>
+					</s:element>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="RETRY_DATE" type="s:dateTime" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="FROM">
+						<s:simpleType>
+							<s:restriction base="s:string">
+								<s:length value="2" />
+							</s:restriction>
+						</s:simpleType>
+					</s:element>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="TO">
+						<s:simpleType>
+							<s:restriction base="s:string">
+								<s:length value="2" />
+							</s:restriction>
+						</s:simpleType>
+					</s:element>
+				</s:sequence>
+			</s:complexType>
+			<s:simpleType name="HEADERPROCESS_TYPE">
+				<s:restriction base="s:string">
+					<s:maxLength value="6" />
+					<s:enumeration value="PORT" />
+					<s:enumeration value="RETURN" />
+					<s:enumeration value="QUERY" />
+					<s:enumeration value="MAINT" />
+				</s:restriction>
+			</s:simpleType>
+			<s:simpleType name="HEADERMSG_TYPE">
+				<s:restriction base="s:string">
+					<s:maxLength value="30" />
+					<s:enumeration value="Check" />
+					<s:enumeration value="Check_response" />
+					<s:enumeration value="Request" />
+					<s:enumeration value="Request_response" />
+					<s:enumeration value="Update" />
+					<s:enumeration value="Update_response" />
+					<s:enumeration value="Cancel" />
+					<s:enumeration value="Cancel_response" />
+					<s:enumeration value="KD_update" />
+					<s:enumeration value="KD_update_response" />
+					<s:enumeration value="Execute" />
+					<s:enumeration value="Execute_response" />
+					<s:enumeration value="Publish" />
+					<s:enumeration value="Publish_response" />
+					<s:enumeration value="Cancel_publish" />
+					<s:enumeration value="Cancel_publish_response" />
+					<s:enumeration value="Return" />
+					<s:enumeration value="Return_response" />
+					<s:enumeration value="Down_system" />
+					<s:enumeration value="Up_system" />
+					<s:enumeration value="Inquire_number" />
+					<s:enumeration value="Inquire_number_response" />
+				</s:restriction>
+			</s:simpleType>
+			<s:complexType name="NP_ACK">
+				<s:sequence>
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="ACK_CODE" type="s1:NP_ACKACK_CODE" />
+					<s:element minOccurs="1" maxOccurs="1" form="unqualified" name="ACK_DATE" type="s:dateTime" />
+				</s:sequence>
+			</s:complexType>
+			<s:simpleType name="NP_ACKACK_CODE">
+				<s:restriction base="s:string">
+					<s:maxLength value="5" />
+					<s:enumeration value="Ack00" />
+					<s:enumeration value="Ack01" />
+					<s:enumeration value="Ack02" />
+					<s:enumeration value="Ack03" />
+					<s:enumeration value="Ack04" />
+					<s:enumeration value="Ack05" />
+					<s:enumeration value="Ack06" />
+					<s:enumeration value="Ack07" />
+				</s:restriction>
+			</s:simpleType>
+		</s:schema>
+	</wsdl:types>
+	<wsdl:message name="sendMessageSoapIn">
+		<wsdl:part name="parameters" element="tns:sendMessage" />
+	</wsdl:message>
+	<wsdl:message name="sendMessageSoapOut">
+		<wsdl:part name="parameters" element="tns:sendMessageResponse" />
+	</wsdl:message>
+	<wsdl:portType name="NPIsraelWSSoap">
+		<wsdl:operation name="sendMessage">
+			<wsdl:input message="tns:sendMessageSoapIn" />
+			<wsdl:output message="tns:sendMessageSoapOut" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="NPIsraelWSSoap" type="tns:NPIsraelWSSoap">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<wsdl:operation name="sendMessage">
+			<soap:operation soapAction="http://www.npisrael.co.il/NP/2.0/sendMessage" style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="NPIsraelWS">
+		<wsdl:port name="NPIsraelWSSoap" binding="tns:NPIsraelWSSoap">
+			<soap:address location="" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

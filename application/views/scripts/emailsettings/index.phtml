@@ -1,0 +1,28 @@
+<?php
+echo '<a name="top"></a>';
+
+echo $this->headerMenu;
+echo '<a href="#adressform">Edit Provider Addresses</a> / <a href="#emailform">Edit Bad Process Email Format</a>';
+echo '<h1>' . Application_Model_General::getSettings("InternalProviderName") . ' Email Settings</h1>';
+
+if (isset($this->provider_emails)) {
+	
+	foreach($this->provider_emails as $provider => $val) {
+		
+		echo "Provider Name			: ".$this->provider_emails[$provider]['providername']."<br/>";
+		echo "Provider Email Adress : ".$this->provider_emails[$provider]['provideremailadress']."<br/><br/>";
+		echo "<a href='/np/emailsettings?deleteProvider=".$this->provider_emails[$provider]['providername']."'>DELETE ROW</a><br/><br/>";
+		
+		
+	}
+}
+echo '<a name="adressform"></a>';
+echo '<a href="#top">back to top</a>';
+echo $this->form;
+
+echo '<a name="emailform"></a>';
+echo '<a href="#top">back to top</a><br/><br/>';
+echo "Place Holder for Provider Name = *Provider_Name* <br/>";
+echo "Place Holder for Request_ID = *Request_ID* ";
+echo $this->emailFormat;
+echo '<a href="#top">back to top</a><br/><br/>';

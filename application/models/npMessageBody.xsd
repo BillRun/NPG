@@ -1,0 +1,1385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 4 U (http://www.xmlspy.com) by Yuval Avni (Liam) -->
+<!-- edited with XML Spy v4.0 U (http://www.xmlspy.com) by John Roujinsky (Netalizer Ltd.) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="npMessageBody" type="npMessageBodyType" nillable="false">
+		<xs:annotation>
+			<xs:documentation>Root element for number portability message body. Version 2.13 (08.10.2007)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="npMessageBody">
+		<xs:annotation>
+			<xs:documentation>Complex type for number portability messages</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:simpleType name="TransactionNumber">
+		<xs:annotation>
+			<xs:documentation>Simple type defining format of transaction number (syntax validation)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="14" fixed="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="OperatorIdentifier">
+		<xs:annotation>
+			<xs:documentation>Simple type defining format of operator identifier (syntax validation)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="2" fixed="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NetworkTypeFixed">
+		<xs:annotation>
+			<xs:documentation>Simple type defining format of fixed network type (syntax validation)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1" fixed="true"/>
+			<xs:enumeration value="F"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NetworkTypeMobile">
+		<xs:annotation>
+			<xs:documentation>Simple type defining format of mobile network type (syntax validation)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1" fixed="true"/>
+			<xs:enumeration value="M"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DN">
+		<xs:annotation>
+			<xs:documentation>Simple type defining format of directory number (syntax validation)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" fixed="true"/>
+			<xs:maxLength value="11" fixed="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="checkType">
+		<xs:choice>
+			<xs:element name="mobile">
+				<xs:annotation>
+					<xs:documentation>Mobile network number</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="networkType" type="NetworkTypeMobile" nillable="false">
+							<xs:annotation>
+								<xs:documentation>Network type 'M'</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:choice>
+							<xs:element name="mobileNumberIdentified" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Identified mobile number</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="numberType" nillable="false">
+											<xs:annotation>
+												<xs:documentation>Mobile number type ('I')</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1" fixed="true"/>
+													<xs:enumeration value="I"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="identificationValue" nillable="false">
+											<xs:annotation>
+												<xs:documentation>Identification of customer</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="identificationValue2nd" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Identification of customer</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="identificationValue3rd" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Identification of customer</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="number" type="DN" nillable="false">
+											<xs:annotation>
+												<xs:documentation>Single directory number in mobile network</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="mobileNumberUnidentified" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Unidentified mobile number</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="numberType" nillable="false">
+											<xs:annotation>
+												<xs:documentation>Mobile number type ('U')</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1" fixed="true"/>
+													<xs:enumeration value="U"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="number" type="DN" nillable="false">
+											<xs:annotation>
+												<xs:documentation>Single directory number in mobile network</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="fixed">
+				<xs:annotation>
+					<xs:documentation>Fixed network number</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="networkType" type="NetworkTypeFixed" nillable="false">
+							<xs:annotation>
+								<xs:documentation>Network type 'F'</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:choice>
+							<xs:element name="fixedNumberSingle" type="fixedNumberSingleType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Single fixed number</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="fixedNumberRange" type="fixedNumberRangeType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Fixed numbers range</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+						<xs:element name="identificationValue" nillable="false">
+							<xs:annotation>
+								<xs:documentation>Identification of customer</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="16"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="identificationValue2nd" minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="16"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="identificationValue3rd" minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="16"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="checkResponseType">
+		<xs:sequence>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+			<xs:element name="requestRetryDate" type="xs:dateTime" nillable="false"/>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>
+										<xs:enumeration value="Gen10"/>
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Chk01"/>
+										<xs:enumeration value="Chk02"/>
+										<xs:enumeration value="Chk03"/>
+										<xs:enumeration value="Chk04"/>
+										<xs:enumeration value="Chk05"/>
+										<xs:enumeration value="Chk07"/>
+										<xs:enumeration value="Chk09"/>
+										<xs:enumeration value="Chk10"/>
+										<xs:enumeration value="Chk13"/>
+										<xs:enumeration value="Chk14"/>
+										<xs:enumeration value="Chk18"/>
+										<xs:enumeration value="Chk19"/>
+										<xs:enumeration value="Chk21"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="essentialInfo1" nillable="false" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="5"/>
+						<xs:enumeration value="Chk11"/>
+						<xs:enumeration value="Chk22"/>
+						<xs:enumeration value="Chk23"/>
+						<xs:enumeration value="Chk24"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="essentialInfo2" nillable="false" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="5"/>
+						<xs:enumeration value="Chk11"/>
+						<xs:enumeration value="Chk22"/>
+						<xs:enumeration value="Chk23"/>
+						<xs:enumeration value="Chk24"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="essentialInfo3" nillable="false" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="5"/>
+						<xs:enumeration value="Chk11"/>
+						<xs:enumeration value="Chk22"/>
+						<xs:enumeration value="Chk23"/>
+						<xs:enumeration value="Chk24"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="essentialInfo4" nillable="false" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="5"/>
+						<xs:enumeration value="Chk11"/>
+						<xs:enumeration value="Chk22"/>
+						<xs:enumeration value="Chk23"/>
+						<xs:enumeration value="Chk24"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="essentialInfo5" nillable="false" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="5"/>
+						<xs:enumeration value="Chk11"/>
+						<xs:enumeration value="Chk22"/>
+						<xs:enumeration value="Chk23"/>
+						<xs:enumeration value="Chk24"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="requestType">
+		<xs:sequence>
+			<xs:element name="portingDateTime" type="xs:dateTime" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Requested date and time of porting</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="requestResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Req02"/>
+										<xs:enumeration value="Req03"/>
+										<xs:enumeration value="Req05"/>
+										<xs:enumeration value="Req07"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+			<xs:element name="requestRetryDate" type="xs:dateTime" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateType">
+		<xs:sequence>
+			<xs:element name="portingDateTime" type="xs:dateTime" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Requested date and time of porting</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cancelType"/>
+	<xs:complexType name="cancelResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>
+										<xs:enumeration value="Gen09"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+			<xs:element name="requestRetryDate" type="xs:dateTime" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="kDUpdateType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="updateRequestType" type="updateRequestTypeType"/>
+				<xs:element name="updateUpdateType" type="updateUpdateTypeType"/>
+				<xs:element name="updateCancelType" type="updateCancelTypeType"/>
+			</xs:choice>
+			<xs:element name="remark" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="kDUpdateResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen09"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+			<xs:element name="updateType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="CANCEL"/>
+						<xs:enumeration value="UPDATE"/>
+						<xs:enumeration value="REQUEST"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="executeType"/>
+	<xs:complexType name="executeResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="disconnectDateTime" type="xs:dateTime" nillable="false"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Exe02"/>
+										<xs:enumeration value="Exe04"/>
+										<xs:enumeration value="Exe06"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="publishType">
+		<xs:sequence>
+			<xs:element name="donor" type="OperatorIdentifier" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Identification of donor operator</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="connectDateTime" type="xs:dateTime" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Date and time of connection by recipient</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="publishType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Port"/>
+						<xs:enumeration value="Rtrn"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="disconnectDateTime" type="xs:dateTime" nillable="false"/>
+			<xs:choice>
+				<xs:element name="mobile">
+					<xs:annotation>
+						<xs:documentation>Mobile network number</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="numberType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Mobile number type 'I'/'U'</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="1"/>
+										<xs:enumeration value="I"/>
+										<xs:enumeration value="U"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="number" type="DN" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Single directory number in mobile network</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="fixed">
+					<xs:annotation>
+						<xs:documentation>Fixed network number</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name="fixedNumberSingle" type="fixedNumberSingleType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Single fixed number</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="fixedNumberRange" type="fixedNumberRangeType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Fixed numbers range</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="publishResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="routeDateTime" type="xs:dateTime" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Date and time of other operator routing (only when approval indication is 'Y', must be validated by application layer)</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>										
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Pub01"/>
+										<xs:enumeration value="Pub02"/>
+										<xs:enumeration value="Pub03"/>
+										<xs:enumeration value="Pub05"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cancelPublishType">
+		<xs:sequence>
+			<xs:element name="donor" type="OperatorIdentifier" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Identification of donor operator</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="returnType">
+		<xs:sequence>
+			<xs:element name="number" type="DN" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Directory number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="mobile">
+					<xs:annotation>
+						<xs:documentation>Mobile network number</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="networkType" type="NetworkTypeMobile" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Network type 'M'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="numberType" nillable="false" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Fixed number type ('I'/'U')</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="1" fixed="true"/>
+										<xs:enumeration value="I"/>
+										<xs:enumeration value="U"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="fixed">
+					<xs:annotation>
+						<xs:documentation>Fixed network number</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="networkType" type="NetworkTypeFixed" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Network type 'F'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="numberType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Fixed number type ('S'/'R')</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="1" fixed="true"/>
+										<xs:enumeration value="R"/>
+										<xs:enumeration value="S"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="returnResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Gen10"/>
+										<xs:enumeration value="Rtn01"/>
+										<xs:enumeration value="Rtn02"/>
+										<xs:enumeration value="Rtn03"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="systemDownType"/>
+	<xs:complexType name="systemUpType"/>
+	<xs:complexType name="inquireNumberType">
+		<xs:sequence>
+			<xs:element name="number" type="DN" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Directory number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="inquireNumberResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="currentOperator" type="OperatorIdentifier" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Current number operator</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Gen10"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="currentOperator" type="OperatorIdentifier" nillable="false" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Current number operator</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="npMessageBodyType">
+		<xs:choice>
+			<xs:element name="Check" type="checkType">
+				<xs:annotation>
+					<xs:documentation>NP message 'Check' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Check_response" type="checkResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'CheckResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Request" type="requestType">
+				<xs:annotation>
+					<xs:documentation>NP message 'Request' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Request_response" type="requestResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'RequestResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Update" type="updateType">
+				<xs:annotation>
+					<xs:documentation>NP message 'Update' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Update_response" type="updateResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'UpdateResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Cancel" type="cancelType" nillable="true">
+				<xs:annotation>
+					<xs:documentation>NP message 'Cancel' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Cancel_response" type="cancelResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'CancelResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="KD_update" type="kDUpdateType">
+				<xs:annotation>
+					<xs:documentation>NP message 'KDUpdate' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="KD_update_response" type="kDUpdateResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'KDUpdateResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Execute" type="executeType" nillable="true">
+				<xs:annotation>
+					<xs:documentation>NP message 'Execute' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Execute_response" type="executeResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'ExecuteResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Publish" type="publishType">
+				<xs:annotation>
+					<xs:documentation>NP message 'Publish' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Publish_response" type="publishResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'PublishResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Cancel_publish" type="cancelPublishType">
+				<xs:annotation>
+					<xs:documentation>NP message 'CancelPublish' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Cancel_publish_response" type="cancelPublishResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'CancelPublishResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Return" type="returnType">
+				<xs:annotation>
+					<xs:documentation>NP message 'Return' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Return_response" type="returnResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'ReturnResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Down_system" type="systemDownType" nillable="true">
+				<xs:annotation>
+					<xs:documentation>NP message 'SystemDown' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Up_system" type="systemUpType" nillable="true">
+				<xs:annotation>
+					<xs:documentation>NP message 'SystemUp' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Inquire_number" type="inquireNumberType">
+				<xs:annotation>
+					<xs:documentation>NP message 'InquireNumber' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Inquire_number_response" type="inquireNumberResponseType">
+				<xs:annotation>
+					<xs:documentation>NP message 'InquireNumberResponse' object type definition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="cancelPublishResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="routeDateTime" type="xs:dateTime" nillable="false"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Cpb01"/>
+										<xs:enumeration value="Cpb03"/>
+										<xs:enumeration value="Cpb04"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="numberSingleType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="S"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="updateCancelTypeType">
+		<xs:sequence>
+			<xs:element name="updateType" nillable="false">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="CANCEL"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateUpdateTypeType">
+		<xs:sequence>
+			<xs:element name="updateType" nillable="false">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="UPDATE"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="portingDateTime" type="xs:dateTime" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Requested date and time of porting</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateRequestTypeType">
+		<xs:sequence>
+			<xs:element name="updateType" nillable="false">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="REQUEST"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="portingDateTime" type="xs:dateTime" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Requested date and time of porting</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="mobile">
+					<xs:annotation>
+						<xs:documentation>Mobile network number</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="networkType" type="NetworkTypeMobile" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Network type 'M'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:choice>
+								<xs:element name="mobileNumberIdentified" nillable="false">
+									<xs:annotation>
+										<xs:documentation>Identified mobile number</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="numberType" nillable="false">
+												<xs:annotation>
+													<xs:documentation>Mobile number type ('I')</xs:documentation>
+												</xs:annotation>
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:length value="1" fixed="true"/>
+														<xs:enumeration value="I"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+											<xs:element name="identificationValue" nillable="false">
+												<xs:annotation>
+													<xs:documentation>Identification of customer</xs:documentation>
+												</xs:annotation>
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:maxLength value="16"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+											<xs:element name="identificationValue2nd" minOccurs="0">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:maxLength value="16"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+											<xs:element name="identificationValue3rd" minOccurs="0">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:maxLength value="16"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+											<xs:element name="number" type="DN" nillable="false">
+												<xs:annotation>
+													<xs:documentation>Single directory number in mobile network</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="mobileNumberUnidentified" nillable="false">
+									<xs:annotation>
+										<xs:documentation>Unidentified mobile number</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="numberType" nillable="false">
+												<xs:annotation>
+													<xs:documentation>Mobile number type ('U')</xs:documentation>
+												</xs:annotation>
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:length value="1" fixed="true"/>
+														<xs:enumeration value="U"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+											<xs:element name="number" type="DN" nillable="false">
+												<xs:annotation>
+													<xs:documentation>Single directory number in mobile network</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:choice>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="fixed">
+					<xs:annotation>
+						<xs:documentation>Fixed network number</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="networkType" type="NetworkTypeFixed" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Network type 'F'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:choice>
+								<xs:element name="fixedNumberSingle" type="fixedNumberSingleType" nillable="false">
+									<xs:annotation>
+										<xs:documentation>Single fixed number</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="fixedNumberRange" type="fixedNumberRangeType" nillable="false">
+									<xs:annotation>
+										<xs:documentation>Fixed numbers range</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:choice>
+							<xs:element name="identificationValue" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Identification of customer</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="identificationValue2nd" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Identification of customer</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="identificationValue3rd" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Identification of customer</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="negativeApprovalIndType">
+		<xs:restriction base="xs:string">
+			<xs:length value="1"/>
+			<xs:enumeration value="N"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="positiveApprovalIndType">
+		<xs:restriction base="xs:string">
+			<xs:length value="1"/>
+			<xs:enumeration value="Y"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="fixedNumberSingleType">
+		<xs:sequence>
+			<xs:element name="numberType" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Fixed number type 'S'</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+						<xs:enumeration value="S"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="number" type="DN" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Single directory number in fixed network</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="fixedNumberRangeType">
+		<xs:sequence>
+			<xs:element name="numberType" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Fixed number type 'R'</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1" fixed="true"/>
+						<xs:enumeration value="R"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="fromNumber" type="DN" nillable="false">
+				<xs:annotation>
+					<xs:documentation>First directory number in the range</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="toNumber" type="DN" nillable="false">
+				<xs:annotation>
+					<xs:documentation>Last directory number in the range</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateResponseType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="positiveApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when positive approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="positiveApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'Y'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="negativeApproval" nillable="false">
+					<xs:annotation>
+						<xs:documentation>Group of fields when negative approval</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="approvalInd" type="negativeApprovalIndType" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Approval indication 'N'</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="rejectReasonCode" nillable="false">
+								<xs:annotation>
+									<xs:documentation>Reject reason code</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="5" fixed="true"/>
+										<xs:enumeration value="Gen04"/>
+										<xs:enumeration value="Gen05"/>
+										<xs:enumeration value="Gen06"/>
+										<xs:enumeration value="Gen07"/>
+										<xs:enumeration value="Gen09"/>
+										<xs:enumeration value="Upd02"/>
+										<xs:enumeration value="Upd03"/>
+										<xs:enumeration value="Upd04"/>
+										<xs:enumeration value="Upd05"/>
+										<xs:enumeration value="Upd07"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="requestTrxNo" type="TransactionNumber" nillable="false"/>
+			<xs:element name="requestRetryDate" type="xs:dateTime" nillable="false"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

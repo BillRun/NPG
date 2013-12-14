@@ -1,0 +1,10 @@
+<?php 
+if ($this->output_enabled):
+	echo "<h1>Publish Status Page</h1>";
+	if ($this->status === TRUE) :
+		echo '<h2>The Following Requests were Publish</h2>';
+		$this->printTable($this->rows);
+	else:
+		echo "<p>" . $this->status . "</p>";
+	endif;
+endif;

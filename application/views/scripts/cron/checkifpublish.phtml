@@ -1,0 +1,10 @@
+<?php
+if ($this->output_enabled):
+echo "<h1>Cron Status Page</h1>";
+echo '<h2>The Following Requests were Execute</h2>';
+$this->printTable($this->transfer);
+echo '<h2>The Following Requests were Publish</h2>';
+$this->printTable($this->publish);
+echo '<h2>The Following will check if all Publish response got back</h2>';
+$this->printTable($this->publish_check);
+endif;

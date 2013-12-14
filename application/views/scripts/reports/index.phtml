@@ -1,0 +1,549 @@
+<?php
+echo "<a name='top'></a>";
+echo $this->headerMenu;
+echo '<h1>' . Application_Model_General::getSettings("InternalProviderName") . ' Process Type Aggregate</h1>';
+echo $this->reportsMenu;
+echo $this->form;
+
+echo '<h2>Number of Ports in : ' . $this->portIns . '</h2>';
+echo '<h2>Number of Ports out : ' . $this->portOut . '</h2>';
+
+// PAGER PARAMS 
+
+if (isset($_GET)) {
+	if (isset($_GET['page'])) {
+		unset($_GET['page']);
+	}
+	$targetpage = $this->url();
+	$get_params = '?' . http_build_query($_GET);
+} else {
+	$get_params = '';
+}
+
+$targetpage = $this->url() . $get_params;
+$total_pages = $this->total_pages_Activity_Process;
+$limit = $this->limit_Activity_Process;
+$adjacents = $this->adjacents_Activity_Process;
+if (isset($this->pagination_Activity_Process)) {
+	$page = $this->pagination_Activity_Process;
+}
+
+// END OF PAGER PARAMS
+/* Setup page vars for display. */
+if (!isset($page) || $page == 0)
+	$page = 1;  //if no page var is given, default to 1.
+$prev = $page - 1; //previous page is page - 1
+$next = $page + 1; //next page is page + 1
+$lastpage = ceil($total_pages / $limit);  //lastpage is = total pages / items per page, rounded up.
+$lpm1 = $lastpage - 1;   //last page minus 1
+/*
+  Now we apply our rules and draw the pagination object.
+  We're actually saving the code to a variable in case we want to draw it more than once.
+ */
+$pagination = "";
+if ($lastpage > 1) {
+	$pagination .= "<div class=\"pagination\">";
+	//previous button
+	if ($page > 1)
+		$pagination.= "<a href=\"$targetpage&page=$prev\">previous </a><br/>";
+	else
+		$pagination.= "<span class=\"disabled\">previous </span><br/>";
+
+	//pages	
+	if ($lastpage < 7 + ($adjacents * 2)) { //not enough pages to bother breaking it up
+		for ($counter = 1; $counter <= $lastpage; $counter++) {
+			if ($counter == $page)
+				$pagination.= "<span class=\"current\">$counter</span>";
+			else
+				$pagination.= "<a href=\"$targetpage&page=$counter\">$counter</a>";
+		}
+	}
+	elseif ($lastpage > 5 + ($adjacents * 2)) { //enough pages to hide some
+		//close to beginning; only hide later pages
+		if ($page < 1 + ($adjacents * 2)) {
+			for ($counter = 1; $counter < 4 + ($adjacents * 2); $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage&page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage&page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage&page=$lastpage\">$lastpage</a>";
+		}
+		//in middle; hide some front and some back
+		elseif ($lastpage - ($adjacents * 2) > $page && $page > ($adjacents * 2)) {
+			$pagination.= "<a href=\"$targetpage&page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage&page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage&page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage&page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage&page=$lastpage\">$lastpage</a>";
+		}
+		//close to end; only hide early pages
+		else {
+			$pagination.= "<a href=\"$targetpage&page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage&page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $lastpage - (2 + ($adjacents * 2)); $counter <= $lastpage; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage&page=$counter\">$counter</a>";
+			}
+		}
+	}
+
+	//next button
+	if ($page < $counter - 1)
+		$pagination.= "<br/><a href=\"$targetpage&page=$next\"> next</a>";
+	else
+		$pagination.= "<span class=\"disabled\"><br/> next</span>";
+	$pagination.= "</div>\n";
+}
+?>
+
+<?php
+
+echo $pagination;
+
+echo '<a href="' . $this->url() . '">RESET FORM</a>';
+echo "<a name='process_type'></a>";
+echo '<h3>Statistics Report Filtered By Process Type and Process Status </h3>';
+echo $this->backToTop;
+$this->printTable($this->processTypeReports);
+
+$total_pages = $this->total_pages_Activity_Timers;
+
+$limit = $this->limit_Activity_Timers;
+$adjacents = $this->adjacents_Activity_Timers;
+if (isset($this->pagination_Activity_Timers)) {
+	$page = $this->pagination_Activity_Timers;
+}
+
+// END OF PAGER PARAMS
+/* Setup page vars for display. */
+if (!isset($page) || $page == 0)
+	$page = 1;  //if no page var is given, default to 1.
+$prev = $page - 1; //previous page is page - 1
+$next = $page + 1; //next page is page + 1
+
+$lastpage = ceil($total_pages / $limit);  //lastpage is = total pages / items per page, rounded up.
+$lpm1 = $lastpage - 1;   //last page minus 1
+
+/*
+  Now we apply our rules and draw the pagination object.
+  We're actually saving the code to a variable in case we want to draw it more than once.
+ */
+$pagination = "";
+if ($lastpage > 1) {
+	$pagination .= "<div class=\"pagination\">";
+	//previous button
+	if ($page > 1)
+		$pagination.= "<a href=\"$targetpage?page=$prev\">previous </a><br/>";
+	else
+		$pagination.= "<span class=\"disabled\">previous </span><br/>";
+
+	//pages	
+	if ($lastpage < 7 + ($adjacents * 2)) { //not enough pages to bother breaking it up
+		for ($counter = 1; $counter <= $lastpage; $counter++) {
+			if ($counter == $page)
+				$pagination.= "<span class=\"current\">$counter</span>";
+			else
+				$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+		}
+	}
+	elseif ($lastpage > 5 + ($adjacents * 2)) { //enough pages to hide some
+		//close to beginning; only hide later pages
+		if ($page < 1 + ($adjacents * 2)) {
+			for ($counter = 1; $counter < 4 + ($adjacents * 2); $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage?page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage?page=$lastpage\">$lastpage</a>";
+		}
+		//in middle; hide some front and some back
+		elseif ($lastpage - ($adjacents * 2) > $page && $page > ($adjacents * 2)) {
+			$pagination.= "<a href=\"$targetpage?page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage?page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage?page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage?page=$lastpage\">$lastpage</a>";
+		}
+		//close to end; only hide early pages
+		else {
+			$pagination.= "<a href=\"$targetpage?page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage?page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $lastpage - (2 + ($adjacents * 2)); $counter <= $lastpage; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+		}
+	}
+
+	//next button
+	if ($page < $counter - 1)
+		$pagination.= "<br/><a href=\"$targetpage?page=$next\"> next</a>";
+	else
+		$pagination.= "<span class=\"disabled\"><br/> next</span>";
+	$pagination.= "</div>\n";
+}
+?>
+
+<?php
+
+echo $pagination;
+echo "<a name='timers'></a>";
+echo '<h3>Statistics Report Filtered By Timers </h3>';
+echo $this->backToTop;
+$this->printTable($this->timersActivity);
+
+$total_pages = $this->total_pages_Shutdown;
+
+$limit = $this->limit_Shutdown;
+$adjacents = $this->adjacents_Shutdown;
+if (isset($this->pagination_Shutdown)) {
+	$page = $this->pagination_Shutdown;
+}
+
+// END OF PAGER PARAMS
+/* Setup page vars for display. */
+if (!isset($page) || $page == 0)
+	$page = 1;  //if no page var is given, default to 1.
+$prev = $page - 1; //previous page is page - 1
+$next = $page + 1; //next page is page + 1
+
+$lastpage = ceil($total_pages / $limit);  //lastpage is = total pages / items per page, rounded up.
+$lpm1 = $lastpage - 1;   //last page minus 1
+
+/*
+  Now we apply our rules and draw the pagination object.
+  We're actually saving the code to a variable in case we want to draw it more than once.
+ */
+$pagination = "";
+if ($lastpage > 1) {
+	$pagination .= "<div class=\"pagination\">";
+	//previous button
+	if ($page > 1)
+		$pagination.= "<a href=\"$targetpage?page=$prev\">previous </a><br/>";
+	else
+		$pagination.= "<span class=\"disabled\">previous </span><br/>";
+
+	//pages	
+	if ($lastpage < 7 + ($adjacents * 2)) { //not enough pages to bother breaking it up
+		for ($counter = 1; $counter <= $lastpage; $counter++) {
+			if ($counter == $page)
+				$pagination.= "<span class=\"current\">$counter</span>";
+			else
+				$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+		}
+	}
+	elseif ($lastpage > 5 + ($adjacents * 2)) { //enough pages to hide some
+		//close to beginning; only hide later pages
+		if ($page < 1 + ($adjacents * 2)) {
+			for ($counter = 1; $counter < 4 + ($adjacents * 2); $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage?page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage?page=$lastpage\">$lastpage</a>";
+		}
+		//in middle; hide some front and some back
+		elseif ($lastpage - ($adjacents * 2) > $page && $page > ($adjacents * 2)) {
+			$pagination.= "<a href=\"$targetpage?page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage?page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage?page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage?page=$lastpage\">$lastpage</a>";
+		}
+		//close to end; only hide early pages
+		else {
+			$pagination.= "<a href=\"$targetpage?page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage?page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $lastpage - (2 + ($adjacents * 2)); $counter <= $lastpage; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+		}
+	}
+
+	//next button
+	if ($page < $counter - 1)
+		$pagination.= "<br/><a href=\"$targetpage?page=$next\"> next</a>";
+	else
+		$pagination.= "<span class=\"disabled\"><br/> next</span>";
+	$pagination.= "</div>\n";
+}
+?>
+
+<?php
+
+echo $pagination;
+
+echo "<a name='shutdown'></a>";
+echo '<h3>Shutdown Statistics  </h3>';
+echo $this->backToTop;
+$this->printTable($this->shutDownReports);
+
+$total_pages = $this->total_pages_Transactions;
+
+$limit = $this->limit_Transactions;
+$adjacents = $this->adjacents_Transactions;
+if (isset($this->pagination_Transactions)) {
+	$page = $this->pagination_Transactions;
+}
+
+// END OF PAGER PARAMS
+/* Setup page vars for display. */
+if (!isset($page) || $page == 0)
+	$page = 1;  //if no page var is given, default to 1.
+$prev = $page - 1; //previous page is page - 1
+$next = $page + 1; //next page is page + 1
+
+$lastpage = ceil($total_pages / $limit);  //lastpage is = total pages / items per page, rounded up.
+$lpm1 = $lastpage - 1;   //last page minus 1
+
+/*
+  Now we apply our rules and draw the pagination object.
+  We're actually saving the code to a variable in case we want to draw it more than once.
+ */
+$pagination = "";
+if ($lastpage > 1) {
+	$pagination .= "<div class=\"pagination\">";
+	//previous button
+	if ($page > 1)
+		$pagination.= "<a href=\"$targetpage?page=$prev\">previous </a><br/>";
+	else
+		$pagination.= "<span class=\"disabled\">previous </span><br/>";
+
+	//pages	
+	if ($lastpage < 7 + ($adjacents * 2)) { //not enough pages to bother breaking it up
+		for ($counter = 1; $counter <= $lastpage; $counter++) {
+			if ($counter == $page)
+				$pagination.= "<span class=\"current\">$counter</span>";
+			else
+				$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+		}
+	}
+	elseif ($lastpage > 5 + ($adjacents * 2)) { //enough pages to hide some
+		//close to beginning; only hide later pages
+		if ($page < 1 + ($adjacents * 2)) {
+			for ($counter = 1; $counter < 4 + ($adjacents * 2); $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage?page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage?page=$lastpage\">$lastpage</a>";
+		}
+		//in middle; hide some front and some back
+		elseif ($lastpage - ($adjacents * 2) > $page && $page > ($adjacents * 2)) {
+			$pagination.= "<a href=\"$targetpage?page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage?page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage?page=$lpm1\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage?page=$lastpage\">$lastpage</a>";
+		}
+		//close to end; only hide early pages
+		else {
+			$pagination.= "<a href=\"$targetpage?page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage?page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $lastpage - (2 + ($adjacents * 2)); $counter <= $lastpage; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage?page=$counter\">$counter</a>";
+			}
+		}
+	}
+
+	//next button
+	if ($page < $counter - 1)
+		$pagination.= "<br/><a href=\"$targetpage?page=$next\"> next</a>";
+	else
+		$pagination.= "<span class=\"disabled\"><br/> next</span>";
+	$pagination.= "</div>\n";
+}
+?>
+
+<?php
+
+echo $pagination;
+echo "<a name='noack'></a>";
+echo '<h3>No Ack Processes</h3>';
+echo $this->backToTop;
+
+$this->printTable($this->noAck);
+
+
+echo '<h1>' . Application_Model_General::getSettings("InternalProviderName") . ' Transaction By Reject Reason Code </h1>';
+echo $this->backToTop;
+echo $this->rejectform;
+
+// PAGER PARAMS 
+
+if (isset($_POST["reject_reason_code"])) {
+
+	$reject_reason = "?rejectReason=" . $_POST["reject_reason_code"];
+}
+if (isset($_GET)) {
+//	$reject_reason = '?rejectReason='.$_GET["rejectReason"];
+	$get_params = http_build_query($_GET);
+
+	if (!isset($_GET['reject_reason']) && isset($reject_reason) && !empty($reject_reason)) {
+		if (isset($_GET['reject_reason'])) {
+			$get_params = "?" . $reject_reason . $get_params;
+		}
+		elseif(isset($_POST['reject_reason_code'])){
+			$get_params .= '?rejectReason='.$_POST['reject_reason_code']; 
+		}
+	} else {
+		$get_params = "?" . $get_params;
+	}
+}
+$targetpage = $this->url();
+$targetpage = $this->url() . $get_params;
+$total_pages = $this->total_pages_rejectReasonCount;
+$limit = $this->limit_rejectReasonCount;
+$adjacents = $this->adjacents_rejectReasonCount;
+if (isset($_GET['page'])) {
+	$page = $_GET['page'];
+}
+if (isset($this->pagination_rejectReasonCount) && !isset($_GET['page'])) {
+	$page = (int) $this->pagination_rejectReasonCount;
+}
+
+if (!isset($page) || $page == 0)
+	$page = 1;  //if no page var is given, default to 1.
+if($page == 1){
+$prev = $page  - 1; //previous page is page - 1
+$next = $page  + 1; //next page is page + 1
+}
+else{
+$prev = ($page / $limit) - 1; //previous page is page - 1
+$next = ($page / $limit) + 1; //next page is page + 1	
+}
+
+$lastpage = ceil($total_pages / $limit);  //lastpage is = total pages / items per page, rounded up.
+$lpm1 = $lastpage - 1;   //last page minus 1
+$pagination = "";
+if ($lastpage > 1) {
+	$pagination .= "<div class=\"pagination\">";
+	//previous button
+	if ($page > 1)
+		$pagination.= "<a href=\"$targetpage&page=$prev#rejectreason\">previous </a><br/>";
+	else
+		$pagination.= "<span class=\"disabled\">previous </span><br/>";
+
+	//pages	
+	if ($lastpage < 7 + ($adjacents * 2)) { //not enough pages to bother breaking it up
+		for ($counter = 1; $counter <= $lastpage; $counter++) {
+			if ($counter == $page)
+				$pagination.= "<span class=\"current\">$counter</span>";
+			else
+				$pagination.= "<a href=\"$targetpage&page=$counter#rejectreason\">$counter</a>";
+		}
+	}
+	elseif ($lastpage > 5 + ($adjacents * 2)) { //enough pages to hide some
+		//close to beginning; only hide later pages
+		if ($page < 1 + ($adjacents * 2)) {
+			for ($counter = 1; $counter < 4 + ($adjacents * 2); $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage&page=$counter#rejectreason\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage&page=$lpm1#rejectreason\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage&page=$lastpage#rejectreason\">$lastpage</a>";
+		}
+		//in middle; hide some front and some back
+		elseif ($lastpage - ($adjacents * 2) > $page && $page > ($adjacents * 2)) {
+			$pagination.= "<a href=\"$targetpage&page=1#rejectreason\">1</a>";
+			$pagination.= "<a href=\"$targetpage&page=2#rejectreason\">2</a>";
+			$pagination.= "...";
+			for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage&page=$counter#rejectreason\">$counter</a>";
+			}
+			$pagination.= "...";
+			$pagination.= "<a href=\"$targetpage&page=$lpm1#rejectreason\">$lpm1</a>";
+			$pagination.= "<a href=\"$targetpage&page=$lastpage#rejectreason\">$lastpage</a>";
+		}
+		//close to end; only hide early pages
+		else {
+			$pagination.= "<a href=\"$targetpage&page=1\">1</a>";
+			$pagination.= "<a href=\"$targetpage&page=2\">2</a>";
+			$pagination.= "...";
+			for ($counter = $lastpage - (2 + ($adjacents * 2)); $counter <= $lastpage; $counter++) {
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage&page=$counter#rejectreason\">$counter</a>";
+			}
+		}
+	}
+
+
+	if (($page / $limit) < ($counter - 1)) {
+		$pagination.= "<br/><a href=\"$targetpage&page=$next#rejectreason\"> next</a>";
+	} else {
+		$pagination.= "<span class=\"disabled\"><br/> next</span>";
+		$pagination.= "</div>\n";
+	}
+}
+?>
+
+<?php
+
+echo $pagination;
+echo "<a name='rejectreason'></a>";
+
+echo "<a href='" . $this->url() . "#rejectreason'>RESET FORM</a>";
+
+$this->printTable($this->rejectReasonTable);
