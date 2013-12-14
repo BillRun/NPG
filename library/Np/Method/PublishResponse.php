@@ -3,8 +3,8 @@
 /**
  * Np_Method_PublishResponse File
  * 
- * @package Np_Method
- * @subpackage Np_Method_PublishResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_PublishResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -41,7 +41,6 @@ class Np_Method_PublishResponse extends Np_MethodResponse {
 		}
 	}
 
-	
 	public function PostValidate() {
 		$this->setAck($this->validateParams($this->getHeaders()));
 		//first step is GEN
@@ -58,8 +57,7 @@ class Np_Method_PublishResponse extends Np_MethodResponse {
 		}
 		return true;
 	}
-	
-	
+
 	/**
 	 * overridden from parent Np_Method
 	 * updates status and last transaction in requests table 

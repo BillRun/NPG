@@ -3,8 +3,8 @@
 /**
  * Np_Method_ReturnResponse File
  * 
- * @package Np_Method
- * @subpackage Np_Method_ReturnResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_ReturnResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -39,7 +39,7 @@ class Np_Method_ReturnResponse extends Np_MethodResponse {
 			}
 		}
 	}
-	
+
 	public function PostValidate() {
 		$this->setAck($this->validateParams($this->getHeaders()));
 		//first step is GEN
@@ -52,7 +52,7 @@ class Np_Method_ReturnResponse extends Np_MethodResponse {
 //		}
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
 			Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
-			
+
 			return $timer_ack;
 		}
 
@@ -60,7 +60,7 @@ class Np_Method_ReturnResponse extends Np_MethodResponse {
 		$updateArray = array(
 			'last_transaction' => $this->getHeaderField("MSG_TYPE"),
 		);
-		
+
 		// if we received success return_response and we are not the initiator we need to publish it after (so leave it with status on)
 		if ($this->getHeaderField("TO") == Application_Model_General::getSettings('InternalProvider')) {
 			$updateArray['status'] = 0;
@@ -70,12 +70,11 @@ class Np_Method_ReturnResponse extends Np_MethodResponse {
 		$whereArray = array(
 			'request_id =?' => $this->getHeaderField("REQUEST_ID"),
 		);
-		
+
 		if (!$tbl->update($updateArray, $whereArray)) {
 			return false;
 		}
 		return true;
 	}
-	
 
 }

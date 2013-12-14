@@ -3,8 +3,8 @@
 /**
  * Internal Model
  * 
- * @package ApplicationModel
- * @subpackage InternalModel
+ * @package         ApplicationModel
+ * @subpackage      InternalModel
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -12,8 +12,8 @@
 /**
  * Internal Object
  * 
- * @package ApplicationModel
- * @subpackage InternalModel
+ * @package     ApplicationModel
+ * @subpackage  InternalModel
  */
 class Application_Model_Internal {
 
@@ -56,14 +56,13 @@ class Application_Model_Internal {
 	 * @since 2.0
 	 */
 	protected $protocal = 'http';
-	
+
 	/**
 	 * Constructor
 	 * Receives Params and uses setParams to put them in params property
 	 * 
 	 * @param array $params 
 	 */
-
 	public function __construct($params) {
 		$this->setParams($params);
 		if (isset($params['protocol'])) {
@@ -176,14 +175,8 @@ class Application_Model_Internal {
 				$this->params['AUTO_CHECK'] = 1;
 			}
 		}
-		if (isset($this->params['MSG_TYPE']) && $this->params['MSG_TYPE'] == "Check" && Application_Model_General::previousCheck($this->params['NUMBER'])
-			|| $this->params['MSG_TYPE'] == "Inquire_number" //might need to take these off because of standard process flow
-			|| $this->params['MSG_TYPE'] == "Return"
-			|| $this->params['MSG_TYPE'] == "Execute"
-			|| $this->params['MSG_TYPE'] == "Publish"
-			|| $this->params['MSG_TYPE'] == "Cancel_publish"
-			|| $this->params['MSG_TYPE'] == "Up_system"
-			|| $this->params['MSG_TYPE'] == "Down_system") {
+		if (isset($this->params['MSG_TYPE']) && $this->params['MSG_TYPE'] == "Check" && Application_Model_General::previousCheck($this->params['NUMBER']) || $this->params['MSG_TYPE'] == "Inquire_number" //might need to take these off because of standard process flow
+			|| $this->params['MSG_TYPE'] == "Return" || $this->params['MSG_TYPE'] == "Execute" || $this->params['MSG_TYPE'] == "Publish" || $this->params['MSG_TYPE'] == "Cancel_publish" || $this->params['MSG_TYPE'] == "Up_system" || $this->params['MSG_TYPE'] == "Down_system") {
 			$this->params['REQUEST_ID'] = $this->createRequestId();
 		} elseif ($this->params['MSG_TYPE'] == "Check" && !Application_Model_General::previousCheck($this->params['NUMBER'])) {
 			$this->setErrorMsg("the number you have submitted is already in process");
@@ -349,10 +342,10 @@ class Application_Model_Internal {
 	}
 
 	/**
-	 * 
+	 * @TODO: implement send error to internal
 	 */
 	public function SendErrorToInternal() {
-		
+		return TRUE;
 	}
 
 	/**
@@ -378,8 +371,8 @@ class Application_Model_Internal {
 				if (isset($auth['password'])) {
 					$password = (string) $auth['password'];
 					$client->setAuth($user, $password);
-				} 
-					$client->setAuth($user);
+				}
+				$client->setAuth($user);
 			}
 			$client->setMethod(Zend_Http_Client::POST);
 			$response = $client->request();
@@ -391,7 +384,7 @@ class Application_Model_Internal {
 		}
 		return $ret;
 	}
-	
+
 	/**
 	 * create data to post to the internal
 	 * 
@@ -486,7 +479,6 @@ class Application_Model_Internal {
 		if (strtoupper($this->params['MSG_TYPE']) == "DB_SYNCH_RESPONSE") {
 			$ret['file_name'] = $this->params['FILE_NAME'];
 		}
-
 	}
 
 	/**
@@ -496,54 +488,25 @@ class Application_Model_Internal {
 	 * @return string 
 	 */
 	protected function getMethodName($msg_type) {
-		switch ($msg_type) {
-			case 'Check':
-			case 'Check_response':
-				$method = 'check_transfer_availbility';
-				break;
-			case 'Request':
-			case 'Request_response':
-				$method = 'transfer_request';
-				break;
-			case 'Update':
-			case 'Update_response':
-				$method = 'update_transfer_request';
-				break;
-			case 'Cancel':
-			case 'Cancel_response':
-				$method = 'cancel_transfer_request';
-				break;
-			case 'Execute':
-			case 'Execute_response':
-				$method = 'execute_transfer';
-				break;
-			case 'Publish':
-			case 'Publish_response':
-				$method = 'publish';
-				break;
-			case "Cancel_publish":
-			case "Cancel_publish_response":
-				$method = 'cancel_publish';
-				break;
-			case "Return":
-			case "Return_response":
-				$method = 'return';
-				break;
-			case "Inquire_number":
-			case "Inquire_number_response":
-				$method = 'inquire_number';
-				break;
-			case "Up_system":
-				$method = 'up_system';
-				break;
-			case "Down_system":
-				$method = 'down_system';
-				break;
-			default:
-				$method = null;
-				break;
+		// @TODO: make the mapping configurable
+		$mapping = array(
+			'Check' => 'check_transfer_availbility',
+			'Request' => 'transfer_request',
+			'Update' => 'update_transfer_request',
+			'Cancel' => 'cancel_transfer_request',
+			'Execute' => 'execute_transfer',
+			'Publish' => 'publish',
+			'Cancel_publish' => 'cancel_publish',
+			'Return' => 'return',
+			'Inquire_number' => 'inquire_number',
+			'Up_system' => 'up_system',
+			'Down_system' => 'Down_system',
+		);
+		$s = str_replace('_response', '', $msg_type);
+		if (isset($mapping[$s])) {
+			return $mapping[$s];
 		}
-		return $method;
+		return NULL;
 	}
 
 	/**
@@ -563,7 +526,7 @@ class Application_Model_Internal {
 			'TO' => $this->params['FROM'],
 			'REQUEST_RETRY_DATE' => $this->params['RETRY_DATE'],
 			'RETRY_DATE' => Application_Model_General::getDateIso(),
-			'RETRY_NO' => isset($this->params['RETRY_NO'])?$this->params['RETRY_NO']:1,
+			'RETRY_NO' => isset($this->params['RETRY_NO']) ? $this->params['RETRY_NO'] : 1,
 			'VERSION_NO' => Application_Model_General::getSettings("VersionNo"),
 			'NETWORK_TYPE' => Application_Model_General::getSettings('NetworkType'),
 			'NUMBER_TYPE' => "I", //@TODO take from config

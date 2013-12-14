@@ -4,8 +4,8 @@
  * Controller for incoming POST messages from internal (number transactions)
  * The internal is proxy owner which uses the proxy to communicate with other providers
  *
- * @package     ApplicationController
- * @subpackage  InternalController
+ * @package         ApplicationController
+ * @subpackage      InternalController
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -101,4 +101,3 @@ class InternalController extends Zend_Controller_Action {
 	}
 
 }
-

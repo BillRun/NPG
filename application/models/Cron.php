@@ -3,8 +3,8 @@
 /**
  * Cron Model
  * 
- * @package ApplicationModel
- * @subpackage CronModel
+ * @package         ApplicationModel
+ * @subpackage      CronModel
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -47,7 +47,7 @@ class Application_Model_Cron {
 		// the first two conditions will verify it will run only in the first 17 minutes
 		$select->where('transfer_time IS NOT NULL');
 		$select->where('transfer_time <= \'' . Application_Model_General::getTimeInSqlFormat(time()) . '\'');
-		$select->where('transfer_time > \''. Application_Model_General::getTimeInSqlFormat(strtotime($minutes . ' minutes ago')) . '\'');
+		$select->where('transfer_time > \'' . Application_Model_General::getTimeInSqlFormat(strtotime($minutes . ' minutes ago')) . '\'');
 		$select->where('last_transaction IN (?)', $execute_statuses);
 		$select->where("to_provider LIKE '" . Application_Model_General::getSettings('InternalProvider') . "'");
 		$select->where('status = 1');
@@ -59,11 +59,6 @@ class Application_Model_Cron {
 			Application_Model_General::forkProcess("/cron/transfer", $row);
 		}
 		return $ret;
-	}
-
-	// TODO
-	public static function forceExecuteProvider() {
-		
 	}
 
 	/**
@@ -134,26 +129,15 @@ class Application_Model_Cron {
 		$max_minutes = 15;
 
 		$select->where('last_transaction = ?', 'Publish')
-//			->where('transfer_time <= \'' . Application_Model_General::getTimeInSqlFormat() . '\'')
-//			->where('transfer_time > \''. Application_Model_General::getTimeInSqlFormat(strtotime($minutes . ' minutes ago')) . '\'')
-			->where('transfer_time <= \'' . Application_Model_General::getTimeInSqlFormat(strtotime('-' . $min_minutes .' minutes ago')) . '\'')
-			->where('transfer_time > \''. Application_Model_General::getTimeInSqlFormat(strtotime('-' . $max_minutes . ' minutes ago')) . '\'')
-
+			->where('transfer_time <= \'' . Application_Model_General::getTimeInSqlFormat(strtotime('-' . $min_minutes . ' minutes ago')) . '\'')
+			->where('transfer_time > \'' . Application_Model_General::getTimeInSqlFormat(strtotime('-' . $max_minutes . ' minutes ago')) . '\'')
 			->where('status =  1');
 
 		$result = $select->query();
 		while ($row = $result->fetch()) {
-			//            $past_minutes = (time() - strtotime($row['transfer_time'])) / 60;
-			//            if (!$force){ //&& $past_minutes > Application_Model_General::getSettings('minutesToRevertTransfer')) {
-			//				$view[] = array_merge($row, array("status" => "time pasted - revert"));
-			//				//revert!!
-			//				$cmd = "/cron/revert";
-			//			} else {
 			$ret[] = array_merge($row, array("status" => "publish check"));
 			$cmd = "/cron/checkpublish";
 			Application_Model_General::forkProcess($cmd, $row); // for debugging
-//            }
-//			Application_Model_General::forkProcess($cmd, $row);
 		}
 
 		return $ret;
@@ -219,7 +203,6 @@ class Application_Model_Cron {
 		//end of fix bug #5285
 		Application_Model_General::writeToLog($params);
 		$reqModel->ExecuteFromInternal();
-
 	}
 
 	/**
@@ -453,4 +436,3 @@ class Application_Model_Cron {
 	}
 
 }
-

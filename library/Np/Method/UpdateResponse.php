@@ -3,8 +3,8 @@
 /**
  * Np_Method_UpdateResponse File
  * 
- * @package Np_Method
- * @subpackage Np_Method_UpdateResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_UpdateResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -49,10 +49,10 @@ class Np_Method_UpdateResponse extends Np_MethodResponse {
 	 */
 	public function RequestValidateDB($request) {
 		if (isset($request->last_transaction) &&
-				($request->last_transaction == "Request_response" || $request->last_transaction == "Update" ||
-				$request->last_transaction == "Update_response" ||
-				$request->last_transaction == "KD_update" ||
-				$request->last_transaction == "‫‪KD_update_response‬‬")) {
+			($request->last_transaction == "Request_response" || $request->last_transaction == "Update" ||
+			$request->last_transaction == "Update_response" ||
+			$request->last_transaction == "KD_update" ||
+			$request->last_transaction == "‫‪KD_update_response‬‬")) {
 			return parent::RequestValidateDB($request);
 		}
 		return false;
@@ -70,7 +70,7 @@ class Np_Method_UpdateResponse extends Np_MethodResponse {
 		if ($this->checkApprove() === FALSE) {
 			return FALSE;
 		}
-		
+
 		$trxno = $this->getBodyField("REQUEST_TRX_NO");
 		$msg_type = $this->getHeaderField("MSG_TYPE");
 		$updateArray = array(

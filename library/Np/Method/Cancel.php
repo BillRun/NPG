@@ -3,8 +3,8 @@
 /**
  * Np_Method_Cancel File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Cancel
+ * @package         Np_Method
+ * @subpackage      Np_Method_Cancel
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -38,12 +38,12 @@ class Np_Method_Cancel extends Np_Method {
 	 */
 	public function RequestValidateDB($request) {
 		if (parent::RequestValidateDB($request) &&
-				($request->last_transaction == "Cancel" ||
-				$request->last_transaction == "Cancel_response" ||
-				$request->last_transaction == "Request_response" ||
-				$request->last_transaction == "Update_response" ||
-				$request->last_transaction == "KD_update" ||
-				$request->last_transaction == "‫‪KD_update_response‬‬" )
+			($request->last_transaction == "Cancel" ||
+			$request->last_transaction == "Cancel_response" ||
+			$request->last_transaction == "Request_response" ||
+			$request->last_transaction == "Update_response" ||
+			$request->last_transaction == "KD_update" ||
+			$request->last_transaction == "‫‪KD_update_response‬‬" )
 		) {
 			return true;
 		}
@@ -100,7 +100,7 @@ class Np_Method_Cancel extends Np_Method {
 			return $tbl->update($updateArray, $whereArray);
 		}
 	}
-	
+
 	public function createXml() {
 		$xml = parent::createXml();
 		$msgType = $this->getHeaderField('MSG_TYPE');
@@ -108,6 +108,5 @@ class Np_Method_Cancel extends Np_Method {
 		$xml->$msgType = "";
 		return $xml;
 	}
-
 
 }

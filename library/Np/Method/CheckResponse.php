@@ -3,8 +3,8 @@
 /**
  * Np_Method_CheckResponse File
  * 
- * @package Np_Method
- * @subpackage Np_Method_CheckResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_CheckResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -52,14 +52,13 @@ class Np_Method_CheckResponse extends Np_MethodResponse {
 	 * @return bool 
 	 */
 	public function RequestValidateDB($request) {
-			if (parent::RequestValidateDB($request) &&
-				$request->last_transaction == "Check" || $request->last_transaction == "Check_response" ) {
-				return true;
+		if (parent::RequestValidateDB($request) &&
+			$request->last_transaction == "Check" || $request->last_transaction == "Check_response") {
+			return true;
 		}
 		return false;
-		
 	}
-	
+
 	protected function checkApprove() {
 		// reset request id if check response not succeed
 		if (!parent::checkApprove()) {
@@ -75,7 +74,7 @@ class Np_Method_CheckResponse extends Np_MethodResponse {
 		}
 		return true;
 	}
-	
+
 	public function createXml() {
 		$xml = parent::createXml();
 		$xml->$msgType->essentialInfo1 = '';
@@ -83,7 +82,8 @@ class Np_Method_CheckResponse extends Np_MethodResponse {
 		$xml->$msgType->essentialInfo3 = '';
 		$xml->$msgType->essentialInfo4 = '';
 		$xml->$msgType->essentialInfo5 = '';
-		
+
 		return $xml;
 	}
+
 }

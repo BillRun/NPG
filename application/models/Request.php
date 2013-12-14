@@ -4,8 +4,8 @@
  * Request Model
  * Model for Number Transaction operations.
  * 
- * @package ApplicationModel
- * @subpackage RequestModel
+ * @package         ApplicationModel
+ * @subpackage      RequestModel
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -13,8 +13,8 @@
 /**
  * Request Object
  * 
- * @package ApplicationModel
- * @subpackage RequestModel
+ * @package     ApplicationModel
+ * @subpackage  RequestModel
  */
 class Application_Model_Request {
 
@@ -67,8 +67,8 @@ class Application_Model_Request {
 				die(json_encode($response));
 			}
 			if (!isset($params['FROM']) || !isset($params['TO'])) {
-					$params['FROM'] = $values['to_provider'];
-					$params['TO'] = $values['from_provider'];
+				$params['FROM'] = $values['to_provider'];
+				$params['TO'] = $values['from_provider'];
 			}
 			if (!isset($params['TRX_NO'])) {
 				$transaction = Application_Model_General::getTransactions($params['REQUEST_ID'], $params['MSG_TYPE']);
@@ -122,14 +122,11 @@ class Application_Model_Request {
 				if ($msg_type[0] == "Publish") {
 					//if is publish response
 					//don't pass to Internal - it is saved and taking care of in our system
-
 					$this->request->setAck("Ack00");
-//                    $this->ExecuteResponse();
 				}
 				$this->ExecuteResponse();
 			} elseif (count($msg_type) > 1 && $msg_type[1] == 'publish' && $msg_type[2] == 'response') {
 				// if is cancel publish response
-//				$this->saveTransactionsDB();
 				$this->ExecuteResponse();
 			} elseif ($this->request->getHeaderField("MSG_TYPE") == "Inquire_number_response") {
 				// if is inquire publish response
@@ -149,10 +146,8 @@ class Application_Model_Request {
 			// if doesnt validate
 //			$this->saveTransactionsDB();
 		}
-//		$ret = $this->request->getAck();
 		// TODO oc666: not required for all cases (set ack as reject reason code)
 		return $this->request->setRejectReasonCode($this->request->getAck());
-//		return $this->request->getAck();
 	}
 
 	/**
@@ -183,7 +178,6 @@ class Application_Model_Request {
 				$response->status = "";
 			}
 		} else {
-//			$this->saveTransactionsDB();
 			if ($validate === FALSE) {
 				$validate = "Ack01";
 			}
@@ -205,14 +199,12 @@ class Application_Model_Request {
 	 * @return void 
 	 */
 	public function ExecuteResponse() {
-//		Application_Model_General::writeToLog($this->data);
 		$validate = $this->request->PostValidate();
 		if ($validate === true) {
 			$some = $this->request->getAck();
 
 			$this->request->setCorrectAck();
 			$this->saveDB();
-//            $this->saveTransactionsDB();
 			$sendToInternal = new Application_Model_Internal($this->data);
 			$some = $this->request->getAck();
 
@@ -231,7 +223,6 @@ class Application_Model_Request {
 				}
 			}
 		} else {
-//			$this->saveTransactionsDB();
 			if ($validate !== FALSE) {
 
 				$ret = $validate;
@@ -372,8 +363,8 @@ class Application_Model_Request {
 	/**
 	 * If Status TRUE update request in requests table TRUE
 	 * @param bool $status 
-	 * @TODO need to clear out the function that calling this function to 
-	 * 		use the right value of the argument. For example when
+	 * @todo need to clear out the function that calling this function to 
+	 * 		use the right value of the argument.
 	 * 		For example when request get reject reason code need to input FALSE
 	 * 		check: calling from executeReponse method
 	 */
@@ -388,29 +379,13 @@ class Application_Model_Request {
 		}
 	}
 
-	function getFieldIfExists($param, $getFrom = "BODY") {
-
-		if ($getFrom == "BODY") {
-			$retParam = $this->request->getBodyField($param);
-		} else {
-			$retParam = $this->request->getHeaderField($param);
-		}
-
-		if (isset($retParam)) {
-			$res = $retParam;
-		} else {
-			$res = NULL;
-		}
-		return $res;
-	}
-
 	/**
 	 * Makes XML for SOAP Response Body
 	 *  
 	 */
 	protected function setResponseXmlBody() {
 
-		$xml = $this->request->xml();
+		$xml = $this->request->createXml();
 		$xmlString = $xml->asXML();
 		$dom = new DOMDocument();
 		$dom->loadXML($xmlString);
@@ -449,15 +424,10 @@ class Application_Model_Request {
 			$url = $this->getRecipientUrl();
 			$trx_no = $this->request->getHeaderField("TRX_NO");
 			$request_id = $this->request->getHeaderField("REQUEST_ID");
-//			$explodethis = substr($request_id, 4, -15);
-//			$explode_id = explode($explodethis, $request_id);
-//			$request_id = implode($message_recipient_code, $explode_id);
-//			$this->request->setHeader("REQUEST_ID", $request_id);
 			// IN ORDER TO SAVE THE PUBLISHES TO EACH PROVIDER   
 			// TODO oc666: why need to save transaction here?
 			$client = $this->getSoapClient($url);
 			$ret = $this->sendAgain($client);
-//			return $ret;
 		}
 		if (strtoupper($lastTransaction) == "PUBLISH" && strtoupper($message_recipient_code) == "XX") {
 			$request_id = $this->request->getHeaderField("REQUEST_ID");
@@ -471,20 +441,6 @@ class Application_Model_Request {
 			$cmd = "/cron/checkpublish";
 			Application_Model_General::forkProcess($cmd, $row); // for debugging
 			return true;
-//			$providers = Application_Model_General::getSettings('provider');
-//			foreach ($providers as $provider => $value) {
-////				$request_id = $this->request->getHeaderField("REQUEST_ID");
-//				$explodethis = substr($request_id, 4, -15);
-//				$explode_id = explode($explodethis, $request_id);
-//				$request_id = implode($provider, $explode_id);
-//				$this->request->setHeader("TO", $provider);
-//				$this->request->setHeader("REQUEST_ID", $request_id);
-//				$url = $value;
-//				$this->saveTransactionsDB();
-//
-//				$client = $this->getSoapClient($url);
-//				$ret = $this->sendAgain($client);
-//			}
 		} else {
 			$url = $this->getRecipientUrl();
 			if ($url == "QA") {
@@ -529,14 +485,13 @@ class Application_Model_Request {
 
 	function getSoapClient($url) {
 		$client = new Zend_Soap_Client(
-				Application_Model_General::getWsdl(),
-				array(
-					'uri' => $url,
-					'location' => $url,
-					'soap_version' => SOAP_1_1,
-					'encoding' => 'UTF-8',
-					'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_DEFLATE
-				)
+			Application_Model_General::getWsdl(), array(
+			'uri' => $url,
+			'location' => $url,
+			'soap_version' => SOAP_1_1,
+			'encoding' => 'UTF-8',
+			'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_DEFLATE
+			)
 		);
 		return $client;
 	}
@@ -568,12 +523,11 @@ class Application_Model_Request {
 		return $ret;
 	}
 
-//	//@TODO change $data input to $this
-//	/**
-//	 * ResponseArray creates Array for Internal's SOAP Response
-//	 * 
-//	 * @return array $soapMsg 
-//	 */
+	/**
+	 * Creates array for internal's SOAP Response
+	 * 
+	 * @return array $soapMsg 
+	 */
 	protected function responseArray() {
 		$soapMsg = array(
 			'NP_MESSAGE' => array(
@@ -601,9 +555,6 @@ class Application_Model_Request {
 				//update db - status OK
 				if ($ack->NP_ACK->ACK_CODE == "Ack00") {
 					Application_Model_General::updateTransactionsAck($this->request->getHeaderField('TRX_NO'), $ack->NP_ACK->ACK_CODE);
-//					$this->updateDB_ack(true);
-				} else {
-//					$this->updateDB_ack(false);
 				}
 			} else {
 				if (strtoupper($this->request->getHeaderField('MSG_TYPE')) == 'CHECK') {
@@ -613,7 +564,6 @@ class Application_Model_Request {
 				return false;
 			}
 		} else {
-//			$this->updateDB_ack(false);
 			$response = new Application_Model_Internal($this->data);
 			$response->SendErrorToInternal();
 		}

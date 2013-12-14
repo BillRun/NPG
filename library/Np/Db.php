@@ -4,8 +4,8 @@
  * Np_Db class handle master-slave replication
  * 
  * 
- * @package Np_Db
- * @subpackage Np_Db
+ * @package         Np_Db
+ * @subpackage      Np_Db
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -13,8 +13,8 @@
 /**
  * Np_Db Class Definition
  * 
- * @package Np_Db
- * @subpackage Np_Db
+ * @package     Np_Db
+ * @subpackage  Np_Db
  */
 Class Np_Db {
 

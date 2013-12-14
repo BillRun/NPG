@@ -4,7 +4,7 @@
  * Np_Method Class
  * Model for Number Transaction operations.
  * 
- * @package Np_Method
+ * @package         Np_Method
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -12,7 +12,7 @@
 /**
  * Np_Method Class Definition
  * 
- * @package Np_Method
+ * @package  Np_Method
  */
 abstract class Np_Method {
 
@@ -225,7 +225,6 @@ abstract class Np_Method {
 		return NULL;
 	}
 
-	//
 	/**
 	 * getBodyField returns aspecific body field from the parsed data
 	 * 
@@ -238,7 +237,7 @@ abstract class Np_Method {
 		}
 		return NULL;
 	}
-	
+
 	/**
 	 * create xml for provider response
 	 * @return \SimpleXMLElement
@@ -346,7 +345,7 @@ abstract class Np_Method {
 			);
 			if (in_array($timer_ack, $timers_array)) {
 				Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
-			} 
+			}
 
 
 			return $timer_ack;
@@ -373,9 +372,7 @@ abstract class Np_Method {
 	 */
 	protected function RequestValidateDB($request) {
 
-		if (is_object($request) && property_exists($request, "status")
-			&& $request->status
-			&& property_exists($request, "last_transaction")) {
+		if (is_object($request) && property_exists($request, "status") && $request->status && property_exists($request, "last_transaction")) {
 			return true;
 		}
 		return false;

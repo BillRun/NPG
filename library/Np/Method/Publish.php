@@ -3,8 +3,8 @@
 /**
  * Np_Method_Publish File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Publish
+ * @package         Np_Method
+ * @subpackage      Np_Method_Publish
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -120,5 +120,5 @@ class Np_Method_Publish extends Np_Method {
 		}
 		return $xml;
 	}
-}
 
+}

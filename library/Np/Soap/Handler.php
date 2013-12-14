@@ -4,8 +4,8 @@
  * Soap Handler Class 
  * 
  * 
- * @package Np_Soap
- * @subpackage Np_Soap
+ * @package         Np_Soap
+ * @subpackage      Np_Soap
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -13,8 +13,8 @@
 /**
  * Np_Db Class Definition
  * 
- * @package Np_Soap
- * @subpackage Np_Soap
+ * @package     Np_Soap
+ * @subpackage  Np_Soap
  */
 class Np_Soap_Handler {
 
@@ -41,8 +41,7 @@ class Np_Soap_Handler {
 		if (Application_Model_General::getSettings('EnableRequestLog')) {
 			Application_Model_General::logRequestResponse($params, $ack, $data['REQUEST_ID'], '[Input] ');
 		}
-		if ($ack === FALSE
-			|| (strpos(strtolower($ack), "ack") === FALSE)) {
+		if ($ack === FALSE || (strpos(strtolower($ack), "ack") === FALSE)) {
 
 			$ack = "Ack00";
 		}
@@ -194,10 +193,8 @@ class Np_Soap_Handler {
 				}
 				$data['REQUEST_TRX_NO'] = (string) $xmlArray->requestTrxNo;
 				$data['REQUEST_RETRY_DATE'] = (string) $xmlArray->requestRetryDate;
-
 		}
 		return $data;
 	}
 
 }
-

@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Controller for Error Handling
  * 
- * @package ApplicationController
- * @subpackage ErrorController
+ * @package         ApplicationController
+ * @subpackage      ErrorController
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -15,6 +16,7 @@
  * @subpackage ErrorController
  */
 class ErrorController extends Zend_Controller_Action {
+
 	/**
 	 * Error Controller Class
 	 * Index Action - "http://SERVER/error/eror"
@@ -62,6 +64,7 @@ class ErrorController extends Zend_Controller_Action {
 
 		$this->view->request = $errors->request;
 	}
+
 	/**
 	 * method to retreive log object
 	 * 
@@ -77,4 +80,3 @@ class ErrorController extends Zend_Controller_Action {
 	}
 
 }
-

@@ -4,7 +4,7 @@
  * Np_Method Class
  * Model for Number Transaction operations.
  * 
- * @package Np_Method
+ * @package         Np_Method
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -63,17 +63,17 @@ abstract class Np_MethodResponse extends Np_Method {
 
 		$msgType = $this->getHeaderField('MSG_TYPE');
 
-		if ($this->request->getBodyField("APPROVAL_IND") === "Y") {
+		if ($this->getBodyField("APPROVAL_IND") === "Y") {
 			$xml->$msgType->positiveApproval;
 			$xml->$msgType->positiveApproval->approvalInd = "Y";
 		} else {
 			$xml->$msgType->negativeApproval;
 			$xml->$msgType->negativeApproval->approvalInd = "N";
-			$rejectReasonCode = $this->getFieldIfExists('REJECT_REASON_CODE');
-			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL)?$rejectReasonCode:'';
+			$rejectReasonCode = $this->getBodyField('REJECT_REASON_CODE');
+			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL) ? $rejectReasonCode : '';
 		}
-		$xml->$msgType->requestTrxNo = $this->getFieldIfExists('REQUEST_TRX_NO');
-		$xml->$msgType->requestRetryDate = $this->getFieldIfExists('REQUEST_RETRY_DATE');
+		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
+		$xml->$msgType->requestRetryDate = $this->getBodyField('REQUEST_RETRY_DATE');
 
 		return $xml;
 	}

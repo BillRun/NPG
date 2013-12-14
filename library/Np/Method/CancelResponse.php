@@ -3,8 +3,8 @@
 /**
  * Np_Method_CancelResponse File
  * 
- * @package Np_Method
- * @subpackage Np_Method_CancelResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_CancelResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */

@@ -4,8 +4,8 @@
  * Np_Method_KDUpdateResponse File
  * Model for Number Transaction operations.
  * 
- * @package Np_Method
- * @subpackage Np_Method_KDUpdateResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_KDUpdateResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */

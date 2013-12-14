@@ -3,8 +3,8 @@
 /**
  * Np_Method_Return File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Return
+ * @package         Np_Method
+ * @subpackage      Np_Method_Return
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -74,15 +74,15 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 			$flags->inquire = $this->getBodyField("CURRENT_OPERATOR");
 
 			$data = array(
-			    'last_transaction' => $this->getHeaderField("MSG_TYPE"),
-			    'status' => 0,
-			    'flags' => json_encode($flags),
+				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
+				'status' => 0,
+				'flags' => json_encode($flags),
 			);
-			
+
 			$whereArray = array(
-			    'request_id =?' => $this->getHeaderField("REQUEST_ID"),
+				'request_id =?' => $this->getHeaderField("REQUEST_ID"),
 			);
-			
+
 			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 			$ret = $tbl->update($data, $whereArray);
 

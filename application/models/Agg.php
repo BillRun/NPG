@@ -4,8 +4,8 @@
  * General Model
  * Model for various Site-wide operations.
  * 
- * @package ApplicationModel
- * @subpackage GeneralModel
+ * @package         ApplicationModel
+ * @subpackage      GeneralModel
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -111,8 +111,8 @@ class Application_Model_Agg {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 
 		$select = $tbl->select('reject_reason_code')
-				->order("id DESC")
-				->limit(1);
+			->order("id DESC")
+			->limit(1);
 		$select->where('request_id=?', $reqID);
 		$result = $select->query()->fetchObject();   //take the last one
 
@@ -138,10 +138,10 @@ class Application_Model_Agg {
 		$select = $tbl->select();
 //		die($date);
 		$select->where('`process_type` = ?', $processType)
-				->where('`process_parent_status` = ?', $status)
-				->where('`agg_date` = ?', $date)
-				->where('`from` = ?', $from)
-				->where('`to` = ?', $to);
+			->where('`process_parent_status` = ?', $status)
+			->where('`agg_date` = ?', $date)
+			->where('`from` = ?', $from)
+			->where('`to` = ?', $to);
 //		die($select->__toString());
 		$result = $select->query()->fetchAll();   //take the last one
 		error_log('$result : ' . print_r($result, 1));
@@ -281,24 +281,23 @@ class Application_Model_Agg {
 //                                    }
 		//->limit($start, $end)
 		$select = $tbl->select();
-		
-		if ( $provider != FALSE && !empty($provider)) {
+
+		if ($provider != FALSE && !empty($provider)) {
 			$select->where("`from` = ?", $provider);
 		}
-		
-		if ( $recipient != FALSE || !empty($recipient) ) {
+
+		if ($recipient != FALSE || !empty($recipient)) {
 			$select->where("recipient = ?", $recipient);
 		}
-		if ( $dateFix == FALSE || empty($dateFix)) {
+		if ($dateFix == FALSE || empty($dateFix)) {
 			$dateFix = "00-00-00 00:00:00";
-		}
-		else{
+		} else {
 			$select->where("agg_date > ?", $dateFix);
 		}
 
 		$result = $select->query()->fetchAll();
-                
-				
+
+
 		return $result;
 	}
 
@@ -307,7 +306,7 @@ class Application_Model_Agg {
 	 * 
 	 * @return object with db data 
 	 */
-	static public function getTimersActivityRows($date = FALSE, $provider = FALSE, $recipient = FALSE, $limitstart=FALSE, $limit=FALSE) {
+	static public function getTimersActivityRows($date = FALSE, $provider = FALSE, $recipient = FALSE, $limitstart = FALSE, $limit = FALSE) {
 		if ($date != FALSE) {
 			$dateFix = $date . " 00:00:00";
 //                                    var_dump($dateFix);
@@ -321,7 +320,7 @@ class Application_Model_Agg {
 //                                    var_dump($dateFix);
 			$select = $tbl->select()
 //				->where('waiting_op =?',$recipient)
-							->where('transaction_time > ?', $date)->limit($limitstart, $limit);
+					->where('transaction_time > ?', $date)->limit($limitstart, $limit);
 		} elseif (!$dateFix && !$provider && !$recipient) {
 			$select = $tbl->select();
 //                                        ->where(' `transaction_time`  = 0')
@@ -360,9 +359,9 @@ class Application_Model_Agg {
 		$date = Application_Model_General::getTimeInSqlFormatAgg($strTime);
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select()->where("last_requests_time > ?", $date)
-				->where("timer_type =?", $timer)
-				->where("obligated_op =?", $obligatedOp)
-				->where("waiting_op =?", $waitingOp);
+			->where("timer_type =?", $timer)
+			->where("obligated_op =?", $obligatedOp)
+			->where("waiting_op =?", $waitingOp);
 		$result = $select->query()->fetchObject();
 		if (!$result) {
 			return FALSE;
@@ -423,8 +422,8 @@ class Application_Model_Agg {
 		$date = Application_Model_General::getTimeInSqlFormatAgg($strTime);
 		$tbl = new Application_Model_DbTable_ActivityTimers(Np_Db::slave());
 		$select = $tbl->select()
-				->where("transaction_time > ?", $date)
-				->where("timer =?", $timer);
+			->where("transaction_time > ?", $date)
+			->where("timer =?", $timer);
 		$result = $select->query()->fetchAll();
 		return count($result);
 	}
@@ -446,8 +445,8 @@ class Application_Model_Agg {
 		$date = Application_Model_General::getTimeInSqlFormatAgg($strTime);
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select()
-				->where("last_transactions_time > ?", $date)
-				->where("message_type =?", $msg_type);
+			->where("last_transactions_time > ?", $date)
+			->where("message_type =?", $msg_type);
 		$result = $select->query()->fetchAll();
 		return $result;
 	}
@@ -457,7 +456,7 @@ class Application_Model_Agg {
 		$date = Application_Model_General::getTimeInSqlFormatAgg($strTime);
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select()
-				->where("last_transactions_time > ?", $date);
+			->where("last_transactions_time > ?", $date);
 		$allRows = $select->query()->fetchAll();
 		$counter = 0;
 		$messageTypes = array();
@@ -492,7 +491,7 @@ class Application_Model_Agg {
 				}
 
 				$faultCount++; //increment the number of faults
-				$faultArray[$obligated][$waiting][$value['reject_reason_code']]['timeouts']++;
+				$faultArray[$obligated][$waiting][$value['reject_reason_code']]['timeouts'] ++;
 			}
 		}
 
@@ -511,4 +510,3 @@ class Application_Model_Agg {
 	}
 
 }
-

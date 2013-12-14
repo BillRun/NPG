@@ -4,8 +4,8 @@
  * Timers Class File
  * Model for Number Transaction operations.
  * 
- * @package Np_Method
- * @subpackage Timers
+ * @package         Np_Method
+ * @subpackage      Timers
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -219,8 +219,8 @@ class Np_Timers {
 
 		// the first timeout should return true or false (no further use for the timer code)
 		if ($isTimeout === TRUE) {
-				Application_Model_General::writeToTimersActivity($request->getHeaders(), self::$failure);
-				
+			Application_Model_General::writeToTimersActivity($request->getHeaders(), self::$failure);
+
 			if (self::$debug) {
 				error_log("Timer is not valid: " . $ret);
 			}

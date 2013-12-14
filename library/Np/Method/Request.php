@@ -3,8 +3,8 @@
 /**
  * Np_Method_Request File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Request
+ * @package         Np_Method
+ * @subpackage      Np_Method_Request
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -46,14 +46,13 @@ class Np_Method_Request extends Np_Method {
 	 */
 	public function RequestValidateDB($request) {
 		if (parent::RequestValidateDB($request) &&
-				($request->last_transaction == "Request" || $request->last_transaction == "Request_response" ||
-				$request->last_transaction == "Check_response")) {
+			($request->last_transaction == "Request" || $request->last_transaction == "Request_response" ||
+			$request->last_transaction == "Check_response")) {
 			return true;
 		}
 		return false;
 	}
 
-	
 	public function PostValidate() {
 		$this->setAck($this->validateParams($this->getHeaders()));
 		//first step is GEN
@@ -66,13 +65,12 @@ class Np_Method_Request extends Np_Method {
 		}
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
 			Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
-			
+
 			return $timer_ack;
 		}
 		return true;
 	}
-	
-	
+
 	/**
 	 * overridden from parent
 	 * 
@@ -92,7 +90,7 @@ class Np_Method_Request extends Np_Method {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 		return $tbl->update($updateArray, $whereArray);
 	}
-	
+
 	/**
 	 * method to create xml from the request
 	 * 
@@ -100,13 +98,13 @@ class Np_Method_Request extends Np_Method {
 	 */
 	public function createXml() {
 		$xml = parent::createXml();
-		
+
 		$msgType = $this->getHeaderField('MSG_TYPE');
-		
-		$xml->$msgType->portingDateTime = Application_Model_General::getDateIso($this->getBodyField('PORT_TIME'));;
-		
+
+		$xml->$msgType->portingDateTime = Application_Model_General::getDateIso($this->getBodyField('PORT_TIME'));
+		;
+
 		return $xml;
 	}
-
 
 }

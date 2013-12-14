@@ -23,7 +23,7 @@ class Application_Model_Reports {
 		$db = Np_Db::slave();
 		$select = $db->select();
 		$select->from($table_name, array())
-				->columns(array('amount' => new Zend_Db_Expr('COUNT(*)')));
+			->columns(array('amount' => new Zend_Db_Expr('COUNT(*)')));
 		$total = $db->fetchOne($select);
 
 		return($total);
@@ -38,45 +38,43 @@ class Application_Model_Reports {
 		}
 		$select = $tbl->select()->from(array('T' => 'Transactions'), "*")->distinct();
 		$select->where('ack_code = ?', "Err")
-				->where('last_transactions_time > ?', $date)
-				->order('id DESC')->limit($start, $end);
+			->where('last_transactions_time > ?', $date)
+			->order('id DESC')->limit($start, $end);
 		$result = $select->query()->fetchAll();   //take the last one
 		if ($result) {
-			foreach($result as $a_result => $val){
+			foreach ($result as $a_result => $val) {
 				$target = $result[$a_result]['target'];
 				$trx_no = $result[$a_result]['trx_no'];
 				unset($result[$a_result]['reject_reason_code']);
 				unset($result[$a_result]['donor']);
-				if($result[$a_result]['message_type'] == "Message Sent"){
-					$send_mail="Mail Sent";
+				if ($result[$a_result]['message_type'] == "Message Sent") {
+					$send_mail = "Mail Sent";
+				} else {
+					$send_mail = "<a href='/np/emailsettings?trx_no=" . $trx_no . "&provider=" . $target . "'>Send Mail</a>";
 				}
-				else{
-					$send_mail="<a href='/np/emailsettings?trx_no=".$trx_no."&provider=".$target."'>Send Mail</a>";
-				}
-				$result[$a_result]['mail']=$send_mail;
+				$result[$a_result]['mail'] = $send_mail;
 			}
 			return $result;
 		}
 		return null;
 	}
 
-	public static function getTransactionsByRejectReasonCode($rejectreason=FALSE, $thedate=FALSE, $limitstart=FALSE, $limitend=FALSE, $provider=FALSE, $to=FALSE) {
-		if($thedate == FALSE){
-			$thedate = "0000-00-00 00:00:00"; 
-		}
-		else{
-			
+	public static function getTransactionsByRejectReasonCode($rejectreason = FALSE, $thedate = FALSE, $limitstart = FALSE, $limitend = FALSE, $provider = FALSE, $to = FALSE) {
+		if ($thedate == FALSE) {
+			$thedate = "0000-00-00 00:00:00";
+		} else {
+
 			$thedate = strtotime($thedate);
-			$thedate = date('Y-m-d H:i:s',$thedate);
+			$thedate = date('Y-m-d H:i:s', $thedate);
 		}
-		
+
 //		var_dump($thedate);
 //		die;
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select();
-		
+
 		if (isset($provider) && !empty($provider) && $provider != FALSE) {
-			$provider = $provider."%";
+			$provider = $provider . "%";
 			$select->where('trx_no LIKE ?', $provider);
 		}
 		if (isset($thedate) && !empty($thedate) && $thedate != FALSE) {
@@ -94,20 +92,20 @@ class Application_Model_Reports {
 		if ($limitend == FALSE) {
 			$limitend = 0;
 		}
-		if($limitend == $limitstart){
-			$limitstart = 0 ; 
+		if ($limitend == $limitstart) {
+			$limitstart = 0;
 		}
 
 
 		$select->where("reject_reason_code = ? ", $rejectreason)
-				->limit($limitend, $limitstart);
+			->limit($limitend, $limitstart);
 		$results = $select->query()->fetchAll();
 
 
 		return $results;
 	}
 
-	public static function getNumberOfPorts($port_type="IN") {
+	public static function getNumberOfPorts($port_type = "IN") {
 		if ($port_type == "IN") {
 			$port_type = 'to_provider';
 		} else {
@@ -117,19 +115,18 @@ class Application_Model_Reports {
 
 		$select = $tbl->select();
 		$select->where("last_transaction = ? ", "Publish_response")
-				->where($port_type . " = ? ", "GT");
+			->where($port_type . " = ? ", "GT");
 
 		$results = $select->query()->fetchAll();
 
 		return count($results);
 	}
 
-	
-	public static function deleteProviderEmailRow($provider){
+	public static function deleteProviderEmailRow($provider) {
 		$tbl = new Application_Model_DbTable_EmailSettings(Np_Db::slave());
 		$where_arr = array('`providername` = ?' => $provider);
 		$res = $tbl->delete($where_arr);
-		return $res ;  
-		
+		return $res;
 	}
+
 }

@@ -3,8 +3,8 @@
 /**
  * Np_Method_CancelPublishResponse File
  * 
- * @package Np_Method
- * @subpackage Np_Method_CancelPublishResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_CancelPublishResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -46,8 +46,7 @@ class Np_Method_CancelPublishResponse extends Np_MethodResponse {
 	 * 
 	 * @return bool 
 	 */
-                    
-        public function PostValidate() {
+	public function PostValidate() {
 		$this->setAck($this->validateParams($this->getHeaders()));
 		//first step is GEN
 		if (!$this->checkDirection()) {
@@ -63,8 +62,7 @@ class Np_Method_CancelPublishResponse extends Np_MethodResponse {
 		}
 		return true;
 	}
-        
-        
+
 //	public function RequestValidateDB($request) {
 //		if (parent::RequestValidateDB($request) &&
 //				$request->last_transaction == "Cancel_publish") {
@@ -72,8 +70,8 @@ class Np_Method_CancelPublishResponse extends Np_MethodResponse {
 //		}
 //		return false;
 //	}
-	
-	
+
+
 	public function saveToDB() {
 		if ($this->checkApprove() === TRUE) {
 			$updateArray = array(

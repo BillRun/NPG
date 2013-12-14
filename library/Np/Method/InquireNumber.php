@@ -3,8 +3,8 @@
 /**
  * Np_Method_Return File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Return
+ * @package         Np_Method
+ * @subpackage      Np_Method_Return
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -39,13 +39,11 @@ class Np_Method_InquireNumber extends Np_Method {
 			}
 		}
 	}
-	
-			protected function ValidateDB() {
+
+	protected function ValidateDB() {
 		return TRUE;
 	}
-	
-	
-	
+
 	public function PostValidate() {
 		$this->setAck($this->validateParams($this->getHeaders()));
 		//first step is GEN
@@ -54,7 +52,6 @@ class Np_Method_InquireNumber extends Np_Method {
 		}
 		//HOW TO CHECK Gen05
 //		if (!$this->ValidateDB()) {
-
 //			return "Gen07";
 //		}
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
@@ -63,7 +60,7 @@ class Np_Method_InquireNumber extends Np_Method {
 		}
 		return true;
 	}
-	
+
 	public function saveToDB() {
 		if ($this->getHeaderField("TRX_NO")) {
 			//this is a request from provider!
@@ -83,7 +80,7 @@ class Np_Method_InquireNumber extends Np_Method {
 		//else //this request is from cron! internal is sending to all providers
 		//don't save in Requests DB
 	}
-	
+
 	/**
 	 * method to create xml from the request
 	 * 

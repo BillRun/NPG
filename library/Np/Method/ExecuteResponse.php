@@ -3,8 +3,8 @@
 /**
  * Np_Method_ExecuteResponse File
  * 
- * @package Np_Method
- * @subpackage Np_Method_ExecuteResponse
+ * @package         Np_Method
+ * @subpackage      Np_Method_ExecuteResponse
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -26,7 +26,7 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 	 * @param array $options 
 	 */
 	protected function __construct($options) {
-		
+
 		parent::__construct($options);
 
 		//SET BODY 
@@ -44,7 +44,6 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 		}
 	}
 
-	
 	public function PostValidate() {
 		$this->setAck($this->validateParams($this->getHeaders()));
 		//first step is GEN
@@ -61,7 +60,7 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 		}
 		return true;
 	}
-		
+
 	/**
 	 * updates status and connect time in requests by request_id and last transaction
 	 * 

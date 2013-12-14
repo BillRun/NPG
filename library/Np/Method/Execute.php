@@ -3,8 +3,8 @@
 /**
  * Np_Method_Execute File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Execute
+ * @package         Np_Method
+ * @subpackage      Np_Method_Execute
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -40,4 +40,3 @@ class Np_Method_Execute extends Np_Method {
 	}
 
 }
-

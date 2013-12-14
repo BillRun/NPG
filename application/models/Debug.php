@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
@@ -143,8 +144,8 @@ class Application_Model_Debug {
 				);
 			} else {
 				$form->addElement(
-				'hidden', $key, array(
-				'value' => $val,
+					'hidden', $key, array(
+					'value' => $val,
 				));
 			}
 		}
@@ -167,19 +168,19 @@ class Application_Model_Debug {
 		unset($row['id']);
 		$table = $row['table'];
 		unset($row['table']);
-		
+
 		// date fields empty should be set to null, else they will set to 00-00-00 00:00:00
 		$date_fields_array = array(
 			'transfer_time',
 			'disconnect_time',
 			'connect_time',
 		);
-		foreach($date_fields_array as $field) {
+		foreach ($date_fields_array as $field) {
 			if (empty($row[$field])) {
 				$row[$field] = null;
 			}
 		}
-		
+
 		$table_class = 'Application_Model_DbTable_' . ucfirst($table);
 		if (class_exists($table_class)) {
 			$table_object = new $table_class(Np_Db::master());
@@ -190,4 +191,5 @@ class Application_Model_Debug {
 			sleep(1.5);
 		}
 	}
+
 }

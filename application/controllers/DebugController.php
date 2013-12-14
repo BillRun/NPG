@@ -99,6 +99,6 @@ class DebugController extends Zend_Controller_Action {
 			$this->view->form = $form;
 		}
 		$this->view->headLink()->appendStylesheet(Application_Model_General::getBaseUrl() . '/css/style.css');
-
 	}
+
 }

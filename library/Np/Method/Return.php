@@ -3,8 +3,8 @@
 /**
  * Np_Method_Return File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Return
+ * @package         Np_Method
+ * @subpackage      Np_Method_Return
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -56,8 +56,7 @@ class Np_Method_Return extends Np_Method {
 		}
 		return true;
 	}
-	
-	
+
 	/**
 	 * overridden function from parent Np_Method
 	 * 

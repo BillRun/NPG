@@ -4,8 +4,8 @@
  * KDupdate Class File
  * 
  * 
- * @package Np_Method
- * @subpackage Np_Method_KDUpdate
+ * @package         Np_Method
+ * @subpackage      Np_Method_KDUpdate
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -58,18 +58,17 @@ class Np_Method_KDUpdate extends Np_Method {
 	 */
 	protected function RequestValidateDB($request) {
 		if (is_object($request) && property_exists($request, "status") &&
-				property_exists($request, "last_transaction") &&
-				(
-				(
-				(
-						
-				$request->last_transaction == "Request_response" ||
-				$request->last_transaction == "Update_response"
-				) &&
-				1 == $request->status)
-				||
-				$request->last_transaction == "Cancel_response"
-				)
+			property_exists($request, "last_transaction") &&
+			(
+			(
+			(
+
+			$request->last_transaction == "Request_response" ||
+			$request->last_transaction == "Update_response"
+			) &&
+			1 == $request->status) ||
+			$request->last_transaction == "Cancel_response"
+			)
 		) {
 			return true;
 		}
@@ -106,16 +105,16 @@ class Np_Method_KDUpdate extends Np_Method {
 
 		$flags = json_decode($requestRecord['flags'], true);
 		$portTime = Application_Model_General::getDateIso($requestRecord['transfer_time']);
-		$process_type= $this->getHeaderField('PROCESS_TYPE');
-		if ($process_type=="PORT") {
+		$process_type = $this->getHeaderField('PROCESS_TYPE');
+		if ($process_type == "PORT") {
 			$path = &$xml->$msgType->updateRequestType;
 			$path->updateType = "REQUEST";
 			$path->portingDateTime = $portTime;
-		} else if ($process_type=="CANCEL") {
+		} else if ($process_type == "CANCEL") {
 			$path = &$xml->$msgType->updateCancelTypeType;
 			$path->updateType = "CANCEL";
 			$path->portingDateTime = $portTime;
-		} else if ($process_type=="UPDATE") {
+		} else if ($process_type == "UPDATE") {
 			$path = &$xml->$msgType->updateUpdateTypeType;
 			$path->updateType = "UPDATE";
 			$path->portingDateTime = $portTime;
@@ -132,7 +131,7 @@ class Np_Method_KDUpdate extends Np_Method {
 		if ($numberType === "I") {
 			$path->$networkType->mobileNumberIdentified;
 			$path->$networkType->mobileNumberIdentified->numberType = $numberType;
-			$path->$networkType->mobileNumberIdentified->identificationValue = isset($flags['identification_value'])?$flags['identification_value']:'';
+			$path->$networkType->mobileNumberIdentified->identificationValue = isset($flags['identification_value']) ? $flags['identification_value'] : '';
 			$path->$networkType->mobileNumberIdentified->identificationValue2nd = 'default';
 			$path->$networkType->mobileNumberIdentified->identificationValue3rd = 'default';
 			$path->$networkType->mobileNumberIdentified->number = $number;
@@ -144,4 +143,5 @@ class Np_Method_KDUpdate extends Np_Method {
 
 		return $xml;
 	}
+
 }

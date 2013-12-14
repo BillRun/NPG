@@ -3,8 +3,8 @@
 /**
  * Controller for incoming Soap messages (number transactions)
  * 
- * @package ApplicationController
- * @subpackage ProviderController
+ * @package         ApplicationController
+ * @subpackage      ProviderController
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -42,8 +42,7 @@ class ProviderController extends Zend_Controller_Action {
 	 * 
 	 */
 	private function handleSOAP() {
-		$soap = new Zend_Soap_Server(Application_Model_General::getWsdl(),
-		array('soap_version' => SOAP_1_1));
+		$soap = new Zend_Soap_Server(Application_Model_General::getWsdl(), array('soap_version' => SOAP_1_1));
 		$soap->setClass('Np_Soap_Handler');
 		$result = $soap->handle();
 		$response = $soap->getLastResponse();
@@ -74,8 +73,7 @@ class ProviderController extends Zend_Controller_Action {
 	 * 
 	 */
 	private function internalhandleSOAP() {
-		$soap = new Zend_Soap_Server(Application_Model_General::getWsdl(),
-		array('soap_version' => SOAP_1_1));
+		$soap = new Zend_Soap_Server(Application_Model_General::getWsdl(), array('soap_version' => SOAP_1_1));
 		$soap->setClass('Np_Soap_HandlerInternal');
 		$result = $soap->handle();
 		return $result; // - change to result from handle 
@@ -100,7 +98,6 @@ class ProviderController extends Zend_Controller_Action {
 		} else {
 			$reqModel->ExecuteRequest(false);
 		}
-
 	}
 
 }

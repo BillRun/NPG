@@ -3,8 +3,8 @@
 /**
  * Np_Method_Check File
  * 
- * @package Np_Method
- * @subpackage Np_Method_Check
+ * @package         Np_Method
+ * @subpackage      Np_Method_Check
  * @copyright       Copyright (C) 2012-2013 S.D.O.C. LTD. All rights reserved.
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
@@ -156,18 +156,18 @@ class Np_Method_Check extends Np_Method {
 	 */
 	public function createXml() {
 		$xml = parent::createXml();
-		
+
 		$networkType = Application_Model_General::getSettings("NetworkType");
 		$numberType = $this->getBodyField('NUMBER_TYPE');
 		$msgType = $this->getHeaderField('MSG_TYPE');
 		$number = $this->getBodyField('NUMBER');
-		
+
 		if ($networkType === "M") {
 			$networkType = "mobile";
 		} else {
 			$networkType = "fixed";
 		}
-		
+
 		$xml->$msgType->$networkType;
 		$xml->$msgType->$networkType->networkType = "M";
 
@@ -181,7 +181,7 @@ class Np_Method_Check extends Np_Method {
 			$xml->$msgType->$networkType->mobileNumberUnidentified->numberType = $numberType;
 			$xml->$msgType->$networkType->mobileNumberUnidentified->number = $number;
 		}
-		
+
 		return $xml;
 	}
 
