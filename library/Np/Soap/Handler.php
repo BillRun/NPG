@@ -65,7 +65,7 @@ class Np_Soap_Handler {
 			$xmlString[0] = "NULL";
 		}
 		$header = (array) $data['HEADER'];
-		$msgtype = $header->MSG_TYPE;
+		$msgtype = $header['MSG_TYPE'];
 
 		$xmlArray = $xmlString[0]->$msgtype;
 
