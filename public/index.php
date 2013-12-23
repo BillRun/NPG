@@ -19,21 +19,26 @@ set_include_path(implode(PATH_SEPARATOR, array(
 /** Zend_Application */
 require_once 'Zend/Application.php';
 
-// Create application, bootstrap, and run
-if (strpos($_SERVER['HTTP_HOST'], '1.1.1.1') !== FALSE ||
-	strpos($_SERVER['HTTP_HOST'], 'localhost') !== FALSE) {
-	if (strpos($_SERVER['REQUEST_URI'], 'np2') !== FALSE) {
-		$config_path = DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR .
-			'np2.ini';
-	} else if (strpos($_SERVER['REQUEST_URI'], 'np3') !== FALSE) {
-		$config_path = DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR .
-			'np3.ini';
-	} else {
-		$config_path = DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR .
-			'np.ini';
-	}
+if (APPLICATION_ENV == 'development') {
+	$host = $_SERVER['HTTP_HOST'];
+} else if (APPLICATION_ENV == 'testing') {
+	$host = strlen($_SERVER['REQUEST_URI']) > 3 ? substr($_SERVER['REQUEST_URI'], 0, 4) : 'testing';
 } else {
-	$config_path = '/configs/application.ini';
+	$host = APPLICATION_ENV;
+}
+
+switch ($host) {
+	case 'npg1':
+	case 'npg2':
+	case 'npg3':
+	case 'npg4':
+	case 'npg5':
+		$config_path = '/../' . $host . '.ini';
+		break;
+	case 'staging':
+	case 'production':
+	default:
+		$config_path = '/configs/application.ini';
 }
 
 $application = new Zend_Application(
