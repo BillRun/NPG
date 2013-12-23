@@ -18,7 +18,7 @@ class Np_Soap_HandlerNp {
 	//and return arrays in defined format only 
 	public function sendMessage($params) {
 		$goodArray = $this->intoArray($params);
-		return array('NP_ACK' => array('ACK_CODE' => 'ACK01', //returns default value for testing need to fix
+		return array('NP_ACK' => array('ACK_CODE' => 'Wtf', //returns default value for testing need to fix
 				'ACK_DATE' => Date('Y-m-d\Th:i:s+h:i')));
 	}
 

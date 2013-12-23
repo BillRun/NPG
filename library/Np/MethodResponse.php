@@ -60,9 +60,18 @@ abstract class Np_MethodResponse extends Np_Method {
 
 	public function createXml() {
 		$xml = parent::createXml();
-
 		$msgType = $this->getHeaderField('MSG_TYPE');
-
+		$this->addApprovalXml($xml, $msgType);
+		$this->addTrxNoXml($xml, $msgType);
+		return $xml;
+	}
+	
+	protected function addTrxNoXml(&$xml, $msgType) {
+		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
+		$xml->$msgType->requestRetryDate = $this->getBodyField('REQUEST_RETRY_DATE');
+	}
+	
+	protected function addApprovalXml(&$xml, $msgType) {
 		if ($this->getBodyField("APPROVAL_IND") === "Y") {
 			$xml->$msgType->positiveApproval;
 			$xml->$msgType->positiveApproval->approvalInd = "Y";
@@ -72,10 +81,6 @@ abstract class Np_MethodResponse extends Np_Method {
 			$rejectReasonCode = $this->getBodyField('REJECT_REASON_CODE');
 			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL) ? $rejectReasonCode : '';
 		}
-		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
-		$xml->$msgType->requestRetryDate = $this->getBodyField('REQUEST_RETRY_DATE');
-
-		return $xml;
 	}
 
 }

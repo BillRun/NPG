@@ -82,4 +82,18 @@ class Np_Method_PublishResponse extends Np_MethodResponse {
 		//else //cron will take care of it. save only in transaction
 	}
 
+	protected function addApprovalXml(&$xml, $msgType) {
+		$route = Application_Model_General::getDateTimeInSqlFormat(Application_Model_General::getRouteTimeByReqId($this->getHeaderField("REQUEST_ID")));
+		if ($this->getBodyField("APPROVAL_IND") == "Y") {
+			$xml->$msgType->positiveApproval;
+			$xml->$msgType->positiveApproval->approvalInd = "Y";
+			$xml->$msgType->positiveApproval->routeDateTime = $route;
+		} else {
+			$xml->$msgType->negativeApproval;
+			$xml->$msgType->negativeApproval->approvalInd = "N";
+			$rejectReasonCode = $this->getBodyField('REJECT_REASON_CODE');
+			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL) ? $rejectReasonCode : '';
+		}
+	}
+
 }

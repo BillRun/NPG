@@ -106,5 +106,23 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 		return $tbl->update($updateArray, $whereArray);
 	}
+	
+	protected function addApprovalXml(&$xml, $msgType) {
+		if ($this->getBodyField("APPROVAL_IND") === "Y") {
+			$xml->$msgType->positiveApproval;
+			$xml->$msgType->positiveApproval->approvalInd = "Y";
+			$xml->$msgType->positiveApproval->disconnectDateTime = $this->getBodyField('DISCONNECT_TIME');
+		} else {
+			$xml->$msgType->negativeApproval;
+			$xml->$msgType->negativeApproval->approvalInd = "N";
+			$rejectReasonCode = $this->getBodyField('REJECT_REASON_CODE');
+			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL) ? $rejectReasonCode : '';
+		}
+	}
+	
+	protected function addTrxNoXml(&$xml, $msgType) {
+		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
+	}
+
 
 }

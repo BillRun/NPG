@@ -60,6 +60,7 @@ class Np_Method_Check extends Np_Method {
 	protected function validateBody() {
 		foreach (self::$require_body_key as $key) {
 			if (!$this->getBodyField($key)) {
+				error_log('Require field is missing: ' . $key);
 				$this->setAck('Ack01');
 				return false;
 			}
@@ -174,8 +175,8 @@ class Np_Method_Check extends Np_Method {
 		if ($numberType === "I") {
 			$xml->$msgType->$networkType->mobileNumberIdentified->numberType = $numberType;
 			$xml->$msgType->$networkType->mobileNumberIdentified->identificationValue = $this->getBodyField('IDENTIFICATION_VALUE');
-			$xml->$msgType->$networkType->mobileNumberIdentified->identificationValue2nd = 'default';
-			$xml->$msgType->$networkType->mobileNumberIdentified->identificationValue3rd = 'default';
+			$xml->$msgType->$networkType->mobileNumberIdentified->identificationValue2nd = '';
+			$xml->$msgType->$networkType->mobileNumberIdentified->identificationValue3rd = '';
 			$xml->$msgType->$networkType->mobileNumberIdentified->number = $number;
 		} else {
 			$xml->$msgType->$networkType->mobileNumberUnidentified->numberType = $numberType;

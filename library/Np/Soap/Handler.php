@@ -60,7 +60,6 @@ class Np_Soap_Handler {
 	public function intoArray($params) {
 		$data = (array) $params->NP_MESSAGE;  //takes data out of np message array
 		$xmlString = simplexml_load_string($data['BODY']); //loads xml string from xml object in body 
-
 		if ($xmlString == NULL) {
 			$xmlString[0] = "NULL";
 		}

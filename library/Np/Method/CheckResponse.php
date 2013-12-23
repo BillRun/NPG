@@ -76,12 +76,15 @@ class Np_Method_CheckResponse extends Np_MethodResponse {
 	}
 
 	public function createXml() {
-		$xml = parent::createXml();
-		$xml->$msgType->essentialInfo1 = '';
-		$xml->$msgType->essentialInfo2 = '';
-		$xml->$msgType->essentialInfo3 = '';
-		$xml->$msgType->essentialInfo4 = '';
-		$xml->$msgType->essentialInfo5 = '';
+		$xml = new SimpleXMLElement('<npMessageBody xmlns=""></npMessageBody>');
+		$msgType = $this->getHeaderField('MSG_TYPE');
+		$this->addTrxNoXml($xml, $msgType);
+		$this->addApprovalXml($xml, $msgType);
+		$xml->$msgType->essentialInfo1;
+		$xml->$msgType->essentialInfo2;
+		$xml->$msgType->essentialInfo3;
+		$xml->$msgType->essentialInfo4;
+		$xml->$msgType->essentialInfo5;
 
 		return $xml;
 	}
