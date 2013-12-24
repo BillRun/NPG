@@ -490,7 +490,7 @@ class Application_Model_Internal {
 	public static function getMethodName($msg_type) {
 		// @TODO: make the mapping configurable
 		$mapping = array(
-			'Check' => 'check_transfer_availbility',
+			'Check' => 'check_transfer_availability',
 			'Request' => 'transfer_request',
 			'Update' => 'update_transfer_request',
 			'Cancel' => 'cancel_transfer_request',
