@@ -22,7 +22,7 @@ require_once 'Zend/Application.php';
 if (APPLICATION_ENV == 'development') {
 	$host = $_SERVER['HTTP_HOST'];
 } else if (APPLICATION_ENV == 'testing') {
-	$host = strlen($_SERVER['REQUEST_URI']) > 3 ? substr($_SERVER['REQUEST_URI'], 0, 4) : 'testing';
+	$host = strlen($_SERVER['REQUEST_URI']) > 3 ? substr($_SERVER['REQUEST_URI'], 1, 4) : 'testing';
 } else {
 	$host = APPLICATION_ENV;
 }
