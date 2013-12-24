@@ -15,7 +15,6 @@
  * @package ApplicationController
  * @subpackage ProviderController
  */
-/* FROM PROVIDER TO INTERNAL */
 class ProviderController extends Zend_Controller_Action {
 
 	/**

@@ -33,7 +33,7 @@ switch ($host) {
 	case 'npg3':
 	case 'npg4':
 	case 'npg5':
-		$config_path = '/../' . $host . '.ini';
+		$config_path = '/configs/' . $host . '.ini';
 		break;
 	case 'staging':
 	case 'production':

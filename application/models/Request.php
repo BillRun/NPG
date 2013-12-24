@@ -139,7 +139,7 @@ class Application_Model_Request {
 					$someAck = $this->request->getAck();
 					$this->request->setAck("Ack00");
 				} else {
-					$this->request->setAck("Ack01");
+					$this->request->setAck("Inv01");
 				}
 			}
 		} else {
@@ -179,7 +179,7 @@ class Application_Model_Request {
 			}
 		} else {
 			if ($validate === FALSE) {
-				$validate = "Ack01";
+				$validate = "Inv02";
 			}
 			$response = new stdClass();
 			$response->status = $validate;
@@ -254,7 +254,7 @@ class Application_Model_Request {
 			}
 		}
 		$validate = false;
-		$this->request->setAck('Ack01'); //??
+		$this->request->setAck('Inv03'); //??
 		if (!$verifyInternal || $this->request->InternalPostValidate()) {
 			$this->request->setCorrectAck();
 
@@ -321,6 +321,7 @@ class Application_Model_Request {
 			$adapter = $tbl->getAdapter();
 			$adapter->beginTransaction();
 			try {
+				// TODO: fix mysql strict compatibility
 				$_id = $tbl->insert(array());
 				$id = substr("00000000000" . $_id, -12, 12);
 				$trx_no = Application_Model_General::getSettings('InternalProvider');
@@ -389,10 +390,11 @@ class Application_Model_Request {
 		$xmlString = $xml->asXML();
 		$dom = new DOMDocument();
 		$dom->loadXML($xmlString);
-
 		$isValid = $dom->schemaValidate('npMessageBody.xsd');
 		if ($isValid === TRUE) {
-			return $xmlString;
+			// format the xml with indentation
+			$dom->formatOutput = true;
+			return $dom->saveXML();
 		} else {
 			error_log("xml doesn't validate");
 		}
@@ -439,7 +441,7 @@ class Application_Model_Request {
 			$row = $result->fetch();
 			$row['forceAll'] = 1;
 			$cmd = "/cron/checkpublish";
-			Application_Model_General::forkProcess($cmd, $row); // for debugging
+			Application_Model_General::forkProcess($cmd, $row);
 			return true;
 		} else {
 			$url = $this->getRecipientUrl();

@@ -1,3 +1,4 @@
 library/Zend
 logs/*
 *.ini
+application/configs/np*ini

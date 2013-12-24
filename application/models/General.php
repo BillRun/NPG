@@ -33,9 +33,6 @@ class Application_Model_General {
 		"Publish",
 	);
 	
-	// move to view
-	static public $menu = "<div>MENU -> <a href='/np/debug/logger'>Logger</a> / <a href='/np/reports'>Reports</a> / <a href='/np/emailsettings'>Email Settings</a></div><br/>";
-
 	/**
 	 * 
 	 * @var string $baseurl 
@@ -65,13 +62,17 @@ class Application_Model_General {
 	 * 
 	 * @return string 
 	 */
-	public static function getSettings($key) {
+	public static function getSettings($key, $default = null) {
 		static $settings;
 		if (!is_array($settings)) {
 			$settings = array();
 		}
 		if (!array_key_exists($key, $settings)) {
 			$settings[$key] = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOption($key);
+		} else {
+			if (!is_null($default)) {
+				return $default;
+			}
 		}
 		return $settings[$key];
 	}
@@ -319,15 +320,23 @@ class Application_Model_General {
 	 * 
 	 * @param String $url the url to open
 	 * @param Array $params data sending to the new process
+	 * @params Boolean $post use POST to query string else use GET
 	 * 
 	 * @return Boolean true on success else FALSE
 	 */
-	public static function forkProcess($url, $params) {
-		$params['fork'] = 1;
+	public static function forkProcess($url, $params, $fork = 1, $post = false) {
+		$params['fork'] = $fork;
 		$forkUrl = self::getForkUrl();
 		$querystring = http_build_query($params);
-		$cmd = "wget -O /dev/null '" . $forkUrl . $url . "?" . $querystring .
-				"' > /dev/null & ";
+		if (!$post) {
+			$cmd = "wget -O /dev/null '" . $forkUrl . $url . "?" . $querystring .
+					"' > /dev/null & ";
+		} else {
+			$cmd = "wget -O /dev/null '" . $forkUrl . $url . "' --post-data '" . $querystring .
+					"' > /dev/null & ";
+		}
+		
+//		echo $cmd . "<br />" . PHP_EOL;
 		if (system($cmd) === FALSE) {
 			error_log("Can't fork PHP process");
 			return false;
@@ -462,6 +471,13 @@ class Application_Model_General {
 		return FALSE;
 	}
 
+	/**
+	 * get transaction port time
+	 * 
+	 * @param string $trxno transaction id
+	 * 
+	 * @return transfer time (unix timestamp) if available, else null
+	 */
 	static public function getTrxPortTime($trxno) {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select();
@@ -474,6 +490,13 @@ class Application_Model_General {
 		return null;
 	}
 
+	/**
+	 * get the last port time of the request
+	 * 
+	 * @param string $reqId
+	 * 
+	 * @return transfer time (unix timestamp) if available, else null
+	 */
 	static public function getLastPortTimeByReqId($reqId) {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select();
@@ -490,8 +513,8 @@ class Application_Model_General {
 	/**
 	 * checks if request is auto request  
 	 * 
-	 * @param type $reqId
-	 * @param type $transcation
+	 * @param string $reqId the request id
+	 * @param string $transcation the transaction that happened before (default: Check)
 	 * @return type 
 	 */
 	static public function isAutoCheck($reqId, $transcation = "Check") {
@@ -543,6 +566,13 @@ class Application_Model_General {
 		return $forkUrl;
 	}
 
+	/**
+	 * check if we sent check already
+	 * 
+	 * @param long $number phone number to check
+	 * 
+	 * @return true if we sent already check
+	 */
 	static public function previousCheck($number) {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select()
@@ -557,8 +587,12 @@ class Application_Model_General {
 	}
 
 	/**
-	 *
-	 * @param type $request_id 
+	 * check if we try this message before
+	 * 
+	 * @param string $requestId the request id to check
+	 * @param string $msgtype which message to search for previous check
+	 * 
+	 * @return int the number of retries we try to send this message
 	 */
 	static public function checkIfRetry($request_id, $msg_type) {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
@@ -569,147 +603,34 @@ class Application_Model_General {
 
 		if (isset($result)) {
 			foreach ($result as $row => $value) {
-
-//					$trycount = $trycount + 1;
-
-
 				$trycount = count($result);
-
-
 				return $trycount;
 			}
 		} else {
-			return FALSE;
+			return 0;
 		}
 	}
 
-	static public function checkIfPreviousTry($requestId, $msgtype) {
-		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
-		$select = $tbl->select()
-				->where('request_id=?', $requestId)
-				->where('message_type=?', $msgtype)
-				->order('id DESC');
-		$result = $select->query()->fetch();
-		$Retrynum = 1;
-		if (!empty($result)) {
-			$Retrynum = 0;
-			foreach ($result as $rows) {
-				$Retrynum++;
-			}
-		} else {
-			$Retrynum = 1;
-		}
-		return $Retrynum;
-	}
+	/**
+	 * check if message type is response
+	 * 
+	 * @param string $msgType the message type to check
+	 * @return boolean true if the message type is response else false
+	 */
+	static public function isMsgResponse($msgType) {
 
-	static public function isMsgResponse($msgtype) {
-
-		$msg_type = explode('_', strtoupper($msgtype));
-		if ((isset($msg_type[1]) && strtoupper($msg_type[1]) == "RESPONSE") || (isset($msg_type[2]) && strtoupper($msg_type[2]) == "RESPONSE")) {
+		$msgTypeParts = explode('_', strtolower($msgType));
+		if (in_array('response', $msgTypeParts)) {
 			return TRUE;
 		} else {
 			return FALSE;
 		}
 	}
 
-	static public function saveShutDownDetails($provider, $type = "DOWN") {
-
-		try {
-			$row = array();
-			$row['provider'] = $provider; //the provider
-			$row['type'] = $type; //up or down
-			if (strtoupper($type) == "UP") {
-				$duration = Application_Model_General::getShutDownDuration();
-			} else {
-				$duration = NULL;
-			}
-			$row['duration'] = $duration; //duration if up
-			$tbl = new Application_Model_DbTable_Shutdown(Np_Db::master());
-			$res = $tbl->insert($row);
-			return $res;
-		} catch (exception $e) {
-			$res = FALSE;
-		}
-	}
-
-	static public function getShutDownDuration() {
-		$tbl = new Application_Model_DbTable_Shutdown(Np_Db::slave());
-		$select = $tbl->select();
-		$select->where('type = ?', "DOWN")->order('date DESC');
-		$result = $select->query()->fetchObject();   //take the last one
-		if ($result) {
-			$old_date = Application_Model_General::getTimeStampInSqlFormat($result->date);
-			$calculate_duration = time() - $old_date;
-			return $calculate_duration;
-		}
-		return null;
-	}
-
-	static public function getShutDowns() {
-		$tbl = new Application_Model_DbTable_Shutdown(Np_Db::slave());
-		$select = $tbl->select();
-		$result = $select->query()->fetchAll();   //take the last one
-		if ($result) {
-
-			return $result;
-		}
-		return null;
-	}
-
-	public static function getAvailableAggDates() {
-
-		$tbl = new Application_Model_DbTable_ActivityProcess(Np_Db::slave());
-
-		$select =
-						$tbl->select()->from(array('ap' => 'Activity_Process'), array('agg_date'))
-						->distinct()->order('agg_date DESC');
-
-//		$select->where('request_id =?', $requestID)->order('id DESC');
-
-		$results = $select->query()->fetchAll();   //take the last one
-
-		foreach ($results as $result => $val) {
-			$date_array[$val['agg_date']] = $val['agg_date'];
-		}
-		if (isset($date_array) && $date_array) {
-
-			return $date_array;
-		}
-
-		return array();
-	}
-
-	public static function getAllAvailableStatisticsTimes() {
-		$timers_array = Application_Model_General::getAvailableAggDatesTimers();
-		$processes_array = Application_Model_General::getAvailableAggDates();
-		$sorted_array = array_merge($timers_array, $processes_array);
-		return $sorted_array;
-	}
-
-	public static function getAvailableAggDatesTimers() {
-
-		$tbl = new Application_Model_DbTable_ActivityTimers(Np_Db::slave());
-
-		$select =
-						$tbl->select()->from(array('at' => 'Activity_Timers'), array('transaction_time'))
-						->distinct()->order('transaction_time DESC');
-
-//		$select->where('request_id =?', $requestID)->order('id DESC');
-
-		$results = $select->query()->fetchAll();   //take the last one
-
-		foreach ($results as $result => $val) {
-
-			$date_array[$val['transaction_time']] = $val['transaction_time'];
-		}
-		if (isset($date_array) && $date_array) {
-
-			return $date_array;
-		}
-
-		return array();
-	}
-
+	/**
+	 * get list of available providers from the configuration
+	 * @return type
+	 */
 	public static function getProviderArray() {
 		$providers = array_keys(Application_Model_General::getSettings('provider'));
 		$InternalProvider = Application_Model_General::getSettings('InternalProvider');
@@ -719,6 +640,14 @@ class Application_Model_General {
 		return $providers;
 	}
 
+	/**
+	 * get the logging request directory path (for logging purpose)
+	 * 
+	 * @param string $request_id request id
+	 * @param boolean $force_create should the method create the folder if not exists
+	 * 
+	 * @return string directory path
+	 */
 	public static function getRequestDirPath($request_id, $force_create = false) {
 		$ar = str_split($request_id, 2);
 		if ($ar && count($ar) > 2) {
@@ -727,16 +656,26 @@ class Application_Model_General {
 			$relative_path = './';
 		}
 		// TODO oc666: move this to config
-		$base_path = APPLICATION_PATH . '/../logs/';
+		$base_path = APPLICATION_PATH . '/../logs/' . Application_Model_General::getSettings('InternalProvider') . '/';
 		$path =  $base_path . $relative_path;
+//		error_log($path);
 		if ($force_create && !file_exists($path)) {
 			if (!@mkdir($path, 0777, true)) {
+				// if cannot create relative path, return the logs root path
 				$path = $base_path;
 			}
 		}
 		return $path;
 	}
 	
+	/**
+	 * get the logging request file path (for logging purpose)
+	 * 
+	 * @param string $request_id request id
+	 * @param boolean $force_create should the method create the folder if not exists
+	 * 
+	 * @return string full file path
+	 */
 	public static function getRequestFilePath($request_id, $force_create = false) {
 		$file_path = self::getRequestDirPath($request_id, $force_create) . $request_id . ".log";
 		if ($force_create && !file_exists($file_path)) {
@@ -747,6 +686,11 @@ class Application_Model_General {
 
 	/**
 	 * method to log soap requests
+	 * 
+	 * @param string $content the content to output
+	 * @param string $request_id the request id (will be the file name)
+	 * 
+	 * @return void
 	 */
 	public static function logRequest($content, $request_id) {
 		try {
@@ -761,6 +705,16 @@ class Application_Model_General {
 		}
 	}
 
+	/**
+	 * method to log request and its response
+	 * 
+	 * @param mixed $request the request to log
+	 * @param mixed $response the response to log
+	 * @param string $request_id the request id
+	 * @param string $prefix prefix to add before the output
+	 * 
+	 * @return void
+	 */
 	public static function logRequestResponse($request, $response, $request_id, $prefix = '') {
 		$InternalProvider = Application_Model_General::getSettings('InternalProvider');
 		self::logRequest($prefix . $InternalProvider . " Request: " . print_R($request, 1) . PHP_EOL, $request_id);
@@ -788,160 +742,6 @@ class Application_Model_General {
 
 		$results = $select->order('id DESC')->limit(1000)->query()->fetchAll();
 		return $results;
-	}
-
-	/**
-	 * Get Provider RPC URL via "TO" field
-	 * 
-	 * @return string URL 
-	 */
-//	public static function getProviderEmail($provider) {
-//		$providers = Application_Model_General::getSettings('email');
-//		$key = $provider;
-//		if (isset($providers[$key])) {
-//			return $providers[$key];
-//		}
-//		return FALSE;
-//	}
-
-	public static function getAllProviderEmails() {
-		$tbl = new Application_Model_DbTable_EmailSettings(Np_Db::slave());
-		$select = $tbl->select();
-
-		$result = $select->query()->fetchAll();   //take the last one
-//		var_dump($result);
-//		die;
-		if ($result) {
-
-			return $result;
-		}
-
-		return array();
-	}
-	
-
-//	public static function setProviderEmail($provider) {
-//		$providers = Application_Model_General::getSettings('email');
-//		$key = $provider;
-//		if (isset($providers[$key])) {
-//			return $providers[$key];
-//		}
-//		return FALSE;
-//	}
-	public static function setProviderEmail($provider=FALSE, $email=FALSE) {
-//		var_dump($email);
-//		die;
-		$providers = Application_Model_General::getAllProviderEmails();
-		
-		foreach ($providers as $providerz => $vals) {
-			$providers[] = $providers[$providerz]['providername'];
-		}
-		if ($providers != FALSE) {
-			$provider_names = $providers;
-		} else {
-			$provider_names = array('asd' => 'asd');
-		}
-//		var_dump($provider);
-//		die;
-		if (!in_array($provider, $provider_names)) {
-//			var_dump($provider);
-//			die('ASDASDASD');
-
-			$row['providername'] = $provider;
-			$row['provideremailadress'] = $email;
-			$tbl = new Application_Model_DbTable_EmailSettings(Np_Db::master());
-//			$where[]="Where";
-			$res = $tbl->insert($row);
-		} else {
-//			var_dump($provider);
-//			die;
-			$tbl = new Application_Model_DbTable_EmailSettings(Np_Db::master());
-			$update_arr = array("provideremailadress" => $email);
-			$where_arr = array(
-				"providername = ?" => $provider
-			);
-
-			$res = $tbl->update($update_arr, $where_arr);
-		}
-
-		return $res;
-	}
-
-	Public static function checkIfEmailFormatEmpty() {
-		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
-		$select = $tbl->select();
-		$result = $select->query()->fetchAll();   //take the last one
-
-		if (count($result) >= 1) {
-
-			return FALSE;
-		}
-
-		return TRUE;
-	}
-
-	public static function setEmailFormat($email_format) {
-		$is_db_empty_check = Application_Model_General::checkIfEmailFormatEmpty();
-
-
-		if ($is_db_empty_check == TRUE) {
-			$row['email_format'] = $email_format;
-//			$row['provideremailadress'] = $email;
-			$tbl = new Application_Model_DbTable_EmailFormat(Np_Db::master());
-			$res = $tbl->insert($row);
-		} else {
-			$tbl = new Application_Model_DbTable_EmailFormat(Np_Db::master());
-			$update_arr = array('email_format' => $email_format);
-			$res = $tbl->update($update_arr, FALSE);
-			return $res;
-		}
-
-		return $res;
-	}
-
-	public static function getEmailFormat() {
-		$tbl = new Application_Model_DbTable_EmailFormat(Np_Db::slave());
-		$select = $tbl->select();
-		$result = $select->query()->fetch();   //take the last one
-
-		if ($result) {
-
-			return $result['email_format'];
-		}
-
-		return FALSE;
-	}
-
-	public static function getProviderEmail($provider) {
-		
-		$tbl = new Application_Model_DbTable_EmailSettings(Np_Db::slave());
-		$select = $tbl->select();
-		$select->where("providername = ?", $provider);
-		
-		$result = $select->query()->fetch();   //take the last one
-		
-		if ($result) {
-
-			return $result['provideremailadress'];
-		}
-
-//		var_dump($select->__toString());
-		die("<h2>No Email Defined For Provider -> ".$provider."</h2><br><a href='/np/emailsettings'>Set One!</a>");
-		return FALSE;
-	}
-
-	public static function getEmailFormatWithPlaceHolders($provider, $request_id) {
-
-		$tbl = new Application_Model_DbTable_EmailFormat(Np_Db::slave());
-		$select = $tbl->select();
-		$result = $select->query()->fetch();   //take the last one
-
-		if ($result) {
-			$result['email_format'] = str_replace("*Provider_Name*", $provider, $result['email_format']);
-			$result['email_format'] = str_replace("*Request_ID*", $request_id, $result['email_format']);
-		}
-
-		return $result['email_format'];
 	}
 
 	public static function modifySentRow($trx_no) {

@@ -357,7 +357,7 @@ class Application_Model_Internal {
 		$data = $this->createPostData($ack, $rejectReasonCode, $idValue);
 		$url = Application_Model_General::getSettings('UrlToInternalResponse');
 		$auth = Application_Model_General::getSettings('InternalAuth');
-		$method = $this->getMethodName($this->params['MSG_TYPE']);
+		$method = self::getMethodName($this->params['MSG_TYPE']);
 		if ($this->protocal == 'http') {
 			$client = new Zend_Http_Client();
 			$client->setUri($url);
@@ -427,7 +427,6 @@ class Application_Model_Internal {
 			}
 		}
 		if (Application_Model_General::isMsgResponse($this->params['MSG_TYPE'])) {
-
 			$ret['approval_ind'] = $this->params['APPROVAL_IND'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "KD_UPDATE_RESPONSE") {
@@ -479,6 +478,7 @@ class Application_Model_Internal {
 		if (strtoupper($this->params['MSG_TYPE']) == "DB_SYNCH_RESPONSE") {
 			$ret['file_name'] = $this->params['FILE_NAME'];
 		}
+		return $ret;
 	}
 
 	/**
@@ -487,7 +487,7 @@ class Application_Model_Internal {
 	 * @param type $msg_type
 	 * @return string 
 	 */
-	protected function getMethodName($msg_type) {
+	public static function getMethodName($msg_type) {
 		// @TODO: make the mapping configurable
 		$mapping = array(
 			'Check' => 'check_transfer_availbility',

@@ -90,14 +90,14 @@ class InternalController extends Zend_Controller_Action {
 	 * 
 	 */
 	private function AddParamsToInternalReq(&$params) {
-		$params['FORK'] = 1;
+//		$params['FORK'] = 1;
 		$params['FROM'] = Application_Model_General::getSettings('InternalProvider'); //requests from internal - Transfer to internal
 		$params['PROCESS_TYPE'] = Application_Model_General::getProcessType($params['MSG_TYPE']);
 		$params['VERSION_NO'] = Application_Model_General::getSettings("VersionNo");
 		$params['RETRY_NO'] = 1;
 		$params['RETRY_DATE'] = Application_Model_General::getDateIso();
 		$params['NETWORK_TYPE'] = Application_Model_General::getSettings("NetworkType");
-//		$params['NUMBER_TYPE'] = Application_Model_General::getSettings("NumberType");
+		$params['NUMBER_TYPE'] = Application_Model_General::getSettings("NumberType");
 	}
 
 }

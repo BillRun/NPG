@@ -137,7 +137,7 @@ class Application_Model_Cron {
 		while ($row = $result->fetch()) {
 			$ret[] = array_merge($row, array("status" => "publish check"));
 			$cmd = "/cron/checkpublish";
-			Application_Model_General::forkProcess($cmd, $row); // for debugging
+			Application_Model_General::forkProcess($cmd, $row);
 		}
 
 		return $ret;
