@@ -408,7 +408,7 @@ class Application_Model_Internal {
 			'number' => $this->params['NUMBER'], //check is set otherwise select number from DB from request_id
 			'identification_value' => $idValue,
 			'provider' => $provider,
-			'msgType' => $this->params['MSG_TYPE'],
+			'msg_type' => $this->params['MSG_TYPE'],
 			'reqId' => $this->params['REQUEST_ID'],
 			'msgDesc' => "Done",
 			'ack' => $ack,
@@ -462,7 +462,7 @@ class Application_Model_Internal {
 			}
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "CANCEL_PUBLISH_RESPONSE") {
-			$ret['msgType'] = "Cancel_Publish_response";
+			$ret['msg_type'] = "Cancel_Publish_response";
 
 			$ret['approval_ind'] = $this->params['APPROVAL_IND'];
 			$ret['route_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['ROUTE_TIME']);
@@ -500,7 +500,7 @@ class Application_Model_Internal {
 			'Return' => 'return',
 			'Inquire_number' => 'inquire_number',
 			'Up_system' => 'up_system',
-			'Down_system' => 'Down_system',
+			'Down_system' => 'down_system',
 		);
 		$s = str_replace('_response', '', $msg_type);
 		if (isset($mapping[$s])) {
