@@ -28,6 +28,7 @@ class TestController extends Zend_Controller_Action {
 	public function indexAction() {
 		$reply = Application_Model_General::getSettings('test-response', 'Ack00');
 		$params = $this->getRequest()->getParams();
+//		error_log(print_R($params, 1));
 		switch ($reply) {
 			case 'rand':
 			case 'random':

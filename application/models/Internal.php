@@ -406,77 +406,73 @@ class Application_Model_Internal {
 		}
 		$ret = array(
 			'number' => $this->params['NUMBER'], //check is set otherwise select number from DB from request_id
-			'identification_value' => $idValue,
 			'provider' => $provider,
 			'msg_type' => $this->params['MSG_TYPE'],
 			'reqId' => $this->params['REQUEST_ID'],
-			'msgDesc' => "Done",
-			'ack' => $ack,
-			'resultCode' => $rejectReasonCode,
-			'more' => '',
+			'more' => array(
+				'identification_value' => $idValue,
+				'resultCode' => $rejectReasonCode,
+				'ack' => $ack,
+			),
 		);
 		if (isset($this->params['NUMBER_TYPE'])) {
-			$ret['number_type'] = $this->params['NUMBER_TYPE'];
-			if ($ret['number_type'] == "R") {
-				$ret['to_number'] = $this->params['TO_NUMBER'];
-				$ret['from_number'] = $this->params['FROM_NUMBER'];
+			$ret['more']['number_type'] = $this->params['NUMBER_TYPE'];
+			if ($ret['more']['number_type'] == "R") {
 				unset($ret['number']);
-			} elseif ($ret['number_type'] == "S") {
-				$ret['number'] = $this->params['NUMBER'];
-				$ret['number_type'] = $this->params['NUMBER_TYPE'];
+				$ret['more']['to_number'] = $this->params['TO_NUMBER'];
+				$ret['more']['from_number'] = $this->params['FROM_NUMBER'];
 			}
 		}
 		if (Application_Model_General::isMsgResponse($this->params['MSG_TYPE'])) {
-			$ret['approval_ind'] = $this->params['APPROVAL_IND'];
+			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "KD_UPDATE_RESPONSE") {
-			$ret['KD_update_type'] = $this->params['KD_UPDATE_TYPE'];
+			$ret['more']['KD_update_type'] = $this->params['KD_UPDATE_TYPE'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "EXECUTE_RESPONSE") {
-			$ret['disconnect_time'] = $this->params['DISCONNECT_TIME'];
+			$ret['more']['disconnect_time'] = $this->params['DISCONNECT_TIME'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "REQUEST") {
 			$ret['port_time'] = $this->params['PORT_TIME'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "UPDATE") {
-			$ret['port_time'] = $this->params['PORT_TIME'];
+			$ret['more']['port_time'] = $this->params['PORT_TIME'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "PUBLISH") {
-			$ret['donor'] = $this->params['DONOR'];
-			$ret['publish_type'] = $this->params['PUBLISH_TYPE'];
+			$ret['more']['donor'] = $this->params['DONOR'];
+			$ret['more']['publish_type'] = $this->params['PUBLISH_TYPE'];
 
 			if (isset($this->params['DISCONNECT_TIME'])) {
-				$ret['disconnect_time'] = $this->params['DISCONNECT_TIME'];
+				$ret['more']['disconnect_time'] = $this->params['DISCONNECT_TIME'];
 			}
 			if (isset($this->params['CONNECT_TIME'])) {
-				$ret['connect_time'] = $this->params['CONNECT_TIME'];
+				$ret['more']['connect_time'] = $this->params['CONNECT_TIME'];
 			}
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "CANCEL_PUBLISH") {
-			$ret['donor'] = $this->params['DONOR'];
+			$ret['more']['donor'] = $this->params['DONOR'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "PUBLISH_RESPONSE") {
-			$ret['approval_ind'] = $this->params['APPROVAL_IND'];
+			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
 			if (isset($this->params['ROUTE_TIME'])) {
-				$ret['route_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['ROUTE_TIME']);
+				$ret['more']['route_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['ROUTE_TIME']);
 			}
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "CANCEL_PUBLISH_RESPONSE") {
-			$ret['msg_type'] = "Cancel_Publish_response";
-
-			$ret['approval_ind'] = $this->params['APPROVAL_IND'];
-			$ret['route_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['ROUTE_TIME']);
+			$ret['more']['msg_type'] = "Cancel_Publish_response";
+			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
+			$ret['more']['route_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['ROUTE_TIME']);
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "INQUIRE_NUMBER_RESPONSE") {
-			$ret['approval_ind'] = $this->params['APPROVAL_IND'];
-			$ret['current_operator'] = $this->params['CURRENT_OPERATOR'];
+			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
+			$ret['more']['current_operator'] = $this->params['CURRENT_OPERATOR'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "DB_SYNCH_REQUEST") {
-			$ret['from_date'] = $this->params['FROM_DATE'];
-			$ret['to_date'] = $this->params['TO_DATE'];
+			$ret['more']['from_date'] = $this->params['FROM_DATE'];
+			$ret['more']['to_date'] = $this->params['TO_DATE'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "DB_SYNCH_RESPONSE") {
-			$ret['file_name'] = $this->params['FILE_NAME'];
+			$ret['more']['file_name'] = $this->params['FILE_NAME'];
 		}
 		return $ret;
 	}
