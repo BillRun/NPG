@@ -66,7 +66,7 @@ CREATE TABLE `Requests` (
   `status` tinyint(4) DEFAULT NULL,
   `last_requests_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `last_transaction` char(25) NOT NULL DEFAULT 'NULL',
-  `flags` char(1) DEFAULT NULL,
+  `flags` char(255) DEFAULT NULL,
   `number` char(16) DEFAULT 'NULL',
   `transfer_time` timestamp NULL DEFAULT NULL,
   `cron_lock` tinyint(4) NOT NULL DEFAULT '0',
