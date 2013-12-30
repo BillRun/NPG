@@ -69,9 +69,9 @@ class Application_Form_Request extends Zend_Form {
 		$providers = array(
 				'GT' => 'Golan Telecom',
 				'PL' => 'Pelephone',
-//				'PR' => 'Partner Cell',
+				'PR' => 'Partner Mobile',
 //				'PM' => 'Partner Mapa',
-//				'CL' => 'Cellcom Cell',
+//				'CL' => 'Cellcom Mobile',
 //				'CM' => 'Cellcom Mapa',
 //				'MI' => 'Mirs',
 //				'BZ' => 'Bezeq',

@@ -429,7 +429,7 @@ class Application_Model_Internal {
 		if (strtoupper($this->params['MSG_TYPE']) == "KD_UPDATE_RESPONSE") {
 			$ret['more']['KD_update_type'] = $this->params['KD_UPDATE_TYPE'];
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "EXECUTE_RESPONSE") {
+		if (strtoupper($this->params['MSG_TYPE']) == "EXECUTE_RESPONSE" && isset($this->params['DISCONNECT_TIME'])) {
 			$ret['more']['disconnect_time'] = $this->params['DISCONNECT_TIME'];
 		}
 		if (strtoupper($this->params['MSG_TYPE']) == "REQUEST") {

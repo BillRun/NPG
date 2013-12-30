@@ -132,7 +132,7 @@ class Application_Model_Cron {
 			->where('transfer_time <= \'' . Application_Model_General::getTimeInSqlFormat(strtotime('-' . $min_minutes . ' minutes ago')) . '\'')
 			->where('transfer_time > \'' . Application_Model_General::getTimeInSqlFormat(strtotime('-' . $max_minutes . ' minutes ago')) . '\'')
 			->where('status =  1');
-
+//		print $select;die;
 		$result = $select->query();
 		while ($row = $result->fetch()) {
 			$ret[] = array_merge($row, array("status" => "publish check"));

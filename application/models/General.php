@@ -46,7 +46,7 @@ class Application_Model_General {
 	private static $wsdl;
 
 	/**
-	 *
+	 * get the base url
 	 * @return string $baseUrl 
 	 */
 	public static function getBaseUrl() {

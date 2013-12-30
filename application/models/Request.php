@@ -388,6 +388,7 @@ class Application_Model_Request {
 
 		$xml = $this->request->createXml();
 		$xmlString = $xml->asXML();
+//		error_log($xmlString);
 		$dom = new DOMDocument();
 		$dom->loadXML($xmlString);
 		$isValid = $dom->schemaValidate('npMessageBody.xsd');

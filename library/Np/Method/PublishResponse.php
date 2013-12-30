@@ -47,6 +47,7 @@ class Np_Method_PublishResponse extends Np_MethodResponse {
 		if (!$this->checkDirection()) {
 			return "Gen04";
 		}
+		
 		//HOW TO CHECK Gen05
 //		if (!$this->ValidateDB()) {
 //			return "Gen07";
@@ -94,6 +95,10 @@ class Np_Method_PublishResponse extends Np_MethodResponse {
 			$rejectReasonCode = $this->getBodyField('REJECT_REASON_CODE');
 			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL) ? $rejectReasonCode : '';
 		}
+	}
+	
+	protected function addTrxNoXml(&$xml, $msgType) {
+		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
 	}
 
 }

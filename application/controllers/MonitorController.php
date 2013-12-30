@@ -102,8 +102,17 @@ class MonitorController extends Zend_Controller_Action {
 	
 	public function requestAction() {
 		$form = new Application_Form_Request();
+		$params = $this->getRequest()->getParams();
+		$form->setDefaults($params);
 		$this->view->form = $form;
 		$this->view->form->setAction("/monitor/send/");
+
+		if (isset($params['message'])) {
+			$this->view->message = (string) $params['message'];
+		}
+		if (isset($params['success'])) {
+			$this->view->success = (int) $params['success'];
+		}
 	}
 	
 	public function sendAction() {
@@ -118,14 +127,22 @@ class MonitorController extends Zend_Controller_Action {
 			'request_time' => time(),
 		);
 
-		if ($method == 'Request') {
+		if ($method == 'Request' || $method == 'Update') {
 			$args['transfer_time'] = $params['porttime'];
 		} else if ($method == 'Execute_response') {
 			$args['more']['connect_time'] = time();
 		}
 
-		Application_Model_General::forkProcess($url, $args, 0, true);
-		die("Request sent");
+		$success = Application_Model_General::forkProcess($url, $args, 0, true);
+		if ($success) {
+			$params['success'] = 1;
+			$params['message'] = 'Request sent';
+		} else {
+			$params['success'] = 0;
+			$params['message'] = 'Request failed';
+		}
+		
+		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/request?' . http_build_query($params));
 	}
 
 }
