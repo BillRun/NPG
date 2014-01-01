@@ -48,6 +48,10 @@ class Np_Method_Check extends Np_Method {
 				case "Port_time": //when internal provider sending request directly
 					$this->setBodyField($key, $value);
 					break;
+				case "Phone_number":
+					$this->setBodyField('Number', $value);
+					break;
+
 			}
 		}
 	}
@@ -128,7 +132,6 @@ class Np_Method_Check extends Np_Method {
 	 * @return bool 
 	 */
 	public function saveToDB() {
-		//INSERT into Requests
 		if ($this->ValidateDB() === FALSE) {
 			RETURN FALSE;
 		}
@@ -137,16 +140,20 @@ class Np_Method_Check extends Np_Method {
 			// if the check received from external provider create request
 			// request id already exists
 			//else - it's from internal - already INSERT into Requests
-			$data = array(
-				'request_id' => $this->getHeaderField("REQUEST_ID"),
-				'from_provider' => $this->getHeaderField("TO"),
-				'to_provider' => $this->getHeaderField("FROM"), // ב"ר קולט שולח הודעה
-				'status' => 1,
-				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
-				'number' => $this->getBodyField("NUMBER"),
-			);
-			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
-			return $tbl->insert($data);
+			try {
+				$data = array(
+					'request_id' => $this->getHeaderField("REQUEST_ID"),
+					'from_provider' => $this->getHeaderField("TO"),
+					'to_provider' => $this->getHeaderField("FROM"),
+					'status' => 1,
+					'last_transaction' => $this->getHeaderField("MSG_TYPE"),
+					'phone_number' => $this->getBodyField("NUMBER"),
+				);
+				$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
+				return $tbl->insert($data);
+			} catch (Exception $e) {
+				error_log("Error on create record in transactions table: " . $e->getMessage());
+			}
 		}
 	}
 

@@ -97,6 +97,12 @@ abstract class Np_Method {
 				case "To":
 					$this->setHeader($key, $value);
 					break;
+				case "From_provider":
+					$this->setHeader('From', $value);
+					break;
+				case "To_provider":
+					$this->setHeader('To', $value);
+					break;
 				case "Ack_code":
 				case "Ack_date":
 					$this->setBodyField($key, $value);
@@ -406,10 +412,10 @@ abstract class Np_Method {
 				}
 				$last_transaction = $select->query()->fetchObject();
 				$this->last_method = $last_transaction->message_type;
-				$this->last_method_time = $last_transaction->last_transactions_time;
+				$this->last_method_time = $last_transaction->last_transaction_time;
 			} else {
 				$this->last_method = $result->last_transaction;
-				$this->last_method_time = $result->last_requests_time;
+				$this->last_method_time = $result->last_request_time;
 			}
 			$this->last_transfer_time = $result->transfer_time;
 			return $this->RequestValidateDB($result);

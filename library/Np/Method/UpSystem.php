@@ -48,7 +48,7 @@ class Np_Method_UpSystem extends Np_Method {
 			$data = array(
 				'request_id' => $this->getHeaderField("REQUEST_ID"),
 				'from_provider' => $this->getHeaderField("FROM"),
-				'to_provider' => $this->getHeaderField("TO"), // ב"ר קולט שולח הודעה
+				'to_provider' => $this->getHeaderField("TO"),
 				'status' => 0,
 				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
 				'number' => $this->getBodyField("NUMBER"),

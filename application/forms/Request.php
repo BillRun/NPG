@@ -51,7 +51,7 @@ class Application_Form_Request extends Zend_Form {
 		$this->addElement('select', 'MSG_TYPE', $msgTypeOptions);
 
 		$numberOptions = array(
-			'label' => 'Number',
+			'label' => 'Phone number',
 			'required' => true,
 			'validators' => array('Int', array('StringLength', FALSE, array(10, 10))),
 			'value' => ''

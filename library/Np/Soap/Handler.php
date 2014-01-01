@@ -102,10 +102,10 @@ class Np_Soap_Handler {
 					$data['IDENTIFICATION_VALUE_2ND'] = (string) $xmlArray->$networkType->mobileNumberIdentified->identificationValue2nd;
 					$data['IDENTIFICATION_VALUE_3RD'] = (string) $xmlArray->$networkType->mobileNumberIdentified->identificationValue3rd;
 					$data['NUMBER_TYPE'] = (string) $xmlArray->$networkType->mobileNumberIdentified->numberType;
-					$data['NUMBER'] = (string) $xmlArray->$networkType->mobileNumberIdentified->number;
+					$data['PHONE_NUMBER'] = (string) $xmlArray->$networkType->mobileNumberIdentified->number;
 				} else {
 					$data['NUMBER_TYPE'] = (string) $xmlArray->$networkType->mobileNumberUnidentified->numberType;
-					$data['NUMBER'] = (string) $xmlArray->$networkType->mobileNumberUnidentified->number;
+					$data['PHONE_NUMBER'] = (string) $xmlArray->$networkType->mobileNumberUnidentified->number;
 				}
 
 				break;

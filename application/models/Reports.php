@@ -38,7 +38,7 @@ class Application_Model_Reports {
 		}
 		$select = $tbl->select()->from(array('T' => 'Transactions'), "*")->distinct();
 		$select->where('ack_code = ?', "Err")
-			->where('last_transactions_time > ?', $date)
+			->where('last_transaction_time > ?', $date)
 			->order('id DESC')->limit($start, $end);
 		$result = $select->query()->fetchAll();   //take the last one
 		if ($result) {
@@ -78,7 +78,7 @@ class Application_Model_Reports {
 			$select->where('trx_no LIKE ?', $provider);
 		}
 		if (isset($thedate) && !empty($thedate) && $thedate != FALSE) {
-			$select->where('last_transactions_time > ?', $thedate);
+			$select->where('last_transaction_time > ?', $thedate);
 		}
 		if (isset($to) && !empty($to) && $to != FALSE) {
 			$select->where('target =?', $to);
@@ -115,7 +115,7 @@ class Application_Model_Reports {
 
 		$select = $tbl->select();
 		$select->where("last_transaction = ? ", "Publish_response")
-			->where($port_type . " = ? ", "GT");
+			->where($port_type . " = ? ", Application_Model_General::getSettings('InternalProvider'));
 
 		$results = $select->query()->fetchAll();
 

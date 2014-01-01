@@ -37,6 +37,10 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 				case "Number":
 					$this->setBodyField($key, $value);
 					break;
+				case "Phone_number":
+					$this->setBodyField('Number', $value);
+					break;
+
 			}
 		}
 	}
@@ -56,8 +60,6 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 //			return "Gen07";
 //		}
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
-
-			Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
 			return $timer_ack;
 		}
 		return true;
@@ -92,5 +94,23 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 		//else //this request is from cron! internal is sending to all providers
 		//don't save in Requests DB
 	}
+	
+	protected function addApprovalXml(&$xml, $msgType) {
+		if ($this->getBodyField("APPROVAL_IND") === "Y") {
+			$xml->$msgType->positiveApproval;
+			$xml->$msgType->positiveApproval->approvalInd = "Y";
+			$xml->$msgType->positiveApproval->currentOperator = $this->data['CURRENT_OPERATOR'];
+		} else {
+			$xml->$msgType->negativeApproval;
+			$xml->$msgType->negativeApproval->approvalInd = "N";
+			$rejectReasonCode = $this->getBodyField('REJECT_REASON_CODE');
+			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL) ? $rejectReasonCode : '';
+		}
+	}
+	
+	protected function addTrxNoXml(&$xml, $msgType) {
+		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
+	}
+
 
 }

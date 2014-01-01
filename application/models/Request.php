@@ -44,9 +44,8 @@ class Application_Model_Request {
 
 			//from provider
 			//if does not have a number get it from request_id - for sending to internal
-			if (!isset($params['NUMBER']) && ($params['MSG_TYPE'] != "Check") && isset($params['REQUEST_ID'])) {
-
-				$params['NUMBER'] = Application_Model_General::getFieldFromRequests("number", $params['REQUEST_ID']);
+			if (!isset($params['PHONE_NUMBER']) && ($params['MSG_TYPE'] != "Check") && isset($params['REQUEST_ID'])) {
+				$params['PHONE_NUMBER'] = Application_Model_General::getFieldFromRequests("phone_number", $params['REQUEST_ID']);
 			}
 
 			$this->data = $params;
@@ -73,15 +72,15 @@ class Application_Model_Request {
 			if (!isset($params['TRX_NO'])) {
 				$transaction = Application_Model_General::getTransactions($params['REQUEST_ID'], $params['MSG_TYPE']);
 				$params['TRX_NO'] = $transaction[0]['trx_no'];
-				$params['RETRY_DATE'] = Application_Model_General::getDateIso($transaction[0]['last_transactions_time']);
+				$params['RETRY_DATE'] = Application_Model_General::getDateIso($transaction[0]['last_transaction_time']);
 			}
 			$this->data = $params;
 		} else if ($params) {
 			// we are receiving data => need to send to provider
-			if (!isset($params['REQUEST_ID']) && ($params['MSG_TYPE'] != "Check") && isset($params['NUMBER'])) {
+			if (!isset($params['REQUEST_ID']) && ($params['MSG_TYPE'] != "Check") && isset($params['PHONE_NUMBER'])) {
 				//CALL FROM INTERNAL WITH NO REQUEST ID
 				//if the type is check the request id will be added later- on insert to DB
-				$params['REQUEST_ID'] = Application_Model_General::getFieldFromRequests("request_id", $params['NUMBER']);
+				$params['REQUEST_ID'] = Application_Model_General::getFieldFromRequests("request_id", $params['PHONE_NUMBER']);
 			}
 			$this->data = $params;
 		} else {
@@ -165,7 +164,7 @@ class Application_Model_Request {
 		if ($validate == TRUE) {
 			$this->saveDB();
 			$ack = $this->request->getAck();
-
+		
 			$content = $request->SendRequestToInternal($ack, $this->request->getRejectReasonCode(), $this->request->getIDValue());
 			if (empty($content)) {
 				Application_Model_General::logRequest($this->request->getHeaderField('REQUEST_ID'), "ExecuteRequest: Internal CRM error");
@@ -247,8 +246,8 @@ class Application_Model_Request {
 				$this->saveTransactionsDB();
 			}
 
-			if (!isset($this->data['NUMBER']) || $this->data['NUMBER'] == NULL) {
-				$this->data['NUMBER'] = Application_Model_General::getFieldFromRequests('number', $this->data['REQUEST_ID']);
+			if (!isset($this->data['PHONE_NUMBER']) || $this->data['PHONE_NUMBER'] == NULL) {
+				$this->data['PHONE_NUMBER'] = Application_Model_General::getFieldFromRequests('phone_number', $this->data['REQUEST_ID']);
 			} else if ($this->data['MSG_TYPE'] != "Publish") {
 //				Application_Model_General::writeToLog($this->data);
 			}
@@ -321,17 +320,12 @@ class Application_Model_Request {
 			$adapter = $tbl->getAdapter();
 			$adapter->beginTransaction();
 			try {
-				// TODO: fix mysql strict compatibility
-				$_id = $tbl->insert(array());
-				$id = substr("00000000000" . $_id, -12, 12);
-				$trx_no = Application_Model_General::getSettings('InternalProvider');
-				$trx_no = $trx_no . $id;
-				$this->request->setTrxNo($trx_no);
+				$temp_trx_no = Application_Model_General::createRandKey(14);
 				if (isset($this->data['request_id'])) {
 					$reqId = $this->data['request_id'];
 				}
 				$row_insert = array(
-					'trx_no' => $trx_no,
+					'trx_no' => $temp_trx_no,
 					'request_id' => $reqId,
 					'message_type' => $this->request->getHeaderField("MSG_TYPE"),
 					'ack_code' => $this->request->getAck(),
@@ -350,11 +344,17 @@ class Application_Model_Request {
 
 					$row_insert['donor'] = Application_Model_General::getDonorByReqId($reqId);
 				}
-				$res = $tbl->update($row_insert, "id = " . $_id);
+				
+				$_id = $tbl->insert($row_insert);
+				$id = substr("00000000000" . $_id, -12, 12);
+				$trx_no = Application_Model_General::getSettings('InternalProvider') . $id;
+				$ret = $tbl->update(array('trx_no' => $trx_no), "id = " . $_id);
+				$this->request->setTrxNo($trx_no);
+				
 				$adapter->commit();
 				return true;
 			} catch (Exception $e) {
-				error_log("the reason for the error GT : " . print_r($e, 1));
+				error_log("Error on create record in transactions table: " . $e->getMessage());
 				$adapter->rollBack();
 				return false;
 			}
@@ -418,12 +418,9 @@ class Application_Model_Request {
 			Application_Model_General::saveShutDownDetails("GT", "UP");
 		}
 
-		// TODO oc666 : Need spec for this section
-
 		$message_recipient_code = $this->request->getHeaderField("TO");
-//		$request_id = $this->request->getHeaderField("REQUEST_ID");
 
-		if (strtoupper($lastTransaction) == "PUBLISH" && strtoupper($message_recipient_code) != "XX") {
+		if (strtoupper($lastTransaction) == "PUBLISH") {
 			$url = $this->getRecipientUrl();
 			$trx_no = $this->request->getHeaderField("TRX_NO");
 			$request_id = $this->request->getHeaderField("REQUEST_ID");
@@ -431,33 +428,11 @@ class Application_Model_Request {
 			// TODO oc666: why need to save transaction here?
 			$client = $this->getSoapClient($url);
 			$ret = $this->sendAgain($client);
-		}
-		if (strtoupper($lastTransaction) == "PUBLISH" && strtoupper($message_recipient_code) == "XX") {
-			$request_id = $this->request->getHeaderField("REQUEST_ID");
-
-			$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
-			$select = $tbl->select();
-			$select->where('request_id = ?', $request_id);
-			$result = $select->query();
-			$row = $result->fetch();
-			$row['forceAll'] = 1;
-			$cmd = "/cron/checkpublish";
-			Application_Model_General::forkProcess($cmd, $row);
-			return true;
 		} else {
 			$url = $this->getRecipientUrl();
-			if ($url == "QA") {
-				$soapAckCode = "undefined";
-				Application_Model_General::updateSoapAckCode($soapAckCode, $request_id, $lastTransaction);
-				return true; //for QA 
-			}
-
-			if (strtoupper($lastTransaction) != "PUBLISH" && strtoupper($message_recipient_code) != "XX") {
-				$client = $this->getSoapClient($url);
-				$ret = $this->sendSoap($client);
-			}
+			$client = $this->getSoapClient($url);
+			$ret = $this->sendSoap($client);
 		}
-
 
 		if (!isset($ret) || !isset($ret->NP_ACK->ACK_CODE)) {
 			return false;
@@ -503,14 +478,14 @@ class Application_Model_Request {
 		try {
 			$soapArray = $this->responseArray();
 
-			$trxInc = (int) substr($soapArray['NP_MESSAGE']['HEADER']['TRX_NO'], 3);
+//			$trxInc = (int) substr($soapArray['NP_MESSAGE']['HEADER']['TRX_NO'], 3);
 			// TODO oc666: why we need this??
 //			$trxInc = $trxInc + 1;
 //			$trxIncLen = strlen($trxInc);
 
-			$formatted = sprintf("%012d", $trxInc);
-			$newTrxNo = substr($soapArray['NP_MESSAGE']['HEADER']['TRX_NO'], 0, 2) . $formatted;
-			$soapArray['NP_MESSAGE']['HEADER']['TRX_NO'] = $newTrxNo;
+//			$formatted = sprintf("%012d", $trxInc);
+//			$newTrxNo = substr($soapArray['NP_MESSAGE']['HEADER']['TRX_NO'], 0, 2) . $formatted;
+//			$soapArray['NP_MESSAGE']['HEADER']['TRX_NO'] = $newTrxNo;
 			$retryNo = Application_Model_General::checkIfRetry($this->request->getHeaderField('REQUEST_ID'), $this->request->getHeaderField('MSG_TYPE'));
 			if (!empty($retryNo)) {
 				$soapArray['NP_MESSAGE']['HEADER']['RETRY_NO'] = $retryNo;

@@ -55,7 +55,6 @@ class Np_Method_InquireNumber extends Np_Method {
 //			return "Gen07";
 //		}
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
-			Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
 			return $timer_ack;
 		}
 		return true;
@@ -72,8 +71,8 @@ class Np_Method_InquireNumber extends Np_Method {
 				'request_id' => $this->getHeaderField("REQUEST_ID"),
 				'number' => $this->getBodyField("NUMBER"),
 				'from_provider' => $this->getHeaderField("TO"),
+				'to_provider' => $this->getHeaderField("FROM"),
 				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
-				'to_provider' => $this->getHeaderField("FROM")
 			);
 			return $tbl->insert($data);
 		}

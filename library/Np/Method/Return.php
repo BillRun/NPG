@@ -36,6 +36,9 @@ class Np_Method_Return extends Np_Method {
 				case "Number":
 					$this->setBodyField($key, $value);
 					break;
+				case "Phone_number":
+					$this->setBodyField('Number', $value);
+					break;
 			}
 		}
 	}
@@ -51,7 +54,6 @@ class Np_Method_Return extends Np_Method {
 //			return "Gen07";
 //		}
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
-			Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
 			return $timer_ack;
 		}
 		return true;
@@ -74,7 +76,7 @@ class Np_Method_Return extends Np_Method {
 			$data = array(
 				'request_id' => $this->getHeaderField("REQUEST_ID"),
 				'from_provider' => $this->getHeaderField("FROM"),
-				'to_provider' => $this->getHeaderField("TO"), // ב"ר קולט שולח הודעה
+				'to_provider' => $this->getHeaderField("TO"),
 				'status' => 1,
 				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
 				'number' => $this->getBodyField("NUMBER"),

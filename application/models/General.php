@@ -135,11 +135,11 @@ class Application_Model_General {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::master());
 		$update_arr = array('ack_code' => $ackCode);
 		$where_arr = array(
-			'request_id =?' => $requestId,
-			'message_type=?' => $lastTransaction,
+			'request_id = ?' => $requestId,
+			'message_type = ?' => $lastTransaction,
 		);
 		if (!empty($trx_no)) {
-			$where_arr['trx_no'] = $trx_no;
+			$where_arr['trx_no = ?'] = $trx_no;
 		}
 		$res = $tbl->update($update_arr, $where_arr);
 		return $res;
@@ -156,9 +156,9 @@ class Application_Model_General {
 			$row = array();
 			$row['process_type'] = isset($request['PROCESS_TYPE']) ? $request['PROCESS_TYPE'] : NULL;
 			$row['msg_type'] = isset($request['MSG_TYPE']) ? $request['MSG_TYPE'] : NULL;
-			$row['number'] = isset($request['NUMBER']) ? $request['NUMBER'] : NULL;
-			$row['from'] = isset($request['FROM']) ? $request['FROM'] : NULL;
-			$row['to'] = isset($request['TO']) ? $request['TO'] : NULL;
+			$row['phone_number'] = isset($request['PHONE_NUMBER']) ? $request['PHONE_NUMBER'] : NULL;
+			$row['from_provider'] = isset($request['FROM_PROVIDER']) ? $request['FROM_PROVIDER'] : (isset($request['FROM'])?$request['FROM']:NULL);
+			$row['to_provider'] = isset($request['TO_PROVIDER']) ? $request['TO_PROVIDER'] : (isset($request['TO'])?$request['TO']:NULL);
 			if (isset($request['FORK'])) {
 				$row['additional'] = "FORK";
 			}
@@ -385,7 +385,10 @@ class Application_Model_General {
 			$row = array();
 			$row['request_id'] = isset($request['REQUEST_ID']) ? $request['REQUEST_ID'] : NULL;
 			$row['timer'] = isset($timer) ? $timer : NULL;
-			$row['transaction_time'] = isset($request['RETRY_DATE']) ? $request['RETRY_DATE'] : NULL;
+			if (isset($request['RETRY_DATE'])) {
+				$row['transaction_time'] = self::getDateTimeInSqlFormat($request['RETRY_DATE']);
+			}
+			
 			$row['network_type'] = isset($request['PROCESS_TYPE']) ? $request['PROCESS_TYPE'] : NULL;
 			$tbl = new Application_Model_DbTable_ActivityTimers(Np_Db::master());
 			$res = $tbl->insert($row);
@@ -432,7 +435,7 @@ class Application_Model_General {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 
 		if (is_null($filterField)) {
-			$filterField = (($fields !== 'number') ? 'number' : 'request_id');
+			$filterField = (($fields !== 'phone_number') ? 'phone_number' : 'request_id');
 		}
 		$select = $tbl->select();
 		$select->where($filterField . ' = ?', $value)->order('id DESC')->limit(1);
@@ -569,14 +572,14 @@ class Application_Model_General {
 	/**
 	 * check if we sent check already
 	 * 
-	 * @param long $number phone number to check
+	 * @param long $phone_number phone number to check
 	 * 
 	 * @return true if we sent already check
 	 */
-	static public function previousCheck($number) {
+	static public function previousCheck($phone_number) {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select()
-				->where('number=?', $number)
+				->where('phone_number=?', $phone_number)
 				->where('status=?', "1")
 				->order('id DESC');
 		$result = $select->query()->fetch();
@@ -592,7 +595,7 @@ class Application_Model_General {
 	 * @param string $requestId the request id to check
 	 * @param string $msgtype which message to search for previous check
 	 * 
-	 * @return int the number of retries we try to send this message
+	 * @return int the phone number of retries we try to send this message
 	 */
 	static public function checkIfRetry($request_id, $msg_type) {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
@@ -752,6 +755,10 @@ class Application_Model_General {
 		$where_arr = array('trx_no =?' => $trx_no);
 		$res = $tbl->update($update_arr, FALSE);
 		return $res;
+	}
+	
+	public static function createRandKey($length = 32) {
+		return substr(md5(microtime()), 0, $length);
 	}
 
 }

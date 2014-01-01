@@ -124,13 +124,15 @@ class Application_Model_Cron {
 		$ret = array();
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select();
-		$minutes = 10;
-		$min_minutes = 5;
-		$max_minutes = 15;
 
+		$min_minutes = 7;
+		$max_minutes = 21;
+		$min_time = Application_Model_General::getTimeInSqlFormat(strtotime($min_minutes . ' minutes ago'));
+		$max_time = Application_Model_General::getTimeInSqlFormat(strtotime($max_minutes . ' minutes ago'));
 		$select->where('last_transaction = ?', 'Publish')
-			->where('transfer_time <= \'' . Application_Model_General::getTimeInSqlFormat(strtotime('-' . $min_minutes . ' minutes ago')) . '\'')
-			->where('transfer_time > \'' . Application_Model_General::getTimeInSqlFormat(strtotime('-' . $max_minutes . ' minutes ago')) . '\'')
+			->where('transfer_time > \'' . $max_time . '\'')
+			->where('transfer_time <= \'' . $min_time . '\'')
+			->where('to_provider = ?', Application_Model_General::getSettings('InternalProvider'))
 			->where('status =  1');
 //		print $select;die;
 		$result = $select->query();
@@ -167,7 +169,7 @@ class Application_Model_Cron {
 		// make sure the request is ok.
 		// can use $reqModel->RequestValidate() but maybe there is no need becuse i'm building it
 		//fix bug #5285
-		$params['NUMBER'] = Application_Model_General::getFieldFromRequests("number", $params['REQUEST_ID']);
+		$params['PHONE_NUMBER'] = Application_Model_General::getFieldFromRequests("phone_number", $params['REQUEST_ID']);
 		//end of fix bug #5285
 		Application_Model_General::writeToLog($params);
 		$reqModel->ExecuteFromInternal();
@@ -199,7 +201,7 @@ class Application_Model_Cron {
 		// make sure the request is ok.
 		// can use $reqModel->RequestValidate() but maybe there is no need becuse i'm building it
 		//fix bug #5285
-		$params['NUMBER'] = Application_Model_General::getFieldFromRequests("number", $params['REQUEST_ID']);
+		$params['PHONE_NUMBER'] = Application_Model_General::getFieldFromRequests("phone_number", $params['REQUEST_ID']);
 		//end of fix bug #5285
 		Application_Model_General::writeToLog($params);
 		$reqModel->ExecuteFromInternal();
@@ -383,7 +385,7 @@ class Application_Model_Cron {
 		$update_arr = array('status' => 0);
 		$where_arr = array(
 			'last_transaction =?' => $msg_type,
-			'last_requests_time < ?' => $compareTime,
+			'last_request_time < ?' => $compareTime,
 			'status =?' => 1
 		);
 

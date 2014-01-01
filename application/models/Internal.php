@@ -23,18 +23,18 @@ class Application_Model_Internal {
 	 * @var array $require_fields
 	 */
 	protected static $require_fields = array(
-		'Check' => array("MSG_TYPE", "TO", "NUMBER"),
-		'Request' => array("MSG_TYPE", "TO", "NUMBER", "PORT_TIME"),
-		'Update' => array("MSG_TYPE", "TO", "NUMBER", "PORT_TIME"),
-		'Cancel' => array("MSG_TYPE", "TO", "NUMBER"),
-		'Execute' => array("MSG_TYPE", "TO", "NUMBER"),
-		'Return' => array("MSG_TYPE", "TO", "NUMBER"),
-		'Publish' => array("MSG_TYPE", "TO", "NUMBER"),
-		'Cancel_publish' => array("MSG_TYPE", "TO", "NUMBER"),
-		'KD_update' => array("MSG_TYPE", "TO", "NUMBER"),
-		'Up_system' => array("MSG_TYPE", "TO"),
-		'Down_system' => array("MSG_TYPE", "TO"),
-		'Inquire_number' => array("MSG_TYPE", "FROM", "NUMBER"),
+		'Check' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER"),
+		'Request' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER", "PORT_TIME"),
+		'Update' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER", "PORT_TIME"),
+		'Cancel' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER"),
+		'Execute' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER"),
+		'Return' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER"),
+		'Publish' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER"),
+		'Cancel_publish' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER"),
+		'KD_update' => array("MSG_TYPE", "TO_PROVIDER", "PHONE_NUMBER"),
+		'Up_system' => array("MSG_TYPE", "TO_PROVIDER"),
+		'Down_system' => array("MSG_TYPE", "TO_PROVIDER"),
+		'Inquire_number' => array("MSG_TYPE", "FROM_PROVIDER", "PHONE_NUMBER"),
 	);
 
 	/**
@@ -110,52 +110,57 @@ class Application_Model_Internal {
 		$adapter = $tbl->getAdapter();
 		$adapter->beginTransaction();
 		try {
-			$_id = $tbl->insert(array());
-			$id = substr("0000" . $_id, -5, 5);
-
-			$request_id = "NP";
-			$request_id .= $this->params['FROM'];  //AA
-			$request_id .= $this->params['TO'];  //BB
-			$request_id .= date("ymd");  //YYMMDD
-			$request_id .= $id;
-			$request_id .= "0001"; //ZZZZ";      //for now nothing
-
+			// we create temp request id because it build from the mysql internal id
+			$temp_request_id = Application_Model_General::createRandKey(21);
 			if (
 				(strtoupper($this->params['MSG_TYPE']) != 'UP_SYSTEM' && strtoupper($this->params['MSG_TYPE']) != 'DOWN_SYSTEM')) {
 				$row_insert = array(
-					'request_id' => $request_id,
+					'request_id' => $temp_request_id,
 					'status' => 1,
 					'last_transaction' => $this->params["MSG_TYPE"],
-					'number' => $this->params["NUMBER"],
+					'phone_number' => $this->params["PHONE_NUMBER"],
 				);
 				if (isset($this->params['MSG_TYPE']) == 'CHECK' && isset($this->params['IDENTIFICATION_VALUE'])) {
 					$row_insert['flags'] = json_encode(array('identification_value' => $this->params['IDENTIFICATION_VALUE']));
 				}
 			} else {
 				$row_insert = array(
-					'request_id' => $request_id,
+					'request_id' => $temp_request_id,
 					'status' => 1,
 					'last_transaction' => $this->params["MSG_TYPE"]
 				);
 			}
 			// we set to from & to as the direction of number transfer
 			if (strtoupper($this->params['MSG_TYPE']) != 'RETURN_NUMBER') {
-				$row_insert['from_provider'] = $this->params["TO"];
-				$row_insert['to_provider'] = $this->params["FROM"];
+				$row_insert['from_provider'] = $this->params["TO_PROVIDER"];
+				$row_insert['to_provider'] = $this->params["FROM_PROVIDER"];
 			} else {
-				$row_insert['from_provider'] = $this->params["FROM"];
-				$row_insert['to_provider'] = $this->params["TO"];
+				$row_insert['from_provider'] = $this->params["FROM_PROVIDER"];
+				$row_insert['to_provider'] = $this->params["TO_PROVIDER"];
 			}
 			if (isset($this->params["AUTO_CHECK"]) && $this->params["AUTO_CHECK"]) {
 				$row_insert['auto_check'] = 1;
 //				$row_insert['transfer_time'] = Application_Model_General::getTimeInSqlFormat($this->params['PORT_TIME']);
 			}
 
-			$tbl->update($row_insert, "id = " . $_id);
+			$_id = $tbl->insert($row_insert);
+			
+			$id = substr("0000" . $_id, -5, 5);
+
+			$request_id = "NP"
+						. $this->params['FROM_PROVIDER']  //AA
+						. $this->params['TO_PROVIDER']    //BB
+						. date("ymd")                     //YYMMDD
+						. $id
+						. "0001";                         //ZZZZ  
+
+			
+			$tbl->update(array('request_id' => $request_id), "id = " . $_id);
+
 			$adapter->commit();
 			return $request_id;
 		} catch (Exception $e) {
-			error_log("Cannot create request ID");
+			error_log("Cannot create request ID. Reason: " . $e->getMessage());
 			$adapter->rollBack();
 		}
 		return FALSE;
@@ -175,16 +180,16 @@ class Application_Model_Internal {
 				$this->params['AUTO_CHECK'] = 1;
 			}
 		}
-		if (isset($this->params['MSG_TYPE']) && $this->params['MSG_TYPE'] == "Check" && Application_Model_General::previousCheck($this->params['NUMBER']) || $this->params['MSG_TYPE'] == "Inquire_number" //might need to take these off because of standard process flow
+		if (isset($this->params['MSG_TYPE']) && $this->params['MSG_TYPE'] == "Check" && Application_Model_General::previousCheck($this->params['PHONE_NUMBER']) || $this->params['MSG_TYPE'] == "Inquire_number" //might need to take these off because of standard process flow
 			|| $this->params['MSG_TYPE'] == "Return" || $this->params['MSG_TYPE'] == "Execute" || $this->params['MSG_TYPE'] == "Publish" || $this->params['MSG_TYPE'] == "Cancel_publish" || $this->params['MSG_TYPE'] == "Up_system" || $this->params['MSG_TYPE'] == "Down_system") {
 			$this->params['REQUEST_ID'] = $this->createRequestId();
-		} elseif ($this->params['MSG_TYPE'] == "Check" && !Application_Model_General::previousCheck($this->params['NUMBER'])) {
-			$this->setErrorMsg("the number you have submitted is already in process");
+		} elseif ($this->params['MSG_TYPE'] == "Check" && !Application_Model_General::previousCheck($this->params['PHONE_NUMBER'])) {
+			$this->setErrorMsg("the phone number you have submitted is already in process");
 			return FALSE;
 		} elseif (($this->params['MSG_TYPE'] == "Cancel" &&
-			Application_Model_General::previousCheck($this->params['NUMBER'])) ||
+			Application_Model_General::previousCheck($this->params['PHONE_NUMBER'])) ||
 			($this->params['MSG_TYPE'] == "Update" &&
-			Application_Model_General::previousCheck($this->params['NUMBER']))) {
+			Application_Model_General::previousCheck($this->params['PHONE_NUMBER']))) {
 			$this->setErrorMsg("invalid order of transactions .");
 			return FALSE;
 		}
@@ -225,7 +230,7 @@ class Application_Model_Internal {
 						"MSG_TYPE" => "Request",
 						"TO" => $this->params['FROM'],
 						"PORT_TIME" => $transfer_time,
-						"NUMBER" => $this->params['NUMBER'],
+						"PHONE_NUMBER" => $this->params['PHONE_NUMBER'],
 						"PROCESS_TYPE" => $this->params['PROCESS_TYPE'],
 						"FROM" => $this->params['TO'],
 						"RETRY_DATE" => Application_Model_General::getDateIso(),
@@ -244,7 +249,7 @@ class Application_Model_Internal {
 					"TO" => "KD",
 					"KD_update_type" => strtoupper(str_ireplace("Response", "", $type)),
 					"PROCESS_TYPE" => $this->params['PROCESS_TYPE'],
-					"NUMBER" => $this->params['NUMBER'],
+					"PHONE_NUMBER" => $this->params['PHONE_NUMBER'],
 					"RETRY_DATE" => Application_Model_General::getDateIso(),
 					"RETRY_NO" => $this->params['RETRY_NO'],
 					"VERSION_NO" => Application_Model_General::getSettings("VersionNo"),
@@ -264,11 +269,11 @@ class Application_Model_Internal {
 	protected function previousCheckExists() {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select()->order("id DESC")
-			->where('number=?', $this->params['NUMBER'])
+			->where('phone_number=?', $this->params['PHONE_NUMBER'])
 			->order('id DESC');
 		$result = $select->query()->fetchObject();
 		if ($result) {
-			$last_request_time_diff = time() - strtotime($result->last_requests_time);
+			$last_request_time_diff = time() - strtotime($result->last_request_time);
 			if ((in_array($result->last_transaction, Application_Model_General::$inProcess)) ||
 				($result->last_transaction == "Check_response" &&
 				$last_request_time_diff < Np_Timers::get("T2DR2")
@@ -304,9 +309,8 @@ class Application_Model_Internal {
 	protected function PreValidate() {
 		if (isset($this->params['MSG_TYPE'])) {
 			if ($this->params['MSG_TYPE'] != "Up_system" && $this->params['MSG_TYPE'] != "Down_system") {
-				if (!$this->params['NUMBER'] || !is_numeric($this->params['NUMBER'])) {
-
-					$this->setErrorMsg("the number you have submitted is invalid");
+				if (!$this->params['PHONE_NUMBER'] || !is_numeric($this->params['PHONE_NUMBER'])) {
+					$this->setErrorMsg("the phone number you have submitted is invalid");
 					return FALSE;
 				}
 			}
@@ -405,7 +409,7 @@ class Application_Model_Internal {
 			$idValue = "no details";
 		}
 		$ret = array(
-			'number' => $this->params['NUMBER'], //check is set otherwise select number from DB from request_id
+			'number' => $this->params['PHONE_NUMBER'], //check is set otherwise select phone number from DB from request_id
 			'provider' => $provider,
 			'msg_type' => $this->params['MSG_TYPE'],
 			'reqId' => $this->params['REQUEST_ID'],
@@ -527,8 +531,8 @@ class Application_Model_Internal {
 			'NETWORK_TYPE' => Application_Model_General::getSettings('NetworkType'),
 			'NUMBER_TYPE' => "I", //@TODO take from config
 		);
-		$number = array("NUMBER" => $this->params['NUMBER']);
-		Application_Model_General::writeToLog(array_merge($response, $number));
+		$phone_number = array("PHONE_NUMBER" => $this->params['PHONE_NUMBER']);
+		Application_Model_General::writeToLog(array_merge($response, $phone_number));
 		//check $status 
 		if (($status->status == "Ack00" && !isset($status->resultCode)) || ($status->status == NULL && $status->resultCode == "Ack00")) {
 			$response['APPROVAL_IND'] = "Y";

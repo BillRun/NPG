@@ -67,10 +67,10 @@ class MonitorController extends Zend_Controller_Action {
 			'from_provider' => 'from_provider',
 			'to_provider' => 'to_provider',
 			'status' => 'status',
-			'last_requests_time' => 'last_requests_time',
+			'last_request_time' => 'last_request_time',
 			'last_transaction' => 'last_transaction',
 			'flags' => 'flags',
-			'number' => 'number',
+			'phone_number' => 'phone_number',
 			'transfer_time' => 'transfer_time',
 			'disconnect_time' => 'disconnect_time',
 			'connect_time' => 'connect_time',
@@ -86,7 +86,7 @@ class MonitorController extends Zend_Controller_Action {
 			$post_data = $this->getRequest()->getPost();
 			unset($post_data['submit']);
 			$model->saveRow($post_data);
-			$this->_redirect(Application_Model_General::getBaseUrl() . '/monitor?phone=' . (string) $post_data['number']);
+			$this->_redirect(Application_Model_General::getBaseUrl() . '/monitor?phone=' . (string) $post_data['phone_number']);
 			exit('redirect...');
 			//redirect to logger
 		}

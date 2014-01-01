@@ -45,6 +45,9 @@ class Np_Method_KDUpdate extends Np_Method {
 				case "Remark":
 					$this->setBodyField($key, $value);
 					break;
+				case "Phone_number":
+					$this->setBodyField('Number', $value);
+					break;
 			}
 		}
 	}

@@ -55,7 +55,6 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 //			return "Gen07";
 //		}
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
-			Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
 			return $timer_ack;
 		}
 		return true;

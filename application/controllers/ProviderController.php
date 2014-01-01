@@ -43,7 +43,7 @@ class ProviderController extends Zend_Controller_Action {
 	private function handleSOAP() {
 		$soap = new Zend_Soap_Server(Application_Model_General::getWsdl(), array('soap_version' => SOAP_1_1));
 		$soap->setClass('Np_Soap_Handler');
-		$result = $soap->handle();
+		$soap->handle();
 		$response = $soap->getLastResponse();
 
 		return $response; // - change to result from handle 
@@ -90,13 +90,10 @@ class ProviderController extends Zend_Controller_Action {
 	public function internalAction() {
 
 		$params = Application_Model_General::getParamsArray($this->getRequest()->getParams());
+//		error_log(print_R($params, 1));
 		$reqModel = new Application_Model_Request($params);
-
-		if (isset($params['MANUAL']) && $params['MANUAL']) {
-			$reqModel->ExecuteRequest(true);
-		} else {
-			$reqModel->ExecuteRequest(false);
-		}
+		$manual = isset($params['MANUAL']) && $params['MANUAL'];
+		$reqModel->ExecuteRequest($manual);
 	}
 
 }

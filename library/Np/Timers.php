@@ -90,7 +90,7 @@ class Np_Timers {
 	 *
 	 * @var type 
 	 */
-	static $last_requests_time;
+	static $last_request_time;
 
 	/**
 	 *
@@ -162,16 +162,16 @@ class Np_Timers {
 		}
 		$compare_time = $input_time + self::get($timer);
 		if (self::$debug) {
-			error_log("timer type GT:      " . $timer);
-			error_log("timer time GT:       " . self::get($timer));
-			error_log("input time GT: " . $input_time);
-			error_log("time GT:       " . $time);
-			error_log("compare time GT:       " . $compare_time);
-			error_log("lt: " . ($lt ? "TRUE" : "FALSE"));
+			error_log("timer type:   " . $timer);
+			error_log("timer time:   " . self::get($timer));
+			error_log("input time:   " . $input_time);
+			error_log("time:         " . $time);
+			error_log("compare time: " . $compare_time);
+			error_log("lt:           " . ($lt ? "TRUE" : "FALSE"));
 		}
 		if (($lt && ($compare_time > $time)) || (!$lt && ($compare_time < $time))) {
 			if (self::$debug) {
-				error_log("Timeout GT");
+				error_log("Timeout " . $timer);
 			}
 			self::$failure = $timer;
 			return TRUE;
@@ -198,7 +198,7 @@ class Np_Timers {
 
 		$msg_type = strtolower($request->getHeaderField('MSG_TYPE'));
 		self::$last_transaction = $request->last_method;
-		self::$last_requests_time = $request->last_method_time;
+		self::$last_request_time = $request->last_method_time;
 		self::$last_port_time = $request->last_transfer_time;
 		self::$port_time = $request->getBodyField("PORT_TIME"); // current port time
 
@@ -208,7 +208,7 @@ class Np_Timers {
 			if ($timer['time'] == "PORT") {
 				$input_time = self::$last_port_time;
 			} else {
-				$input_time = self::$last_requests_time;
+				$input_time = self::$last_request_time;
 			}
 			if ($timer['lt']) {
 				$isTimeout = self::isTimeout($timer['code'], $input_time); //true of false
@@ -248,10 +248,10 @@ class Np_Timers {
 	 * @return bool 
 	 */
 	static protected function requestTimeout() {
-		if (self::isTimeout("REQ02", self::$last_requests_time, self::$port_time, TRUE)) {
+		if (self::isTimeout("REQ02", self::$last_request_time, self::$port_time, TRUE)) {
 			return FALSE;
 		}
-		if (self::isTimeout("REQ03", self::$last_requests_time, self::$port_time, FALSE)) {
+		if (self::isTimeout("REQ03", self::$last_request_time, self::$port_time, FALSE)) {
 			return FALSE;
 		}
 		return TRUE;
@@ -278,7 +278,7 @@ class Np_Timers {
 	 * @return bool 
 	 */
 	static protected function cancel_publishTimeout() {
-		if (self::isTimeout("CPB04", self::$last_requests_time)) {
+		if (self::isTimeout("CPB04", self::$last_request_time)) {
 			return FALSE;
 		}
 		return TRUE;
@@ -295,7 +295,7 @@ class Np_Timers {
 		} else { // cancel_response
 			$timer = "T3RK3";
 		}
-		if (self::isTimeout($timer, self::$last_requests_time)) {
+		if (self::isTimeout($timer, self::$last_request_time)) {
 			return FALSE;
 		}
 		return TRUE;
@@ -308,10 +308,10 @@ class Np_Timers {
 	 */
 	static protected function updateTimeout() {
 		//the requested port time is smaller than old port time
-		if (self::isTimeout("UPD02", self::$last_requests_time, self::$port_time)) {
+		if (self::isTimeout("UPD02", self::$last_request_time, self::$port_time)) {
 			return FALSE;
 		}
-		if (self::isTimeout("UPD03", self::$last_requests_time, self::$port_time, FALSE)) {
+		if (self::isTimeout("UPD03", self::$last_request_time, self::$port_time, FALSE)) {
 			return FALSE;
 		}
 		if (self::isTimeout("UPD04", self::$port_time, NULL, FALSE)) {

@@ -26,6 +26,20 @@ class InternalController extends Zend_Controller_Action {
 	 */
 	public function indexAction() {
 		$params = Application_Model_General::getParamsArray($this->getRequest()->getParams());
+		// backward compatability
+		if (isset($params['NUMBER'])) {
+			$params['PHONE_NUMBER'] = $params['NUMBER'];
+			unset($params['NUMBER']);
+		}
+		if (isset($params['TO'])) {
+			$params['TO_PROVIDER'] = $params['TO'];
+			unset($params['TO']);
+		}
+		if (isset($params['FROM'])) {
+			$params['FROM_PROVIDER'] = $params['FROM'];
+			unset($params['FROM']);
+		}
+//		error_log(print_R($params, 1));
 		$this->AddParamsToInternalReq($params);
 		$model = new Application_Model_Internal($params);
 		$obj = new stdClass();
@@ -52,6 +66,7 @@ class InternalController extends Zend_Controller_Action {
 		if (isset($params['REQID'])) {
 			$params['REQUEST_ID'] = $params['REQID'];
 		}
+
 		$reqModel = new Application_Model_Request($params);
 		$reqModel->ExecuteFromInternal();
 	}
@@ -91,7 +106,7 @@ class InternalController extends Zend_Controller_Action {
 	 */
 	private function AddParamsToInternalReq(&$params) {
 //		$params['FORK'] = 1;
-		$params['FROM'] = Application_Model_General::getSettings('InternalProvider'); //requests from internal - Transfer to internal
+		$params['FROM_PROVIDER'] = Application_Model_General::getSettings('InternalProvider'); //requests from internal - Transfer to internal
 		$params['PROCESS_TYPE'] = Application_Model_General::getProcessType($params['MSG_TYPE']);
 		$params['VERSION_NO'] = Application_Model_General::getSettings("VersionNo");
 		$params['RETRY_NO'] = 1;

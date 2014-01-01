@@ -17,7 +17,7 @@ class Application_Model_Monitor {
 		$date = date('Y-m-d') . " 00:00:00";
 		$select = $tbl->select();
 		$select->from(array('r' => 'Requests'), array('r.id'))
-			->where('last_requests_time > ?', $date)
+			->where('last_request_time > ?', $date)
 			->order('r.id DESC');
 		$result = $select->query()->fetchAll();   //take the last one
 
@@ -46,38 +46,38 @@ class Application_Model_Monitor {
 		switch ($table) {
 			case 'Requests':
 				if (!empty($date)) {
-					$select->where('last_' . strtolower($table) . '_time >= ?', $date);
+					$select->where('last_request_time >= ?', $date);
 				}
-				$select->where('last_' . strtolower($table) . '_time <= ?', $tomorrow);
+				$select->where('last_request_time <= ?', $tomorrow);
 				if ($stage) {
 					$select->where('last_transaction IN (?)', $stageMapping[$stage]);
 				}
 				$request_id_field = "t.request_id";
-				$number_field = "t.number";
+				$number_field = "t.phone_number";
 				break;
 			case 'Transactions':
 				$select->join(array('r' => "Requests"), 'r.request_id = t.request_id', array());
 				if (!empty($date)) {
-					$select->where('last_' . strtolower($table) . '_time >= ?', $date);
+					$select->where('last_transaction_time >= ?', $date);
 				}
 				if ($stage) {
 					$select->where('r.last_transaction IN (?)', $stageMapping[$stage]);
 				}
-				$select->where('last_' . strtolower($table) . '_time <= ?', $tomorrow);
+				$select->where('last_transaction_time <= ?', $tomorrow);
 				$request_id_field = "r.request_id";
-				$number_field = "r.number";
+				$number_field = "r.phone_number";
 				break;
 			case 'Logs':
-				$select->join(array('r' => "Requests"), 'r.number = t.number', array());
+				$select->join(array('r' => "Requests"), 'r.phone_number = t.phone_number', array());
 				if (!empty($date)) {
-					$select->where('time >= ?', $date);
+					$select->where('log_time >= ?', $date);
 				}
 				if ($stage) {
 					$select->where('r.last_transaction IN (?)', $stageMapping[$stage]);
 				}
 
-				$select->where('time <= ?', $tomorrow);
-				$number_field = "t.number";
+				$select->where('log_time <= ?', $tomorrow);
+				$number_field = "t.phone_number";
 
 				$request_id_field = "r.request_id";
 				break;
@@ -91,7 +91,7 @@ class Application_Model_Monitor {
 			$select->where($request_id_field . ' =?', $reqId);
 		}
 		$select->order("t.id DESC")->limit($this->limit);
-//		print $select;
+//		print $select;die;
 		$rows = $db->query($select)->fetchAll();
 
 		return $rows;

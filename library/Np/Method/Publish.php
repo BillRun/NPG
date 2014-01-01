@@ -41,6 +41,9 @@ class Np_Method_Publish extends Np_Method {
 				case "Publish_type":
 					$this->setBodyField($key, $value);
 					break;
+				case "Phone_number":
+					$this->setBodyField('Number', $value);
+					break;
 			}
 		}
 	}
@@ -66,6 +69,12 @@ class Np_Method_Publish extends Np_Method {
 		if (!$this->ValidateDB()) {
 			return "Gen07";
 		}
+		
+		$providers = Application_Model_General::getProviderArray();
+		if (!in_array($this->getBodyField('donor'), $providers)) {
+			return 'Pub05';
+		}
+
 		if (($timer_ack = Np_Timers::validate($this)) !== TRUE) {
 			return $timer_ack;
 		}
@@ -83,22 +92,30 @@ class Np_Method_Publish extends Np_Method {
 		//this is a request from provider!
 		//save a new row in Requests DB
 		if ($this->getHeaderField("FROM") != Application_Model_General::getSettings('InternalProvider')) {
-			$flags = new stdClass();
-			$flags->publish_type = $this->getBodyField("PUBLISH_TYPE");
-			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
-			$data = array(
-				'request_id' => $this->getHeaderField("REQUEST_ID"),
-				'from_provider' => $this->getHeaderField("TO"),
-				'to_provider' => $this->getHeaderField("FROM"),
-				'status' => 1,
-				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
-				'number' => $this->getBodyField("NUMBER"),
-				'disconnect_time' => $this->getBodyField("DISCONNECT_TIME"),
-				'connect_time' => $this->getBodyField("CONNECT_TIME"),
-				'flags' => json_encode($flags),
-			);
+			try {
+				$flags = new stdClass();
+				$flags->publish_type = $this->getBodyField("PUBLISH_TYPE");
+				$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
+				$data = array(
+					'request_id' => $this->getHeaderField("REQUEST_ID"),
+					'from_provider' => $this->getHeaderField("TO"),
+					'to_provider' => $this->getHeaderField("FROM"),
+					'status' => 1,
+					'last_transaction' => $this->getHeaderField("MSG_TYPE"),
+					'phone_number' => $this->getBodyField("NUMBER"),
+					'disconnect_time' => Application_Model_General::getTimeInSqlFormat($this->getBodyField("DISCONNECT_TIME")),
+					'connect_time' => Application_Model_General::getTimeInSqlFormat($this->getBodyField("CONNECT_TIME")),
+					'flags' => json_encode($flags),
+				);
 
-			return $tbl->insert($data);
+				if (!empty($this->getBodyField("ROUTE_TIME"))) {
+					$data['CONNECT_TIME'] = Application_Model_General::getTimeInSqlFormat($this->getBodyField("ROUTE_TIME"));
+				}
+
+				return $tbl->insert($data);
+			} catch (Exception $e) {
+				error_log("Error on create record in transactions table: " . $e->getMessage());
+			}
 		}
 		return TRUE;
 	}
@@ -114,7 +131,7 @@ class Np_Method_Publish extends Np_Method {
 		if ($networkType === "M") {
 			$xml->$msgType->mobile;
 			$xml->$msgType->mobile->numberType = "I";
-			$xml->$msgType->mobile->number = $this->request->getBodyField("NUMBER");
+			$xml->$msgType->mobile->number = $this->getBodyField("NUMBER");
 		} else {
 			$xml->$msgType->fixed->fixedNumberSingle;
 		}
