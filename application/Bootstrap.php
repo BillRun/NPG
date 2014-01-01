@@ -21,7 +21,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		foreach ($config['db'] as $name => $dbConf) {
 			// Set up database
 			$db = Zend_Db::factory($dbConf['adapter'], $dbConf['params']);
-			$db->query("SET NAMES 'utf8'");
+//			$db->query("SET NAMES 'utf8'");
 			$dbArrays[$name] = $db;
 
 			if ((boolean) $dbConf['default']) {
