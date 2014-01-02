@@ -384,7 +384,7 @@ class Application_Model_Internal {
 			$client->setMethod(Zend_Http_Client::POST);
 			$response = $client->request();
 			$ret = $response->getBody();
-			$logContentResponse = "Receive from internal " . PHP_EOL . $ret . PHP_EOL . PHP_EOL . PHP_EOL;
+			$logContentResponse = "Response from internal " . PHP_EOL . $ret . PHP_EOL . PHP_EOL . PHP_EOL;
 			Application_Model_General::logRequest($logContentResponse, $data['reqId']);
 		} elseif ($this->protocal == 'soap') {
 			$client = new Zend_Soap_Client();

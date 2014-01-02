@@ -80,7 +80,6 @@ class Np_Method_Request extends Np_Method {
 		$updateArray = array(
 			'status' => 1,
 			'last_transaction' => $this->getHeaderField("MSG_TYPE"),
-//			'transfer_time' => Application_Model_General::getTimeInSqlFormatFlip($this->getBodyField("PORT_TIME"))
 		);
 		$whereArray = array(
 			'request_id = ?' => $this->getHeaderField("REQUEST_ID"),

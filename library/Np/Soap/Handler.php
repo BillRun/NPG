@@ -136,10 +136,12 @@ class Np_Soap_Handler {
 						$data['TO_NUMBER'] = (string) $xmlArray->fixed->fixedNumberRange->toNumber;
 					} else {
 						$data['NUMBER'] = (string) $xmlArray->fixed->fixedNumberSingle->number;
+						$data['PHONE_NUMBER'] = (string) $xmlArray->fixed->fixedNumberSingle->number;
 					}
 				} else {
 					$data['NUMBER_TYPE'] = (string) $xmlArray->mobile->numberType;
 					$data['NUMBER'] = (string) $xmlArray->mobile->number;
+					$data['PHONE_NUMBER'] = (string) $xmlArray->mobile->number;
 				}
 
 				break;
