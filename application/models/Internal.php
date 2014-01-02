@@ -358,6 +358,7 @@ class Application_Model_Internal {
 	 * @return string
 	 */
 	public function SendRequestToInternal($ack = "Ack00", $rejectReasonCode = "OK", $idValue = NULL) {
+		usleep(100000);
 		$data = $this->createPostData($ack, $rejectReasonCode, $idValue);
 		$url = Application_Model_General::getSettings('UrlToInternalResponse');
 		$auth = Application_Model_General::getSettings('InternalAuth');
@@ -378,9 +379,13 @@ class Application_Model_Internal {
 				}
 				$client->setAuth($user);
 			}
+			$logContentRequest = "Send to internal " . PHP_EOL . print_R(array_merge(array('method' => $method), $data), 1) . PHP_EOL;
+			Application_Model_General::logRequest($logContentRequest, $data['reqId']);
 			$client->setMethod(Zend_Http_Client::POST);
 			$response = $client->request();
 			$ret = $response->getBody();
+			$logContentResponse = "Receive from internal " . PHP_EOL . $ret . PHP_EOL . PHP_EOL . PHP_EOL;
+			Application_Model_General::logRequest($logContentResponse, $data['reqId']);
 		} elseif ($this->protocal == 'soap') {
 			$client = new Zend_Soap_Client();
 			$client->setUri($url);
