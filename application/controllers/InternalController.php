@@ -54,6 +54,11 @@ class InternalController extends Zend_Controller_Action {
 			$obj->desc = $desc;
 		}
 		$this->view->ack = $obj;
+		// log the request and response
+		$logContentRequest = "Receive from internal " . PHP_EOL . print_R($this->getRequest()->getParams(), 1) . PHP_EOL;
+		Application_Model_General::logRequest($logContentRequest, $obj->reqId);
+		$logContentResponse = "Response to internal " . PHP_EOL . print_R($obj, 1) . PHP_EOL;
+		Application_Model_General::logRequest($logContentResponse, $obj->reqId);
 	}
 
 	/**
