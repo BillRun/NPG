@@ -140,7 +140,7 @@ class Application_Model_Internal {
 			}
 			if (isset($this->params["AUTO_CHECK"]) && $this->params["AUTO_CHECK"]) {
 				$row_insert['auto_check'] = 1;
-//				$row_insert['transfer_time'] = Application_Model_General::getTimeInSqlFormat($this->params['PORT_TIME']);
+//				$row_insert['transfer_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['PORT_TIME']);
 			}
 
 			$_id = $tbl->insert($row_insert);
@@ -233,7 +233,7 @@ class Application_Model_Internal {
 						"PHONE_NUMBER" => $this->params['PHONE_NUMBER'],
 						"PROCESS_TYPE" => $this->params['PROCESS_TYPE'],
 						"FROM" => $this->params['TO'],
-						"RETRY_DATE" => Application_Model_General::getDateIso(),
+						"RETRY_DATE" => Application_Model_General::getDateTimeIso(),
 						"RETRY_NO" => $this->params['RETRY_NO'],
 						"VERSION_NO" => Application_Model_General::getSettings("VersionNo"),
 					);
@@ -250,7 +250,7 @@ class Application_Model_Internal {
 					"KD_update_type" => strtoupper(str_ireplace("Response", "", $type)),
 					"PROCESS_TYPE" => $this->params['PROCESS_TYPE'],
 					"PHONE_NUMBER" => $this->params['PHONE_NUMBER'],
-					"RETRY_DATE" => Application_Model_General::getDateIso(),
+					"RETRY_DATE" => Application_Model_General::getDateTimeIso(),
 					"RETRY_NO" => $this->params['RETRY_NO'],
 					"VERSION_NO" => Application_Model_General::getSettings("VersionNo"),
 				);
@@ -296,8 +296,7 @@ class Application_Model_Internal {
 			->order('id DESC');
 		$result = $select->query()->fetchObject();
 		if ($result && $result->auto_check) {
-			$datetime = new Zend_Date($result->transfer_time, 'yyyy-MM-dd HH:mm:ss', new Zend_Locale('he_IL'));
-			return $datetime->getTimestamp();
+			return Application_Model_General::getDateTimeInTimeStamp($result->transfer_time);
 		}
 		return false;
 	}
@@ -358,7 +357,9 @@ class Application_Model_Internal {
 	 * @return string
 	 */
 	public function SendRequestToInternal($ack = "Ack00", $rejectReasonCode = "OK", $idValue = NULL) {
-		usleep(100000);
+		if (strpos(APPLICATION_ENV, 'prod') === FALSE) {
+			usleep(100000); // important for dev/testing environments
+		}
 		$data = $this->createPostData($ack, $rejectReasonCode, $idValue);
 		$url = Application_Model_General::getSettings('UrlToInternalResponse');
 		$auth = Application_Model_General::getSettings('InternalAuth');
@@ -530,7 +531,7 @@ class Application_Model_Internal {
 			'FROM' => $this->params['TO'],
 			'TO' => $this->params['FROM'],
 			'REQUEST_RETRY_DATE' => $this->params['RETRY_DATE'],
-			'RETRY_DATE' => Application_Model_General::getDateIso(),
+			'RETRY_DATE' => Application_Model_General::getDateTimeIso(),
 			'RETRY_NO' => isset($this->params['RETRY_NO']) ? $this->params['RETRY_NO'] : 1,
 			'VERSION_NO' => Application_Model_General::getSettings("VersionNo"),
 			'NETWORK_TYPE' => Application_Model_General::getSettings('NetworkType'),
@@ -550,7 +551,7 @@ class Application_Model_Internal {
 		}
 		if ($this->params['MSG_TYPE'] == "Execute") {
 			$time = isset($status->DISCONNECT_TIME) ? $status->DISCONNECT_TIME : null;
-			$response['DISCONNECT_TIME'] = Application_Model_General::getDateIso($time);
+			$response['DISCONNECT_TIME'] = Application_Model_General::getDateTimeIso($time);
 		}
 		if ($response['MSG_TYPE'] == "Inquire_number_response") {
 

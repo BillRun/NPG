@@ -72,7 +72,7 @@ class Application_Model_Request {
 			if (!isset($params['TRX_NO'])) {
 				$transaction = Application_Model_General::getTransactions($params['REQUEST_ID'], $params['MSG_TYPE']);
 				$params['TRX_NO'] = $transaction[0]['trx_no'];
-				$params['RETRY_DATE'] = Application_Model_General::getDateIso($transaction[0]['last_transaction_time']);
+				$params['RETRY_DATE'] = Application_Model_General::getDateTimeIso($transaction[0]['last_transaction_time']);
 			}
 			$this->data = $params;
 		} else if ($params) {
@@ -305,7 +305,7 @@ class Application_Model_Request {
 				$data['reject_reason_code'] = $rejectReasonCode;
 			}
 			if ($msgType == "Update" || $msgType == "Request") {
-				$data['requested_transfer_time'] = Application_Model_General::getTimeInSqlFormatFlip($portTime);
+				$data['requested_transfer_time'] = Application_Model_General::getDateTimeInSqlFormat($portTime);
 			}
 			if ($msgType == "Publish") {
 				$data['donor'] = Application_Model_General::getDonorByReqId($reqId);
@@ -338,7 +338,7 @@ class Application_Model_Request {
 				}
 				if ($msgType == "Update" || $msgType == "Request" ||
 					($msgType == "Check" && Application_Model_General::isAutoCheck($reqId))) {
-					$row_insert['requested_transfer_time'] = Application_Model_General::getTimeInSqlFormat($portTime);
+					$row_insert['requested_transfer_time'] = Application_Model_General::getDateTimeInSqlFormat($portTime);
 				}
 				if ($msgType == "Publish") {
 

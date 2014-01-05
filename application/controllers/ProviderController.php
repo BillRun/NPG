@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Controller for incoming Soap messages (number transactions)
+ * Controller for incoming Soap messages (from external providers)
  * 
  * @package         ApplicationController
  * @subpackage      ProviderController
@@ -47,35 +47,6 @@ class ProviderController extends Zend_Controller_Action {
 		$response = $soap->getLastResponse();
 
 		return $response; // - change to result from handle 
-	}
-
-	/**
-	 *
-	 * The URL for SOAP requests coming in from Internal 
-	 * 
-	 * @package ApplicationController
-	 * @subpackage ProviderController
-	 * 
-	 */
-	public function internalsoapAction() {
-		$this->_helper->viewRenderer->setNoRender();
-		$this->_helper->layout->setLayout('clean');
-		$res = $this->internalhandleSOAP();
-		$this->view->ack = $res;
-	}
-
-	/**
-	 *
-	 * SOAP Handle Function for Internal
-	 * 
-	 * @return bool $result The Result of the SOAP Handle Function
-	 * 
-	 */
-	private function internalhandleSOAP() {
-		$soap = new Zend_Soap_Server(Application_Model_General::getWsdl(), array('soap_version' => SOAP_1_1));
-		$soap->setClass('Np_Soap_HandlerInternal');
-		$result = $soap->handle();
-		return $result; // - change to result from handle 
 	}
 
 	/**

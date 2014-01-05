@@ -10,7 +10,7 @@ class Application_Form_Request extends Zend_Form {
 
 		// Set the method for the display form to POST
 		$this->setMethod('POST');
-		$this->setAction("/monitor/send/");
+		$this->setAction(Application_Model_General::getBaseUrl() . "/monitor/send/");
 
 		$processTypeOptions = array(
 			'label' => 'PROCESS_TYPE',

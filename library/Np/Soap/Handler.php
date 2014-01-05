@@ -33,7 +33,9 @@ class Np_Soap_Handler {
 	 * 		@return		array "NP_ACK" or string
 	 */
 	public function sendMessage($params) {
-
+		if (strpos(APPLICATION_ENV, 'prod') === FALSE) {
+			usleep(100000); // on dev/testing environments is important for logging order
+		}
 		$data = $this->intoArray($params);
 		$reqModel = new Application_Model_Request($data); //prepares data for sending internal the message
 		$ack = $reqModel->Execute();
@@ -46,7 +48,7 @@ class Np_Soap_Handler {
 			$ack = "Ack00";
 		}
 		return array('NP_ACK' => array('ACK_CODE' => $ack, //returns default value for testing need to fix
-				'ACK_DATE' => Application_Model_General::getDateIso()));
+				'ACK_DATE' => Application_Model_General::getDateTimeIso()));
 	}
 
 	/**

@@ -69,10 +69,9 @@ class Application_Model_General {
 		}
 		if (!array_key_exists($key, $settings)) {
 			$settings[$key] = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOption($key);
-		} else {
-			if (!is_null($default)) {
-				return $default;
-			}
+		}
+		if (is_null($settings[$key]) && !is_null($default)) {
+			return $default;
 		}
 		return $settings[$key];
 	}
@@ -200,7 +199,7 @@ class Application_Model_General {
 	 */
 	public static function updateTransactions($reqID, $requestedTransferTime, $msgType) {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::master());
-		$update_arr = array('requested_transfer_time' => Application_Model_General::getTimeInSqlFormat($requestedTransferTime));
+		$update_arr = array('requested_transfer_time' => Application_Model_General::getDateTimeInSqlFormat($requestedTransferTime));
 		$where_arr = array(
 			'request_id =?' => $reqID,
 			'message_type =?' => $msgType
@@ -210,56 +209,7 @@ class Application_Model_General {
 	}
 
 	/**
-	 * 
-	 * 
-	 * @param type $strTime
-	 * @return string Date in SQL Format 
-	 */
-	public static function getTimeInSqlFormat($strTime) {
-		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
-		return $time->toString('yy-MM-dd HH:mm:ss');
-	}
-
-	/**
-	 * 
-	 * 
-	 * @param type $strTime
-	 * @return string Date in SQL Format 
-	 */
-	public static function getTimeInSqlFormatFlip($strTime) {
-		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
-		return $time->toString('yy-MM-dd HH:mm:ss');
-	}
-
-	/**
-	 * 
-	 * 
-	 * @param type $strTime
-	 * @return string Date in SQL Format 
-	 */
-	public static function getTimeInSqlFormatAgg($strTime) {
-		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
-		return $time->toString('yy-MM-dd HH:mm:ss');
-	}
-
-	/**
-	 * dd-mm 
-	 * 
-	 * @param type $strTime
-	 * @return string Date in SQL Format 
-	 */
-	public static function getTimeInSqlFormatForAgg($strTime) {
-		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
-		return $time->toString('yyyy-dd-MM HH:mm:ss');
-	}
-
-	public static function getRealTimeInSqlFormatForAgg($strTime) {
-		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
-		return $time->toString('yyyy-MM-dd');
-	}
-
-	/**
-	 * 
+	 * get sql format of date time
 	 * 
 	 * @param type $strTime
 	 * @return string Date in SQL Format 
@@ -270,18 +220,18 @@ class Application_Model_General {
 	}
 
 	/**
-	 * 
+	 * get sql format of date time
 	 * 
 	 * @param type $strTime
 	 * @return string Date in SQL Format 
 	 */
-	public static function getTimeStampInSqlFormat($strTime) {
+	public static function getDateTimeInTimeStamp($strTime) {
 		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
 		return $time->getTimestamp();
 	}
 
 	/**
-	 * 
+	 * get the NPG wsdl
 	 * @return string WSDL URL 
 	 */
 	public static function getWsdl() {
@@ -306,13 +256,9 @@ class Application_Model_General {
 	 * 
 	 * @return string Date in ISO-8601 format
 	 */
-	public static function getDateIso($date = null) {
+	public static function getDateTimeIso($date = null) {
 		$date = new Zend_Date($date, null, new Zend_Locale('he_IL'));
-		$iso = $date->getIso();
-//		$brokenIso = explode("+", $iso);
-//		$brokenIso[0] = $brokenIso[0] . ".00";
-//		$iso = implode("+", $brokenIso);
-		return $iso;
+		return $date->getIso();
 	}
 
 	/**
@@ -386,7 +332,7 @@ class Application_Model_General {
 			$row['request_id'] = isset($request['REQUEST_ID']) ? $request['REQUEST_ID'] : NULL;
 			$row['timer'] = isset($timer) ? $timer : NULL;
 			if (isset($request['RETRY_DATE'])) {
-				$row['transaction_time'] = self::getDateTimeInSqlFormat($request['RETRY_DATE']);
+//				$row['transaction_time'] = self::getDateTimeInSqlFormat($request['RETRY_DATE']);
 			}
 			
 			$row['network_type'] = isset($request['PROCESS_TYPE']) ? $request['PROCESS_TYPE'] : NULL;
@@ -533,7 +479,7 @@ class Application_Model_General {
 					->order('id DESC');
 			$result = $select->query()->fetchObject();
 			if ($result !== FALSE && isset($result->requested_transfer_time)) {
-				$datetime = new Zend_Date($result->requested_transfer_time, 'yyyy-MM-dd HH:mm:ss', new Zend_Locale('he_IL'));
+				$datetime = new Zend_Date($result->requested_transfer_time, null, new Zend_Locale('he_IL'));
 				return $datetime->getTimestamp();
 			} else {
 				return TRUE;
@@ -747,16 +693,12 @@ class Application_Model_General {
 		return $results;
 	}
 
-	public static function modifySentRow($trx_no) {
-//		var_dump($request_id);
-//		die;
-		$tbl = new Application_Model_DbTable_Transactions(Np_Db::master());
-		$update_arr = array('message_type' => "Message Sent");
-		$where_arr = array('trx_no =?' => $trx_no);
-		$res = $tbl->update($update_arr, FALSE);
-		return $res;
-	}
-	
+	/**
+	 * method to create random key in specific length
+	 * @param int $length the length of the generated key
+	 * 
+	 * @return string random key
+	 */
 	public static function createRandKey($length = 32) {
 		return substr(md5(microtime()), 0, $length);
 	}

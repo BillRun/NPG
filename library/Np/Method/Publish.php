@@ -103,13 +103,13 @@ class Np_Method_Publish extends Np_Method {
 					'status' => 1,
 					'last_transaction' => $this->getHeaderField("MSG_TYPE"),
 					'phone_number' => $this->getBodyField("NUMBER"),
-					'disconnect_time' => Application_Model_General::getTimeInSqlFormat($this->getBodyField("DISCONNECT_TIME")),
-					'connect_time' => Application_Model_General::getTimeInSqlFormat($this->getBodyField("CONNECT_TIME")),
+					'disconnect_time' => Application_Model_General::getDateTimeInSqlFormat($this->getBodyField("DISCONNECT_TIME")),
+					'connect_time' => Application_Model_General::getDateTimeInSqlFormat($this->getBodyField("CONNECT_TIME")),
 					'flags' => json_encode($flags),
 				);
 
 				if (!empty($this->getBodyField("ROUTE_TIME"))) {
-					$data['CONNECT_TIME'] = Application_Model_General::getTimeInSqlFormat($this->getBodyField("ROUTE_TIME"));
+					$data['CONNECT_TIME'] = Application_Model_General::getDateTimeInSqlFormat($this->getBodyField("ROUTE_TIME"));
 				}
 
 				return $tbl->insert($data);
@@ -125,9 +125,9 @@ class Np_Method_Publish extends Np_Method {
 		$msgType = $this->getHeaderField('MSG_TYPE');
 		$networkType = Application_Model_General::getSettings("NetworkType");
 		$xml->$msgType->donor = $this->getBodyField('DONOR');
-		$xml->$msgType->connectDateTime = Application_Model_General::getDateIso($this->getBodyField('CONNECT_TIME'));
+		$xml->$msgType->connectDateTime = Application_Model_General::getDateTimeIso($this->getBodyField('CONNECT_TIME'));
 		$xml->$msgType->publishType = $this->getBodyField('PUBLISH_TYPE');
-		$xml->$msgType->disconnectDateTime = Application_Model_General::getDateIso($this->getBodyField('DISCONNECT_TIME'));
+		$xml->$msgType->disconnectDateTime = Application_Model_General::getDateTimeIso($this->getBodyField('DISCONNECT_TIME'));
 		if ($networkType === "M") {
 			$xml->$msgType->mobile;
 			$xml->$msgType->mobile->numberType = "I";

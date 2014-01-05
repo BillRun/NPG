@@ -46,8 +46,8 @@ class Application_Model_Cron {
 		$select = $tbl->select();
 		// the first two conditions will verify it will run only in the first 17 minutes
 		$select->where('transfer_time IS NOT NULL');
-		$select->where('transfer_time <= \'' . Application_Model_General::getTimeInSqlFormat(time()) . '\'');
-		$select->where('transfer_time > \'' . Application_Model_General::getTimeInSqlFormat(strtotime($minutes . ' minutes ago')) . '\'');
+		$select->where('transfer_time <= \'' . Application_Model_General::getDateTimeInSqlFormat(time()) . '\'');
+		$select->where('transfer_time > \'' . Application_Model_General::getDateTimeInSqlFormat(strtotime($minutes . ' minutes ago')) . '\'');
 		$select->where('last_transaction IN (?)', $execute_statuses);
 		$select->where("to_provider LIKE '" . Application_Model_General::getSettings('InternalProvider') . "'");
 		$select->where('status = 1');
@@ -127,8 +127,8 @@ class Application_Model_Cron {
 
 		$min_minutes = 7;
 		$max_minutes = 21;
-		$min_time = Application_Model_General::getTimeInSqlFormat(strtotime($min_minutes . ' minutes ago'));
-		$max_time = Application_Model_General::getTimeInSqlFormat(strtotime($max_minutes . ' minutes ago'));
+		$min_time = Application_Model_General::getDateTimeInSqlFormat(strtotime($min_minutes . ' minutes ago'));
+		$max_time = Application_Model_General::getDateTimeInSqlFormat(strtotime($max_minutes . ' minutes ago'));
 		$select->where('last_transaction = ?', 'Publish')
 			->where('transfer_time > \'' . $max_time . '\'')
 			->where('transfer_time <= \'' . $min_time . '\'')
@@ -161,7 +161,7 @@ class Application_Model_Cron {
 			'MSG_TYPE' => "Execute",
 			'FROM' => Application_Model_General::getSettings('InternalProvider'),
 			'TO' => $request['from_provider'],
-			"RETRY_DATE" => Application_Model_General::getDateIso(),
+			"RETRY_DATE" => Application_Model_General::getDateTimeIso(),
 			"RETRY_NO" => "1",
 			"VERSION_NO" => Application_Model_General::getSettings("VersionNo"),
 		);
@@ -193,7 +193,7 @@ class Application_Model_Cron {
 			'MSG_TYPE' => "Execute_response",
 			'TO' => Application_Model_General::getSettings('InternalProvider'),
 			'FROM' => $request['from_provider'],
-			"RETRY_DATE" => Application_Model_General::getDateIso(),
+			"RETRY_DATE" => Application_Model_General::getDateTimeIso(),
 			"RETRY_NO" => "1",
 			"VERSION_NO" => Application_Model_General::getSettings("VersionNo"),
 		);
@@ -245,7 +245,7 @@ class Application_Model_Cron {
 		$params['FROM'] = Application_Model_General::getSettings('InternalProvider');
 		$params['DONOR'] = $params['FROM_PROVIDER']; //$row['DONOR'] = $provider;
 		$params['PUBLISH_TYPE'] = $publish_type;
-		$params["RETRY_DATE"] = Application_Model_General::getDateIso();
+		$params["RETRY_DATE"] = Application_Model_General::getDateTimeIso();
 		$params["RETRY_NO"] = $this->get_retry_no($params);
 		$params["VERSION_NO"] = Application_Model_General::getSettings("VersionNo");
 
@@ -379,7 +379,7 @@ class Application_Model_Cron {
 	static public function setTimeoutChecks($msg_type = "Check", $time = 1, $checkTransferTimeExists = false) {
 //		$setTimeOutArray = array('Check'=>'30','Check_response'=>'30','Request'=>'30',);
 		$dateInTimeStamp = time() - ($time * 60);
-		$compareTime = Application_Model_General::getTimeInSqlFormat($dateInTimeStamp);
+		$compareTime = Application_Model_General::getDateTimeInSqlFormat($dateInTimeStamp);
 
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 		$update_arr = array('status' => 0);

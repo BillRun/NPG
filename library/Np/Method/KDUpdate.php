@@ -107,7 +107,7 @@ class Np_Method_KDUpdate extends Np_Method {
 		$number = $this->getBodyField('NUMBER');
 
 		$flags = json_decode($requestRecord['flags'], true);
-		$portTime = Application_Model_General::getDateIso($requestRecord['transfer_time']);
+		$portTime = Application_Model_General::getDateTimeIso($requestRecord['transfer_time']);
 		$process_type = $this->getHeaderField('PROCESS_TYPE');
 		if ($process_type == "PORT") {
 			$path = &$xml->$msgType->updateRequestType;

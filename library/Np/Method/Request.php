@@ -98,7 +98,7 @@ class Np_Method_Request extends Np_Method {
 
 		$msgType = $this->getHeaderField('MSG_TYPE');
 
-		$xml->$msgType->portingDateTime = Application_Model_General::getDateIso($this->getBodyField('PORT_TIME'));
+		$xml->$msgType->portingDateTime = Application_Model_General::getDateTimeIso($this->getBodyField('PORT_TIME'));
 		;
 
 		return $xml;

@@ -105,7 +105,6 @@ class MonitorController extends Zend_Controller_Action {
 		$params = $this->getRequest()->getParams();
 		$form->setDefaults($params);
 		$this->view->form = $form;
-		$this->view->form->setAction("/monitor/send/");
 
 		if (isset($params['message'])) {
 			$this->view->message = (string) $params['message'];

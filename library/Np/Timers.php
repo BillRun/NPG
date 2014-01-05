@@ -156,7 +156,7 @@ class Np_Timers {
 			$input_time = strtotime($input_time);
 		}
 		if (empty($time)) {
-			$time = Application_Model_General::getTimeStampInSqlFormat(time());
+			$time = time();
 		} else if (!is_numeric($time)) {
 			$time = strtotime($time);
 		}

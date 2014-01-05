@@ -93,7 +93,7 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 		$updateArray = array(
 			'status' => 1,
 			'last_transaction' => $this->getHeaderField("MSG_TYPE"),
-			'disconnect_time' => Application_Model_General::getTimeInSqlFormat($this->getBodyField("DISCONNECT_TIME")),
+			'disconnect_time' => Application_Model_General::getDateTimeInSqlFormat($this->getBodyField("DISCONNECT_TIME")),
 		);
 		// if it's execute_response that leaves, status => 0 (no more actions)
 		if ($this->getHeaderField("FROM") == Application_Model_General::getSettings('InternalProvider')) {
