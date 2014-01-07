@@ -223,7 +223,7 @@ class Application_Model_Request {
 			}
 
 			if (isset($obj->status)) {
-				if (strtolower($obj->status) == 'true') {
+				if (strtolower($obj->status) == 'true' || strtolower($obj->status) == 'false') {
 					$ret = 'Ack00';
 				} else {
 					$ret = $obj->status;

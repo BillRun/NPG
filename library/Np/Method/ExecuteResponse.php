@@ -111,7 +111,6 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 			$whereArray = array(
 				'request_id =?' => $this->getHeaderField("REQUEST_ID"),
 			);
-			error_log(print_R($updateArray, 1));
 			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 			return $tbl->update($updateArray, $whereArray);
 
