@@ -32,7 +32,8 @@ class Application_Model_General {
 		"Execute", "Execute_response",
 		"Publish",
 	);
-	
+	static protected $locales = array();
+
 	/**
 	 * 
 	 * @var string $baseurl 
@@ -156,8 +157,8 @@ class Application_Model_General {
 			$row['process_type'] = isset($request['PROCESS_TYPE']) ? $request['PROCESS_TYPE'] : NULL;
 			$row['msg_type'] = isset($request['MSG_TYPE']) ? $request['MSG_TYPE'] : NULL;
 			$row['phone_number'] = isset($request['PHONE_NUMBER']) ? $request['PHONE_NUMBER'] : NULL;
-			$row['from_provider'] = isset($request['FROM_PROVIDER']) ? $request['FROM_PROVIDER'] : (isset($request['FROM'])?$request['FROM']:NULL);
-			$row['to_provider'] = isset($request['TO_PROVIDER']) ? $request['TO_PROVIDER'] : (isset($request['TO'])?$request['TO']:NULL);
+			$row['from_provider'] = isset($request['FROM_PROVIDER']) ? $request['FROM_PROVIDER'] : (isset($request['FROM']) ? $request['FROM'] : NULL);
+			$row['to_provider'] = isset($request['TO_PROVIDER']) ? $request['TO_PROVIDER'] : (isset($request['TO']) ? $request['TO'] : NULL);
 			if (isset($request['FORK'])) {
 				$row['additional'] = "FORK";
 			}
@@ -215,7 +216,7 @@ class Application_Model_General {
 	 * @return string Date in SQL Format 
 	 */
 	public static function getDateTimeInSqlFormat($strTime) {
-		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
+		$time = new Zend_Date($strTime, null, Application_Model_General::getLocale(null, true));
 		return $time->toString('yyyy-MM-ddTHH:mm:ss');
 	}
 
@@ -226,7 +227,7 @@ class Application_Model_General {
 	 * @return string Date in SQL Format 
 	 */
 	public static function getDateTimeInTimeStamp($strTime) {
-		$time = new Zend_Date($strTime, null, new Zend_Locale('he_IL'));
+		$time = new Zend_Date($strTime, null, Application_Model_General::getLocale(null, true));
 		return $time->getTimestamp();
 	}
 
@@ -240,7 +241,7 @@ class Application_Model_General {
 			$position = Application_Model_General::getSettings('NpWsdlPosition');
 			if ($position === "relative") {
 				self::$wsdl = Application_Model_General::getBaseUrl() .
-						Application_Model_General::getSettings('NpWsdl');
+					Application_Model_General::getSettings('NpWsdl');
 			} else {
 				return Application_Model_General::getSettings('NpWsdl');
 			}
@@ -257,7 +258,7 @@ class Application_Model_General {
 	 * @return string Date in ISO-8601 format
 	 */
 	public static function getDateTimeIso($date = null) {
-		$date = new Zend_Date($date, null, new Zend_Locale('he_IL'));
+		$date = new Zend_Date($date, null, Application_Model_General::getLocale(null, true));
 		return $date->getIso();
 	}
 
@@ -276,12 +277,12 @@ class Application_Model_General {
 		$querystring = http_build_query($params);
 		if (!$post) {
 			$cmd = "wget -O /dev/null '" . $forkUrl . $url . "?" . $querystring .
-					"' > /dev/null & ";
+				"' > /dev/null & ";
 		} else {
 			$cmd = "wget -O /dev/null '" . $forkUrl . $url . "' --post-data '" . $querystring .
-					"' > /dev/null & ";
+				"' > /dev/null & ";
 		}
-		
+
 //		echo $cmd . "<br />" . PHP_EOL;
 		if (system($cmd) === FALSE) {
 			error_log("Can't fork PHP process");
@@ -334,7 +335,7 @@ class Application_Model_General {
 			if (isset($request['RETRY_DATE'])) {
 //				$row['transaction_time'] = self::getDateTimeInSqlFormat($request['RETRY_DATE']);
 			}
-			
+
 			$row['network_type'] = isset($request['PROCESS_TYPE']) ? $request['PROCESS_TYPE'] : NULL;
 			$tbl = new Application_Model_DbTable_ActivityTimers(Np_Db::master());
 			$res = $tbl->insert($row);
@@ -431,7 +432,7 @@ class Application_Model_General {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select();
 		$select->where('trx_no = ?', $trxno)
-				->order('id DESC');
+			->order('id DESC');
 		$result = $select->query()->fetchObject();   //take the last one
 		if ($result) {
 			return $result->requested_transfer_time;
@@ -450,8 +451,8 @@ class Application_Model_General {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select();
 		$select->where('request_id = ?', $reqId)
-				->where('message_type = ?', "Request")
-				->order('id DESC');
+			->where('message_type = ?', "Request")
+			->order('id DESC');
 		$result = $select->query()->fetchObject();   //take the last one
 		if ($result) {
 			return $result->requested_transfer_time;
@@ -473,13 +474,13 @@ class Application_Model_General {
 		if ($result && $result->auto_check) {
 			$db = Np_Db::slave();
 			$select = $db->select()->from("Transactions")
-					->where('request_id=?', $reqId)
-					->where('message_type=?', $transcation)
-					->where('requested_transfer_time IS NOT NULL')
-					->order('id DESC');
+				->where('request_id=?', $reqId)
+				->where('message_type=?', $transcation)
+				->where('requested_transfer_time IS NOT NULL')
+				->order('id DESC');
 			$result = $select->query()->fetchObject();
 			if ($result !== FALSE && isset($result->requested_transfer_time)) {
-				$datetime = new Zend_Date($result->requested_transfer_time, null, new Zend_Locale('he_IL'));
+				$datetime = new Zend_Date($result->requested_transfer_time, null, Application_Model_General::getLocale(null, true));
 				return $datetime->getTimestamp();
 			} else {
 				return TRUE;
@@ -505,14 +506,7 @@ class Application_Model_General {
 	 * @return type string or NULL
 	 */
 	static public function getForkUrl() {
-
-		$forkSetting = Application_Model_General::getSettings('ForkUrl');
-		if (!empty($forkSetting)) {
-			$forkUrl = $forkSetting;
-		} else {
-			$forkUrl = self::getBaseUrl();
-		}
-		return $forkUrl;
+		return Application_Model_General::getSettings('ForkUrl', self::getBaseUrl());
 	}
 
 	/**
@@ -525,9 +519,9 @@ class Application_Model_General {
 	static public function previousCheck($phone_number) {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select()
-				->where('phone_number=?', $phone_number)
-				->where('status=?', "1")
-				->order('id DESC');
+			->where('phone_number=?', $phone_number)
+			->where('status=?', "1")
+			->order('id DESC');
 		$result = $select->query()->fetch();
 		if (!empty($result) && $result !== FALSE) {
 			return false;
@@ -546,8 +540,8 @@ class Application_Model_General {
 	static public function checkIfRetry($request_id, $msg_type) {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select()
-				->where('request_id=?', $request_id)
-				->where('message_type=?', $msg_type);
+			->where('request_id=?', $request_id)
+			->where('message_type=?', $msg_type);
 		$result = $select->query()->fetchAll();
 
 		if (isset($result)) {
@@ -606,7 +600,7 @@ class Application_Model_General {
 		}
 		// TODO oc666: move this to config
 		$base_path = APPLICATION_PATH . '/../logs/' . Application_Model_General::getSettings('InternalProvider') . '/';
-		$path =  $base_path . $relative_path;
+		$path = $base_path . $relative_path;
 //		error_log($path);
 		if ($force_create && !file_exists($path)) {
 			if (!@mkdir($path, 0777, true)) {
@@ -616,7 +610,7 @@ class Application_Model_General {
 		}
 		return $path;
 	}
-	
+
 	/**
 	 * get the logging request file path (for logging purpose)
 	 * 
@@ -644,7 +638,7 @@ class Application_Model_General {
 	public static function logRequest($content, $request_id) {
 		try {
 			$logFilePath = self::getRequestFilePath($request_id, true);
-			
+
 			if (!file_exists($logFilePath)) {
 				mkdir($logFilePath);
 			}
@@ -669,6 +663,7 @@ class Application_Model_General {
 		self::logRequest($prefix . $InternalProvider . " Request: " . print_R($request, 1) . PHP_EOL, $request_id);
 		self::logRequest($prefix . $InternalProvider . " Receive Response: " . print_R($response, 1) . PHP_EOL, $request_id);
 	}
+
 	/**
 	 * search transaction by request id and stage ()
 	 * @param string $request_id the id of the request
@@ -701,6 +696,50 @@ class Application_Model_General {
 	 */
 	public static function createRandKey($length = 32) {
 		return substr(md5(microtime()), 0, $length);
+	}
+
+	public static function isProd() {
+		return strpos(APPLICATION_ENV, 'prod') !== FALSE;
+	}
+
+	/**
+	 * make sleep on non production environments
+	 * useful when the log order is not correct in dev or testing environments
+	 * 
+	 * @param int $sleepTime time to sleep in microseconds. if not supply set by config or default (0.1 seconds)
+	 * 
+	 * @return void
+	 */
+	public static function virtualSleep($sleepTime = null) {
+		if (!self::isProd()) {
+			if (is_null($sleepTime)) {
+				$sleepTime = self::getSettings('testing-sleep', 100000); // microseconds
+			}
+			usleep((int) $sleepTime);
+		}
+	}
+
+	/**
+	 * method to get locale, default to config locale
+	 * 
+	 * @param string $locale the locale to bring if null get locale from settings
+	 * @param boolean $instance if true return zend locale instance
+	 * 
+	 * @return mixed if instance is true return zend locale, else return string
+	 */
+	public static function getLocale($locale = null, $instance = true) {
+		if (is_null($locale)) {
+			$locale = self::getSettings('locale', 'he_IL');
+		}
+		$stamp = md5(serialize(array($locale, $instance)));
+		if (!isset(self::$locales[$stamp])) {
+			if ($instance) {
+				self::$locales[$stamp] = new Zend_Locale($locale);
+			} else {
+				self::$locales[$stamp] = $locale;
+			}
+		}
+		return self::$locales[$stamp];
 	}
 
 }

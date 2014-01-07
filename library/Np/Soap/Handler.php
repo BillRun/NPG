@@ -33,9 +33,7 @@ class Np_Soap_Handler {
 	 * 		@return		array "NP_ACK" or string
 	 */
 	public function sendMessage($params) {
-		if (strpos(APPLICATION_ENV, 'prod') === FALSE) {
-			usleep(100000); // on dev/testing environments is important for logging order
-		}
+		Application_Model_General::virtualSleep();
 		$data = $this->intoArray($params);
 		$reqModel = new Application_Model_Request($data); //prepares data for sending internal the message
 		$ack = $reqModel->Execute();

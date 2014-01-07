@@ -63,17 +63,18 @@ class MonitorController extends Zend_Controller_Action {
 		$this->view->requestsTable = $monitorModel->getAllLogData('Requests', $date, $phone, $request_id, $stage);
 		$this->view->requestsTableFields = array(
 			'id' => 'id',
-			'request_id' => 'request_id',
-			'from_provider' => 'from_provider',
-			'to_provider' => 'to_provider',
+			'request_id' => 'request id',
+			'from_provider' => 'from provider',
+			'to_provider' => 'to provider',
 			'status' => 'status',
-			'last_request_time' => 'last_request_time',
-			'last_transaction' => 'last_transaction',
+			'last_request_time' => 'last request time',
+			'last_transaction' => 'last transaction',
 			'flags' => 'flags',
-			'phone_number' => 'phone_number',
-			'transfer_time' => 'transfer_time',
-			'disconnect_time' => 'disconnect_time',
-			'connect_time' => 'connect_time',
+			'phone_number' => 'phone number',
+			'transfer_time' => 'transfer time',
+			'disconnect_time' => 'disconnect time',
+			'connect_time' => 'connect time',
+			'auto_check' => 'auto_check',
 		); 
 		$this->view->transactionsTable = $monitorModel->getAllLogData('Transactions', $date, $phone, $request_id, $stage);
 		$this->view->logsTable = $monitorModel->getAllLogData('Logs', $date, $phone, $request_id, $stage);

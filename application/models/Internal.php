@@ -236,6 +236,7 @@ class Application_Model_Internal {
 						"RETRY_DATE" => Application_Model_General::getDateTimeIso(),
 						"RETRY_NO" => $this->params['RETRY_NO'],
 						"VERSION_NO" => Application_Model_General::getSettings("VersionNo"),
+						"SLEEP" => 5,
 					);
 				}
 				break;
@@ -357,9 +358,7 @@ class Application_Model_Internal {
 	 * @return string
 	 */
 	public function SendRequestToInternal($ack = "Ack00", $rejectReasonCode = "OK", $idValue = NULL) {
-		if (strpos(APPLICATION_ENV, 'prod') === FALSE) {
-			usleep(100000); // important for dev/testing environments
-		}
+		Application_Model_General::virtualSleep(); // used to write to log to be in order
 		$data = $this->createPostData($ack, $rejectReasonCode, $idValue);
 		$url = Application_Model_General::getSettings('UrlToInternalResponse');
 		$auth = Application_Model_General::getSettings('InternalAuth');
@@ -535,12 +534,12 @@ class Application_Model_Internal {
 			'RETRY_NO' => isset($this->params['RETRY_NO']) ? $this->params['RETRY_NO'] : 1,
 			'VERSION_NO' => Application_Model_General::getSettings("VersionNo"),
 			'NETWORK_TYPE' => Application_Model_General::getSettings('NetworkType'),
-			'NUMBER_TYPE' => "I", //@TODO take from config
+			'NUMBER_TYPE' => isset($this->params['NUMBER_TYPE'])?$this->params['NUMBER_TYPE']:Application_Model_General::getSettings("NumberType"),
 		);
 		$phone_number = array("PHONE_NUMBER" => $this->params['PHONE_NUMBER']);
 		Application_Model_General::writeToLog(array_merge($response, $phone_number));
 		//check $status 
-		if (($status->status == "Ack00" && !isset($status->resultCode)) || ($status->status == NULL && $status->resultCode == "Ack00")) {
+		if ((($status->status == "Ack00" || $status->status == "true") && !isset($status->resultCode)) || ($status->status == NULL && $status->resultCode == "Ack00")) {
 			$response['APPROVAL_IND'] = "Y";
 		} elseif ($status->status == "Gen07") {
 			$response['APPROVAL_IND'] = "N";

@@ -46,7 +46,8 @@ class CronController extends Zend_Controller_Action {
 			//first execute
 			$this->view->transfer = Application_Model_Cron::makeChangeProvider();
 		}
-		if (date('i') % 10 == 9 || $forceAll) {
+		$publish_verification_iteration = Application_Model_General::getSettings('publish-verification-iteration', 20);
+		if (date('i') % $publish_verification_iteration == 0 || $forceAll) {
 			// verify all requests return publish
 			$this->view->publish_check = Application_Model_Cron::checkPublishResponseFromProviders();
 		}
@@ -162,18 +163,18 @@ class CronController extends Zend_Controller_Action {
 
 		$res = Application_Model_Cron::setTimeoutChecks('Check', 11);
 		$res = Application_Model_Cron::setTimeoutChecks('Check_response', 30);
-		$res = Application_Model_Cron::setTimeoutChecks('Request', 60, true);
+//		$res = Application_Model_Cron::setTimeoutChecks('Request', 60, true);
 		// 1500 => more than 24 hrs
 //		$res = Application_Model_Cron::setTimeoutChecks('Request_response',1500);
-		$res = Application_Model_Cron::setTimeoutChecks('Update', 60, true);
+//		$res = Application_Model_Cron::setTimeoutChecks('Update', 60, true);
 //		$res = Application_Model_Cron::setTimeoutChecks('Update_response', 1500);
-		$res = Application_Model_Cron::setTimeoutChecks('Cancel', 15);
+//		$res = Application_Model_Cron::setTimeoutChecks('Cancel', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel_response', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Execute', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Execute_response', 60);
 //		$res = Application_Model_Cron::setTimeoutChecks('Publish', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Publish_response', 5);
-		$res = Application_Model_Cron::setTimeoutChecks('Return', 10);
+//		$res = Application_Model_Cron::setTimeoutChecks('Return', 10);
 //		$res = Application_Model_Cron::setTimeoutChecks('Return_response', 10);
 //		$res = Application_Model_Cron::setTimeoutChecks('Inquire_number', 1);
 //		$res = Application_Model_Cron::setTimeoutChecks('Inquire_number_respon', 0);

@@ -15,7 +15,8 @@ CREATE TABLE `Logs` (
   `to_provider` char(2),
   `log_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `additional` varchar(1024),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `phone_number_idx` (`phone_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='utf8_general_ci';
 
 CREATE TABLE `Requests` (
@@ -35,7 +36,8 @@ CREATE TABLE `Requests` (
   `connect_time` timestamp NULL,
   PRIMARY KEY (`id`),
   KEY `last_transaction_idx` (`last_transaction`),
-  KEY `request_id_idx` (`request_id`)
+  KEY `request_id_idx` (`request_id`),
+  KEY `phone_number_idx` (`phone_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='utf8_general_ci';
 
 CREATE TABLE `Transactions` (

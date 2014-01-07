@@ -125,8 +125,8 @@ class Application_Model_Cron {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select();
 
-		$min_minutes = 7;
-		$max_minutes = 21;
+		$min_minutes = Application_Model_General::getSettings('publish-verification-min', 15);
+		$max_minutes = Application_Model_General::getSettings('publish-verification-max', 240);
 		$min_time = Application_Model_General::getDateTimeInSqlFormat(strtotime($min_minutes . ' minutes ago'));
 		$max_time = Application_Model_General::getDateTimeInSqlFormat(strtotime($max_minutes . ' minutes ago'));
 		$select->where('last_transaction = ?', 'Publish')

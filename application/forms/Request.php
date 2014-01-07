@@ -57,35 +57,23 @@ class Application_Form_Request extends Zend_Form {
 			'value' => ''
 		);
 		$this->addElement('text', 'NUMBER', $numberOptions);
-		$d = new Zend_Date(null, null, 'he_IL');
+		$d = new Zend_Date(null, null, Application_Model_General::getLocale(null, false));
 		$dateOptions = array(
 			'label' => 'PORT TIME',
 			'id' => 'datetimepicker',
 			'required' => true,
 //			'validators' => array('Int'),
-			'value' => $d->toString('YYYY-MM-dd HH:mm:ss', 'he_IL'),
+			'value' => $d->toString('YYYY-MM-dd HH:mm:ss', Application_Model_General::getLocale(null, false)),
 		);
 		$this->addElement('text', 'porttime', $dateOptions);
-		$providers = array(
-				'GT' => 'Golan Telecom',
-				'PL' => 'Pelephone',
-				'PR' => 'Partner Mobile',
-//				'PM' => 'Partner Mapa',
-//				'CL' => 'Cellcom Mobile',
-//				'CM' => 'Cellcom Mapa',
-//				'MI' => 'Mirs',
-//				'BZ' => 'Bezeq',
-//				'HT' => 'Hot',
-//				'KD' => 'DefenseMinistry',
-//				'KZ' => 'Kavei Zahav',
-//				'NV' => 'Barak/Globecall Netvision',
-//				'EX' => 'Exphone'
-		);
+		$providers = Application_Model_General::getProviderArray();
 		$currentProvider = Application_Model_General::getSettings('InternalProvider');
-		unset($providers[$currentProvider]);
+		if (($key = array_search($currentProvider, $providers)) !== FALSE) {
+			unset($providers[$key]);
+		}
 		$toOptions = array(
 			'label' => 'TO',
-			'multioptions' => $providers,
+			'multioptions' => array_combine($providers, $providers),
 		);
 		$this->addElement('select', 'TO', $toOptions);
 		$dateTimeLabelOptions = array(
