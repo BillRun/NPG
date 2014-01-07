@@ -392,7 +392,7 @@ class Application_Model_Request {
 		$dom = new DOMDocument();
 		$dom->loadXML($xmlString);
 		$isValid = $dom->schemaValidate('npMessageBody.xsd');
-		if ($isValid === TRUE) {
+		if ($isValid === TRUE || Application_Model_General::isProd()) {
 			// format the xml with indentation
 			$dom->formatOutput = true;
 			return $dom->saveXML();

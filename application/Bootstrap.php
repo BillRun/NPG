@@ -5,6 +5,8 @@
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
 	public function _initAutoLoad() {
+		// hack for PHP 5.4/5.5
+		libxml_disable_entity_loader(false);
 		$autoLoader = Zend_Loader_Autoloader::getInstance();
 		$autoLoader->registerNamespace('Np_')
 				->setFallbackAutoloader(true)
