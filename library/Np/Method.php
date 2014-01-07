@@ -175,7 +175,6 @@ abstract class Np_Method {
 
 	public function getIDValue() {
 		if ($this->getBodyField("IDENTIFICATION_VALUE")) {
-
 			return $this->getBodyField("IDENTIFICATION_VALUE");
 		} else {
 			return NULL;

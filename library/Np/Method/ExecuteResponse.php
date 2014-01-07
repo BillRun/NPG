@@ -61,24 +61,6 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 	}
 
 	/**
-	 * updates status and connect time in requests by request_id and last transaction
-	 * 
-	 * @param string $ack
-	 * @return bool 
-	 */
-	public function updateDB_ack($ack) {
-
-		$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
-		$update_arr = array('status' => 1, 'connect_time' => new Zend_Db_Expr('NOW()')); //$ack->connect_time);
-		$where_arr = array(
-			'request_id =?' => $this->getHeaderField('REQUEST_ID'),
-			'last_transaction=?' => $this->getHeaderField('MSG_TYPE'),
-		);
-		$res = $tbl->update($update_arr, $where_arr);
-		return $res;
-	}
-
-	/**
 	 * updates status , last transaction and disconnect time in requests table 
 	 * where request_id 
 	 * 
@@ -123,5 +105,17 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
 	}
 
+	public function setConnectTime($connect_time) {
+		if ($this->getHeaderField("TO") == Application_Model_General::getSettings('InternalProvider')) {
+			$updateArray = array('connect_time' => Application_Model_General::getDateTimeInSqlFormat($connect_time));
+			$whereArray = array(
+				'request_id =?' => $this->getHeaderField("REQUEST_ID"),
+			);
+			error_log(print_R($updateArray, 1));
+			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
+			return $tbl->update($updateArray, $whereArray);
+
+		}
+	}
 
 }

@@ -126,17 +126,18 @@ class InternalController extends Zend_Controller_Action {
 		$params['RETRY_NO'] = 1;
 		$params['RETRY_DATE'] = Application_Model_General::getDateTimeIso();
 		$params['NETWORK_TYPE'] = Application_Model_General::getSettings("NetworkType");
-		if (isset($params['more']['number_type'])) {
-			$params['NUMBER_TYPE'] = $params['more']['number_type'];
-		} else if (isset($params['number_type'])) {
-			$params['NUMBER_TYPE'] = $params['number_type'];
-		} else {
+		
+		if (isset($params['more'])) {
+			foreach ($params['more'] as $key => $value) {
+				$params[strtoupper($key)] = $value;
+			}
+		}
+		// backward compatibility
+		if (!isset($params['NUMBER_TYPE'])) {
 			$params['NUMBER_TYPE'] = Application_Model_General::getSettings("NumberType");
 		}
-		if (isset($params['more']['identification_value'])) {
-			$params['IDENTIFICATION_VALUE'] = $params['more']['identification_value'];
-		} else if (isset($params['identification_value'])) {
-			$params['IDENTIFICATION_VALUE'] = $params['identification_value'];
+		if (isset($params['number_type'])) {
+			$params['NUMBER_TYPE'] = $params['number_type'];
 		}
 	}
 

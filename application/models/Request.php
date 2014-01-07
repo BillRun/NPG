@@ -133,7 +133,7 @@ class Application_Model_Request {
 				$this->ExecuteResponse();
 			} else {
 				//if not response
-				if (Application_Model_General::forkProcess("/provider/internal", $this->data)) {
+				if (Application_Model_General::forkProcess("/provider/internal", $this->data, false, Application_Model_General::getSettings('fork-sleep-provider', 1))) {
 					// create new process for not responses
 					$someAck = $this->request->getAck();
 					$this->request->setAck("Ack00");
@@ -200,30 +200,42 @@ class Application_Model_Request {
 	public function ExecuteResponse() {
 		$validate = $this->request->PostValidate();
 		if ($validate === true) {
-			$some = $this->request->getAck();
-
 			$this->request->setCorrectAck();
 			$this->saveDB();
-			$sendToInternal = new Application_Model_Internal($this->data);
-			$some = $this->request->getAck();
-
-			$ack = json_decode($sendToInternal->SendRequestToInternal($this->request->getAck(), $this->request->getRejectReasonCode(), $this->request->getIDValue()));
+			$internalModel = new Application_Model_Internal($this->data);
+			$json = $internalModel->SendRequestToInternal($this->request->getAck(), $this->request->getRejectReasonCode(), $this->request->getIDValue());
+			$obj = json_decode($json);
 			$reject_reason_code = $this->request->getRejectReasonCode();
+			// send auto request only if no reject reason code
 			if (empty($reject_reason_code)) {
-				$sendToInternal->sendAutoRequest($this->request->type);
-				$ret = "Ack00";
+				$internalModel->sendAutoRequest($this->request->type);
+			}
+			// set connect time from internal to the requests table
+			if ($this->request instanceof Np_Method_ExecuteResponse) {
+				if (isset($obj->more->connect_time)) {
+					$connect_time = $obj->more->connect_time;
+				} else if (isset($obj->connect_time)) {
+					$connect_time = $obj->connect_time;
+				} else {
+					$connect_time = time();
+				}
+				$this->request->setConnectTime($connect_time);
 			}
 
-			if (isset($ack->resultCode) && $ack->resultCode !== "OK") {
-				$ret = $ack->resultCode;
-			} else {
-				if (!isset($ack->resultCode)) {
-					$ret = "Ack00";
+			if (isset($obj->status)) {
+				if (strtolower($obj->status) == 'true') {
+					$ret = 'Ack00';
+				} else {
+					$ret = $obj->status;
 				}
+			} else if (isset($obj->resultCode) && strtoupper($obj->resultCode) != "OK") {
+				// backward compatibility
+				$ret = $obj->resultCode;
+			} else if (!isset($obj->resultCode) && !isset($obj->status)) {
+					$ret = "Ack00";
 			}
 		} else {
 			if ($validate !== FALSE) {
-
 				$ret = $validate;
 			}
 		}

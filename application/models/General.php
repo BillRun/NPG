@@ -271,8 +271,11 @@ class Application_Model_General {
 	 * 
 	 * @return Boolean true on success else FALSE
 	 */
-	public static function forkProcess($url, $params, $fork = 1, $post = false) {
-		$params['fork'] = $fork;
+	public static function forkProcess($url, $params, $post = false, $sleep = 0) {
+		$params['fork'] = 1;
+		if ($sleep) {
+			$params['SLEEP'] = (int) $sleep;
+		}
 		$forkUrl = self::getForkUrl();
 		$querystring = http_build_query($params);
 		if (!$post) {

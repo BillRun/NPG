@@ -26,7 +26,7 @@ class TestController extends Zend_Controller_Action {
 	 * @subpackage CronController
 	 */
 	public function indexAction() {
-		$reply = Application_Model_General::getSettings('test-response', 'Ack00');
+		$reply = Application_Model_General::getSettings('test-response', 'true');
 		$params = $this->getRequest()->getParams();
 //		error_log(print_R($params, 1));
 		switch ($reply) {
@@ -45,6 +45,13 @@ class TestController extends Zend_Controller_Action {
 			'status' => $ack,
 			'desc' => 'run on ' . $reply,
 		);
+		
+		switch ($params['method']) {
+			case "execute_transfer":
+				$arr['more']['connect_time'] = time();
+				break;
+		}
+
 		$response = json_encode($arr);
 		$this->view->response = $response;
 	}

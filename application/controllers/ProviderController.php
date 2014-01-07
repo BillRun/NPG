@@ -59,8 +59,10 @@ class ProviderController extends Zend_Controller_Action {
 	 * @subpackage	ProviderController
 	 */
 	public function internalAction() {
-
 		$params = Application_Model_General::getParamsArray($this->getRequest()->getParams());
+		if (isset($params['SLEEP'])) {
+			sleep((int) $params['SLEEP']);
+		}
 //		error_log(print_R($params, 1));
 		$reqModel = new Application_Model_Request($params);
 		$manual = isset($params['MANUAL']) && $params['MANUAL'];

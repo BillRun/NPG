@@ -133,7 +133,7 @@ class MonitorController extends Zend_Controller_Action {
 			$args['more']['connect_time'] = time();
 		}
 
-		$success = Application_Model_General::forkProcess($url, $args, 0, true);
+		$success = Application_Model_General::forkProcess($url, $args, true);
 		if ($success) {
 			$params['success'] = 1;
 			$params['message'] = 'Request sent';

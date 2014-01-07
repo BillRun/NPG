@@ -236,7 +236,6 @@ class Application_Model_Internal {
 						"RETRY_DATE" => Application_Model_General::getDateTimeIso(),
 						"RETRY_NO" => $this->params['RETRY_NO'],
 						"VERSION_NO" => Application_Model_General::getSettings("VersionNo"),
-						"SLEEP" => 5,
 					);
 				}
 				break;
@@ -258,7 +257,7 @@ class Application_Model_Internal {
 				break;
 		}
 		if ($request) {
-			Application_Model_General::forkProcess("/internal/provider", $request);
+			Application_Model_General::forkProcess("/internal/provider", $request, false, Application_Model_General::getSettings('fork-sleep-internal', 1));
 		}
 	}
 

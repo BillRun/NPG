@@ -19,7 +19,7 @@
 class Np_Soap_Handler {
 
 	/**
-	 * 		sendMessage os the function defined by our wsdl .
+	 * 		sendMessage is the function defined by our wsdl.
 	 * 
 	 * 		it will be called by
 	 * 		other providers in order to send transactio messages to internal.
@@ -42,7 +42,6 @@ class Np_Soap_Handler {
 			Application_Model_General::logRequestResponse($params, $ack, $data['REQUEST_ID'], '[Input] ');
 		}
 		if ($ack === FALSE || (strpos(strtolower($ack), "ack") === FALSE)) {
-
 			$ack = "Ack00";
 		}
 		return array('NP_ACK' => array('ACK_CODE' => $ack, //returns default value for testing need to fix
