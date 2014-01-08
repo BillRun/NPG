@@ -11,13 +11,13 @@ class Application_Form_DPFilter extends Zend_Form {
 		$this->setAction('');
 		$this->addElement(
 			'text', 'request_id', array(
-			'label' => 'request_id',
+			'label' => 'Request id',
 //			'value' => $this->getValue('request_id'),
 			)
 		);
 		$this->addElement(
 			'text', 'phone', array(
-			'label' => 'phone',
+			'label' => 'Phone',
 			'required' => true,
 			'validators' => array(
 				'Alnum',
@@ -44,23 +44,37 @@ class Application_Form_DPFilter extends Zend_Form {
 
 		$this->addElement(
 			'text', 'date', array(
-			'label' => 'Date: YYYY-MM-DD For Example : 2013-11-20',
+			'label' => 'Date (YYYY-MM-DD)',
 			'required' => true,
 			)
 		);
 		$this->addElement(
 			'text', 'time', array(
-			'label' => 'Time: HH:MM:SS For Example : 16:20:00',
+			'label' => 'Time (HH:MM:SS)',
 			'required' => true,
 			'invalidMessage' => 'Invalid date specified.',
 //			'formatLength' => 'long',
 			'filters' => array('StringTrim')
 			)
 		);
+		
+		$providers = Application_Model_General::getProviderArray();
+		$currentProvider = Application_Model_General::getSettings('InternalProvider');
+		if (($key = array_search($currentProvider, $providers)) !== FALSE) {
+			unset($providers[$key]);
+		}
+		array_unshift($providers, 'None', $currentProvider);
+		$toOptions = array(
+			'label' => 'From provider',
+			'multioptions' => array_combine($providers, $providers),
+		);
+		$this->addElement('select', 'from', $toOptions);
+		$toOptions['label'] = 'To provider';
+		$this->addElement('select', 'to', $toOptions);
 		// Add the submit button
 		$this->addElement('submit', 'submit', array(
 			'ignore' => true,
-			'label' => 'submit',
+			'label' => 'Search',
 		));
 	}
 

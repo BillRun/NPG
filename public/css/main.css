@@ -1,22 +1,18 @@
-
-
-/* ==========================================================================
-   Author's custom styles
-   ========================================================================== */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+dl {
+ width:100%;
+ overflow:hidden;
+}
+dt, dd {
+	margin-top:5px;
+}
+dt {
+ float:left;
+ width:20%; /* adjust the width; make sure the total of both is 100% */
+}
+dt label {
+	display: inline;
+}
+dd {
+ float:left;
+ width:80%; /* adjust the width; make sure the total of both is 100% */
+}

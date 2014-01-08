@@ -85,7 +85,7 @@ class Application_Form_Request extends Zend_Form {
 		$this->addElement('text', 'Date and Time', $dateTimeLabelOptions);
 		$submitOptions = array(
 			'ignore' => true,
-			'label' => 'submit',
+			'label' => 'Send',
 		);
 		$this->addElement('submit', 'submit', $submitOptions);
 	}

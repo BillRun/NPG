@@ -28,7 +28,7 @@ class Application_Model_Monitor {
 		return FALSE;
 	}
 
-	public function getAllLogData($table, $date = false, $phone = FALSE, $reqId = FALSE, $stage = FALSE) {
+	public function getAllLogData($table, $date = false, $phone = FALSE, $reqId = FALSE, $stage = FALSE, $to = FALSE, $from = FALSE) {
 
 		$db = Np_Db::slave();
 		$select = $db->select()->from(array('t' => $table));
@@ -53,6 +53,7 @@ class Application_Model_Monitor {
 					$select->where('last_transaction IN (?)', $stageMapping[$stage]);
 				}
 				$request_id_field = "t.request_id";
+				$filter_provider_table = 't';
 				$number_field = "t.phone_number";
 				break;
 			case 'Transactions':
@@ -65,6 +66,7 @@ class Application_Model_Monitor {
 				}
 				$select->where('last_transaction_time <= ?', $tomorrow);
 				$request_id_field = "r.request_id";
+				$filter_provider_table = 'r';
 				$number_field = "r.phone_number";
 				break;
 			case 'Logs':
@@ -78,7 +80,7 @@ class Application_Model_Monitor {
 
 				$select->where('log_time <= ?', $tomorrow);
 				$number_field = "t.phone_number";
-
+				$filter_provider_table = 'r';
 				$request_id_field = "r.request_id";
 				break;
 		}
@@ -90,8 +92,17 @@ class Application_Model_Monitor {
 		if (!empty($reqId)) {
 			$select->where($request_id_field . ' =?', $reqId);
 		}
+		
+		if (!empty($to) && strtoupper($to) != 'NONE') {
+			$select->where($filter_provider_table . '.to_provider = ?', strtoupper($to));
+		}
+		
+		if (!empty($from) && strtoupper($from) != 'NONE') {
+			$select->where($filter_provider_table . '.from_provider = ?', strtoupper($from));
+		}
+
 		$select->order("t.id DESC")->limit($this->limit);
-//		print $select;die;
+//		print $select . "<br/ >";
 		$rows = $db->query($select)->fetchAll();
 
 		return $rows;
