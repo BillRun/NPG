@@ -3,7 +3,7 @@ CREATE TABLE `Activity_Timers` (
   `timer` varchar(6),
   `transaction_time` timestamp NULL,
   `network_type` varchar(6),
-  PRIMARY KEY (`request_id`)
+  PRIMARY KEY (`request_id`, `transaction_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `Logs` (

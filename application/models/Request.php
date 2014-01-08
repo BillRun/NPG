@@ -164,7 +164,7 @@ class Application_Model_Request {
 		if ($validate == TRUE) {
 			$this->saveDB();
 			$ack = $this->request->getAck();
-		
+
 			$content = $request->SendRequestToInternal($ack, $this->request->getRejectReasonCode(), $this->request->getIDValue());
 			if (empty($content)) {
 				Application_Model_General::logRequest($this->request->getHeaderField('REQUEST_ID'), "ExecuteRequest: Internal CRM error");
@@ -232,7 +232,7 @@ class Application_Model_Request {
 				// backward compatibility
 				$ret = $obj->resultCode;
 			} else if (!isset($obj->resultCode) && !isset($obj->status)) {
-					$ret = "Ack00";
+				$ret = "Ack00";
 			}
 		} else {
 			if ($validate !== FALSE) {
@@ -356,13 +356,13 @@ class Application_Model_Request {
 
 					$row_insert['donor'] = Application_Model_General::getDonorByReqId($reqId);
 				}
-				
+
 				$_id = $tbl->insert($row_insert);
 				$id = substr("00000000000" . $_id, -12, 12);
 				$trx_no = Application_Model_General::getSettings('InternalProvider') . $id;
 				$ret = $tbl->update(array('trx_no' => $trx_no), "id = " . $_id);
 				$this->request->setTrxNo($trx_no);
-				
+
 				$adapter->commit();
 				return true;
 			} catch (Exception $e) {
@@ -489,15 +489,6 @@ class Application_Model_Request {
 	function sendSoap($client) {
 		try {
 			$soapArray = $this->responseArray();
-
-//			$trxInc = (int) substr($soapArray['NP_MESSAGE']['HEADER']['TRX_NO'], 3);
-			// TODO oc666: why we need this??
-//			$trxInc = $trxInc + 1;
-//			$trxIncLen = strlen($trxInc);
-
-//			$formatted = sprintf("%012d", $trxInc);
-//			$newTrxNo = substr($soapArray['NP_MESSAGE']['HEADER']['TRX_NO'], 0, 2) . $formatted;
-//			$soapArray['NP_MESSAGE']['HEADER']['TRX_NO'] = $newTrxNo;
 			$retryNo = Application_Model_General::checkIfRetry($this->request->getHeaderField('REQUEST_ID'), $this->request->getHeaderField('MSG_TYPE'));
 			if (!empty($retryNo)) {
 				$soapArray['NP_MESSAGE']['HEADER']['RETRY_NO'] = $retryNo;
