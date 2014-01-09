@@ -84,7 +84,7 @@ class MonitorController extends Zend_Controller_Action {
 
 	public function editAction() {
 		$model = new Application_Model_Monitor();
-		$form = new Application_Form_Edit();
+		$editForm = new Application_Form_Edit();
 		if ($this->getRequest()->isPost()) {
 			$post_data = $this->getRequest()->getPost();
 			unset($post_data['submit']);
@@ -97,12 +97,37 @@ class MonitorController extends Zend_Controller_Action {
 		$id = (int) $this->getRequest()->getParam('id');
 		$data = $model->getTableRow($table, $id);
 		if ($data) {
-			$model->createForm($form, $table, $data);
-			$this->view->form = $form;
+			$model->createForm($editForm, $table, $data);
+			$this->view->editForm = $editForm;
+			if ($data['status']) {
+				$executeData = array(
+					'id' => $data['id'], 
+					'request_id' => $data['request_id'],
+					'from_provider' => $data['from_provider'],
+				);
+				$executeForm = new Application_Form_Execute();
+				$executeForm->setDefaults($executeData);
+				$this->view->executeForm = $executeForm;
+			} else {
+				$this->view->executeForm = '';
+			}
+
 		}
 		$this->view->headLink()->appendStylesheet(Application_Model_General::getBaseUrl() . '/css/style.css');
 	}
 	
+	public function executeAction() {
+		$params = $this->getRequest()->getParams();
+		$success = Application_Model_General::forkProcess('/cron/transfer', $params, true);
+		if ($success) {
+			$params['success'] = 1;
+			$params['message'] = 'Execute sent';
+		} else {
+			$params['success'] = 0;
+			$params['message'] = 'Execute failed';
+		}
+		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/?' . http_build_query($params));
+	}
 	public function requestAction() {
 		$form = new Application_Form_Request();
 		$params = $this->getRequest()->getParams();

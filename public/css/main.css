@@ -7,12 +7,26 @@ dt, dd {
 }
 dt {
  float:left;
- width:20%; /* adjust the width; make sure the total of both is 100% */
+ width:30%; /* adjust the width; make sure the total of both is 100% */
 }
 dt label {
 	display: inline;
 }
 dd {
  float:left;
- width:80%; /* adjust the width; make sure the total of both is 100% */
+ width:70%; /* adjust the width; make sure the total of both is 100% */
+}
+
+.request-form #table-label,
+.execute-form #id-label,
+.execute-form #id-element,
+.execute-form #request_id-label,
+.execute-form #request_id-element,
+.execute-form #from_provider-label,
+.execute-form #from_provider-element,
+.execute-form #submit-label
+{
+	display:none;
+	width:0;
+	height:0;
 }

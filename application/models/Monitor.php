@@ -162,10 +162,6 @@ class Application_Model_Monitor {
 	}
 
 	public function createForm($form, $table, $data) {
-		$form->addElement(
-			'hidden', 'table', array(
-			'value' => $table,
-		));
 		$id = $data['id'];
 		unset($data['id']);
 		foreach ($data as $key => $val) {
@@ -195,6 +191,14 @@ class Application_Model_Monitor {
 			'hidden', 'id', array(
 			'value' => $id,
 		));
+		$form->addElement(
+			'hidden',
+			'table', 
+			array(
+				'value' => $table,
+			)
+		);
+		$form->setAttrib('class', 'request-form');
 	}
 
 	public function saveRow($row) {

@@ -34,15 +34,13 @@ class CronController extends Zend_Controller_Action {
 		} else {
 			$this->view->output_enabled = false;
 		}
-		// move to model and make it configurable
-		$stage = date('i') % 6;
 		// we make 3 process at different iteraion
 		// we order the check publish before publish for scenario of force all (all on one time)
 		// we don't use else in case we force all
 		$this->view->transfer = array();
 		$this->view->publish_check = array();
 		$this->view->publish = array();
-		if ($stage == 0 || $stage == 2 || $stage == 4 || $forceAll) {
+		if (date('i') % 2 === 0 || $forceAll) {
 			//first execute
 			$this->view->transfer = Application_Model_Cron::makeChangeProvider();
 		}
@@ -51,7 +49,7 @@ class CronController extends Zend_Controller_Action {
 			// verify all requests return publish
 			$this->view->publish_check = Application_Model_Cron::checkPublishResponseFromProviders();
 		}
-		if ($stage == 1 || $stage == 3 || $stage == 5 || $forceAll) {
+		if (date('i') % 2 === 1 || $forceAll) {
 			// publish
 			$this->view->publish = Application_Model_Cron::publishChangeProvider();
 		}

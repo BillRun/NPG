@@ -29,13 +29,15 @@ class TestController extends Zend_Controller_Action {
 		$reply = Application_Model_General::getSettings('test-response', 'true');
 		$params = $this->getRequest()->getParams();
 //		error_log(print_R($params, 1));
-		switch ($reply) {
+		switch (strtolower($reply)) {
 			case 'rand':
 			case 'random':
 				$ack = $this->randResponse();
 				break;
+			case 'true':
+				$ack = 'true';
+				break;
 			case 'ack00':
-			case 'Ack00':
 			default:
 				$ack = 'Ack00';
 				break;
