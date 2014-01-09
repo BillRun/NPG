@@ -28,7 +28,8 @@ class Application_Model_Monitor {
 		return FALSE;
 	}
 
-	public function getAllLogData($table, $date = false, $phone = FALSE, $reqId = FALSE, $stage = FALSE, $to = FALSE, $from = FALSE) {
+	public function getAllLogData($table, $date = false, $phone = FALSE, $reqId = FALSE, 
+		$stage = FALSE, $to = FALSE, $from = FALSE, $status = -1) {
 
 		$db = Np_Db::slave();
 		$select = $db->select()->from(array('t' => $table));
@@ -101,6 +102,9 @@ class Application_Model_Monitor {
 			$select->where($filter_provider_table . '.from_provider = ?', strtoupper($from));
 		}
 
+		if ($status != -1) {
+			$select->where($filter_provider_table . '.status = ?', (int) $status);
+		}
 		$select->order("t.id DESC")->limit($this->limit);
 //		print $select . "<br/ >";
 		$rows = $db->query($select)->fetchAll();

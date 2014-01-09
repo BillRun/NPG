@@ -71,6 +71,13 @@ class Application_Form_DPFilter extends Zend_Form {
 		$this->addElement('select', 'from', $toOptions);
 		$toOptions['label'] = 'To provider';
 		$this->addElement('select', 'to', $toOptions);
+		
+		$statusOptions = array(
+			'label' => 'Status',
+			'multioptions' => array(-1 => "All", 1 => "Active", 0 => "Inactive"),
+		);
+		$this->addElement('select', 'status', $statusOptions);
+
 		// Add the submit button
 		$this->addElement('submit', 'submit', array(
 			'ignore' => true,

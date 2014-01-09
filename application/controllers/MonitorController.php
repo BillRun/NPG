@@ -44,13 +44,13 @@ class MonitorController extends Zend_Controller_Action {
 		}
 		$date = $this->getRequest()->getParam('date');
 		$time = $this->getRequest()->getParam('time');
-		$formDefaults['date'] = $date;
-		$formDefaults['time'] = $time;
 		if (!empty($date) && !empty($time)) {
 			$date .= ' ' . $time;
 		} else if ($date === null) {
 			$date = date('Y-m-d');
 		}
+		$formDefaults['date'] = $date;
+		$formDefaults['time'] = $time;
 
 		$stage = $this->getRequest()->getParam('stage');
 		if (empty($stage) || $stage == 'All') {
@@ -61,8 +61,9 @@ class MonitorController extends Zend_Controller_Action {
 		}
 		$formDefaults['to'] = $to = $this->getRequest()->getParam('to');
 		$formDefaults['from'] = $from = $this->getRequest()->getParam('from');
+		$status = $formDefaults['status'] = $this->getRequest()->getParam('status');
 		$this->view->form->setDefaults($formDefaults);
-		$this->view->requestsTable = $monitorModel->getAllLogData('Requests', $date, $phone, $request_id, $stage, $to, $from);
+		$this->view->requestsTable = $monitorModel->getAllLogData('Requests', $date, $phone, $request_id, $stage, $to, $from, $status);
 		$this->view->requestsTableFields = array(
 			'id' => 'id',
 			'request_id' => 'request id',
@@ -78,8 +79,8 @@ class MonitorController extends Zend_Controller_Action {
 			'connect_time' => 'connect time',
 			'auto_check' => 'auto_check',
 		); 
-		$this->view->transactionsTable = $monitorModel->getAllLogData('Transactions', $date, $phone, $request_id, $stage, $to, $from);
-		$this->view->logsTable = $monitorModel->getAllLogData('Logs', $date, $phone, $request_id, $stage, $to, $from);
+		$this->view->transactionsTable = $monitorModel->getAllLogData('Transactions', $date, $phone, $request_id, $stage, $to, $from, $status);
+		$this->view->logsTable = $monitorModel->getAllLogData('Logs', $date, $phone, $request_id, $stage, $to, $from, $status);
 	}
 
 	public function editAction() {
