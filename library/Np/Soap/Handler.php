@@ -183,6 +183,9 @@ class Np_Soap_Handler {
 			case "Publish_response":
 			case "KD_update_response":
 			case "Inquire_number_response":
+				if (isset($xmlArray->positiveApproval) && isset($xmlArray->positiveApproval->currentOperator)) {
+					$data['CURRENT_OPERATOR'] = (string) $xmlArray->positiveApproval->currentOperator;
+				}
 			case "Cancel_publish_response":
 			case "Return_response":
 				if (isset($xmlArray->positiveApproval)) {

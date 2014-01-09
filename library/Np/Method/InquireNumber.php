@@ -36,6 +36,9 @@ class Np_Method_InquireNumber extends Np_Method {
 				case "Number":
 					$this->setBodyField($key, $value);
 					break;
+				case "Phone_number":
+					$this->setBodyField($key, $value);
+					break;
 			}
 		}
 	}

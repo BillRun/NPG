@@ -52,6 +52,9 @@ class TestController extends Zend_Controller_Action {
 			case "execute_transfer":
 				$arr['more']['connect_time'] = time();
 				break;
+			case "inquire_number":
+				$arr['more']['current_operator'] = 'PR';
+				break;
 		}
 
 		$response = json_encode($arr);
