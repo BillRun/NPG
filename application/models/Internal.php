@@ -270,6 +270,7 @@ class Application_Model_Internal {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
 		$select = $tbl->select()->order("id DESC")
 			->where('phone_number=?', $this->params['PHONE_NUMBER'])
+			->where('status=?', 1)
 			->order('id DESC');
 		$result = $select->query()->fetchObject();
 		if ($result) {
