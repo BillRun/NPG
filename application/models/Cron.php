@@ -265,7 +265,7 @@ class Application_Model_Cron {
 	public function checkPublish($request) {
 		$internalProvider = Application_Model_General::getSettings('InternalProvider');
 		$publish_response_providers = array();
-		if (isset($request['forceAll']) && $request['forceAll']) {
+		if (!isset($request['forceAll']) || !$request['forceAll']) {
 			$db = Np_Db::slave();
 			$select = $db->select();
 			$select->from('Transactions'); //, array('provider' => new Zend_Db_Expr('SUBSTR(trx_no,1,2)') ,'request_id')); //THERE IS NO FROM FIELD!!
