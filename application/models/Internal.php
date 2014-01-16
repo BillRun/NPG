@@ -357,9 +357,9 @@ class Application_Model_Internal {
 	 * 
 	 * @return string
 	 */
-	public function SendRequestToInternal($ack = "Ack00", $rejectReasonCode = "OK", $idValue = NULL) {
+	public function SendRequestToInternal(Np_Method $request) {
 		Application_Model_General::virtualSleep(); // used to write to log to be in order
-		$data = $this->createPostData($ack, $rejectReasonCode, $idValue);
+		$data = $this->createPostData($request);
 		$url = Application_Model_General::getSettings('UrlToInternalResponse');
 		$auth = Application_Model_General::getSettings('InternalAuth');
 		$method = self::getMethodName($this->params['MSG_TYPE']);
@@ -397,11 +397,16 @@ class Application_Model_Internal {
 	/**
 	 * create data to post to the internal
 	 * 
-	 * @param string $ack
-	 * @param string $rejectReasonCode
-	 * @param mixed $idValue
+	 * @param Np_Method $request the request to create post data from
+	 * 
+	 * @return void
+	 * 
+	 * @todo refatoring to bridge classes
 	 */
-	protected function createPostData($ack = "Ack00", $rejectReasonCode = "OK", $idValue = NULL) {
+	protected function createPostData(Np_Method $request) {
+		$ack = $request->getAck();
+		$rejectReasonCode = $request->getRejectReasonCode();
+		$idValue = $request->getIDValue();
 		if ($this->params['FROM'] != Application_Model_General::getSettings('InternalProvider')) {
 			$provider = $this->params['FROM'];
 		} else {
@@ -410,7 +415,7 @@ class Application_Model_Internal {
 		if (!$rejectReasonCode || $rejectReasonCode === "" || $rejectReasonCode == " ") {
 			$rejectReasonCode = "OK";
 		}
-		if ($idValue == FALSE) {
+		if (empty($idValue)) {
 			$idValue = "no details";
 		}
 		$ret = array(
@@ -424,6 +429,9 @@ class Application_Model_Internal {
 				'ack' => $ack,
 			),
 		);
+		if (isset($this->params['PHONE_NUMBER'])) {
+			$ret['number'] = $this->params['PHONE_NUMBER'];
+		}
 		if (isset($this->params['NUMBER_TYPE'])) {
 			$ret['more']['number_type'] = $this->params['NUMBER_TYPE'];
 			if ($ret['more']['number_type'] == "R") {
@@ -435,19 +443,18 @@ class Application_Model_Internal {
 		if (Application_Model_General::isMsgResponse($this->params['MSG_TYPE'])) {
 			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "KD_UPDATE_RESPONSE") {
+		$msg_type = strtoupper($this->params['MSG_TYPE']);
+		if ($msg_type == "KD_UPDATE_RESPONSE") {
 			$ret['more']['KD_update_type'] = $this->params['KD_UPDATE_TYPE'];
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "EXECUTE_RESPONSE" && isset($this->params['DISCONNECT_TIME'])) {
+		if ($msg_type == "EXECUTE_RESPONSE" && isset($this->params['DISCONNECT_TIME'])) {
 			$ret['more']['disconnect_time'] = $this->params['DISCONNECT_TIME'];
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "REQUEST") {
-			$ret['port_time'] = $this->params['PORT_TIME'];
+		if ($msg_type == "REQUEST" || $msg_type == "UPDATE") {
+			// all the cases for backward compatibility
+			$ret['port_time'] = $ret['more']['port_time'] = $ret['transfer_time'] = $ret['more']['transfer_time'] = $this->params['PORT_TIME'];
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "UPDATE") {
-			$ret['more']['port_time'] = $this->params['PORT_TIME'];
-		}
-		if (strtoupper($this->params['MSG_TYPE']) == "PUBLISH") {
+		if ($msg_type == "PUBLISH") {
 			$ret['more']['donor'] = $this->params['DONOR'];
 			$ret['more']['publish_type'] = $this->params['PUBLISH_TYPE'];
 
@@ -458,29 +465,29 @@ class Application_Model_Internal {
 				$ret['more']['connect_time'] = $this->params['CONNECT_TIME'];
 			}
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "CANCEL_PUBLISH") {
+		if ($msg_type == "CANCEL_PUBLISH") {
 			$ret['more']['donor'] = $this->params['DONOR'];
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "PUBLISH_RESPONSE") {
+		if ($msg_type == "PUBLISH_RESPONSE") {
 			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
 			if (isset($this->params['ROUTE_TIME'])) {
 				$ret['more']['route_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['ROUTE_TIME']);
 			}
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "CANCEL_PUBLISH_RESPONSE") {
+		if ($msg_type == "CANCEL_PUBLISH_RESPONSE") {
 			$ret['more']['msg_type'] = "Cancel_Publish_response";
 			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
 			$ret['more']['route_time'] = Application_Model_General::getDateTimeInSqlFormat($this->params['ROUTE_TIME']);
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "INQUIRE_NUMBER_RESPONSE") {
+		if ($msg_type == "INQUIRE_NUMBER_RESPONSE") {
 			$ret['more']['approval_ind'] = $this->params['APPROVAL_IND'];
-			$ret['more']['current_operator'] = $this->params['CURRENT_OPERATOR'];
+			$ret['more']['current_operator'] = isset($this->params['CURRENT_OPERATOR'])?$this->params['CURRENT_OPERATOR']:'  ';
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "DB_SYNCH_REQUEST") {
+		if ($msg_type == "DB_SYNCH_REQUEST") {
 			$ret['more']['from_date'] = $this->params['FROM_DATE'];
 			$ret['more']['to_date'] = $this->params['TO_DATE'];
 		}
-		if (strtoupper($this->params['MSG_TYPE']) == "DB_SYNCH_RESPONSE") {
+		if ($msg_type == "DB_SYNCH_RESPONSE") {
 			$ret['more']['file_name'] = $this->params['FILE_NAME'];
 		}
 		return $ret;
@@ -518,8 +525,10 @@ class Application_Model_Internal {
 	 * sends automatic response to transaction messages sent to internal.
 	 * 
 	 * @param bool $status
+	 * 
+	 * @todo refatoring to bridge classes
 	 */
-	public function CreateMethodResponse($status, $manual = false) {
+	public function CreateMethodResponse($status) {
 		//update DB ack!
 		//SEND RESPONSE TO PROVIDER
 		$response = array(
@@ -553,9 +562,7 @@ class Application_Model_Internal {
 			$response['DISCONNECT_TIME'] = Application_Model_General::getDateTimeIso($time);
 		}
 		if ($response['MSG_TYPE'] == "Inquire_number_response") {
-
-//			$response['APPROVAL_IND'] = $status->approval_ind;
-			$response['CURRENT_OPERATOR'] = $status->current_operator;
+			$response['CURRENT_OPERATOR'] = isset($status->current_operator)?$status->current_operator:$status->more->current_operator;
 		}
 		if (isset($status->resultCode) && !empty($status->resultCode)) {
 			$response['REJECT_REASON_CODE'] = $status->resultCode;

@@ -40,16 +40,17 @@ class CronController extends Zend_Controller_Action {
 		$this->view->transfer = array();
 		$this->view->publish_check = array();
 		$this->view->publish = array();
-		if (date('i') % 2 === 0 || $forceAll) {
+		$minute = date('i');
+		if ($minute % 2 === 0 || $forceAll) {
 			//first execute
 			$this->view->transfer = Application_Model_Cron::makeChangeProvider();
 		}
 		$publish_verification_iteration = Application_Model_General::getSettings('publish-verification-iteration', 20);
-		if (date('i') % $publish_verification_iteration == 0 || $forceAll) {
+		if ($minute % $publish_verification_iteration == 0 || $forceAll) {
 			// verify all requests return publish
 			$this->view->publish_check = Application_Model_Cron::checkPublishResponseFromProviders();
 		}
-		if (date('i') % 2 === 1 || $forceAll) {
+		if ($minute % 2 === 1 || $forceAll) {
 			// publish
 			$this->view->publish = Application_Model_Cron::publishChangeProvider();
 		}
@@ -108,7 +109,8 @@ class CronController extends Zend_Controller_Action {
 	}
 
 	/**
-	 * Check Publish
+	 * Check Publish verify if all providers return response
+	 * in case some provider did not respond, the action will resend the publish
 	 * 
 	 * Check Publish Action - "http://SERVER/Cron/checkpublish"
 	 * 
@@ -117,40 +119,7 @@ class CronController extends Zend_Controller_Action {
 	 */
 	public function checkpublishAction() {
 		$run = new Application_Model_Cron();
-		if ($this->getRequest()->getParam('forceAll') == 1) {
-			$forcePublishAll = TRUE;
-		} else {
-			$forcePublishAll = FALSE;
-		}
-		$run->checkPublish($this->getRequest()->getParams(), $forcePublishAll);
-	}
-
-	/**
-	 * Agg Publish
-	 * 
-	 * Aggregate Action - "http://SERVER/Cron/checkpublish"
-	 * 
-	 * @package ApplicationController
-	 * @subpackage CronController
-	 */
-	public function aggAction() {
-		$parentProcessArray = Application_Model_Agg::getParentProcessArray();
-		$processTypes = Application_Model_Agg::$processTypes;
-
-		foreach ($parentProcessArray as $key => $val) {
-			$msgType = $parentProcessArray[$key]['last_transaction'];
-			$rejectReasonCode = Application_Model_Agg::getRejectReasonCodeByRequestID($parentProcessArray[$key]['request_id']);
-			$processType = Application_Model_General::getProcessType($msgType);
-			$from = $parentProcessArray[$key]['from_provider'];
-			$to = $parentProcessArray[$key]['to_provider'];
-			$status = Application_Model_Agg::getParentProcessStatus($msgType, $rejectReasonCode);
-			$res = Application_Model_Agg::validateProcessTypeReportsRow($processType, $status, $from, $to);
-			if (empty($res) || $res == FALSE) {
-				Application_Model_Agg::InsertToProcessTypeReports($processType, $status, $from, $to);
-			} else {
-				Application_Model_Agg::UpdateProcessTypeReports($processType, $status, $from, $to);
-			}
-		}
+		$run->checkPublish($this->getRequest()->getParams());
 	}
 
 	/**
@@ -161,7 +130,7 @@ class CronController extends Zend_Controller_Action {
 
 		$res = Application_Model_Cron::setTimeoutChecks('Check', 11);
 		$res = Application_Model_Cron::setTimeoutChecks('Check_response', 30);
-//		$res = Application_Model_Cron::setTimeoutChecks('Request', 60, true);
+		$res = Application_Model_Cron::setTimeoutChecks('Request', 60, true);
 		// 1500 => more than 24 hrs
 //		$res = Application_Model_Cron::setTimeoutChecks('Request_response',1500);
 //		$res = Application_Model_Cron::setTimeoutChecks('Update', 60, true);
@@ -180,29 +149,6 @@ class CronController extends Zend_Controller_Action {
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel_publish_respon', 0);
 //		$res = Application_Model_Cron::setTimeoutChecks('Up_system', 0);
 //		$res = Application_Model_Cron::setTimeoutChecks('Down_system', 0);
-	}
-
-	/**
-	 * Action to trigger timers aggregate
-	 * 
-	 */
-	public function aggregateTimersAction() {
-		$timerActivityRows = Application_Model_Agg::getTimersActivityRows();
-
-		// gets all data from Activity_Timers
-
-		foreach ($timerActivityRows as $vals) {
-			// check if timer exists with specific obligated operator , waiting operator and in specific date .
-		}
-	}
-
-	public function checkifpublishAction() {
-		$result = Application_Model_Cron::checkifpublish();
-		return $result;
-	}
-
-	public function testAction() {
-		die('ASD');
 	}
 
 }

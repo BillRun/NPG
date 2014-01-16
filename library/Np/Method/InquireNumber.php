@@ -17,8 +17,6 @@
  */
 class Np_Method_InquireNumber extends Np_Method {
 
-	var $type = "InquireNumber";
-
 	/**
 	 * Constructor
 	 * 
@@ -27,7 +25,7 @@ class Np_Method_InquireNumber extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 
@@ -37,7 +35,7 @@ class Np_Method_InquireNumber extends Np_Method {
 					$this->setBodyField($key, $value);
 					break;
 				case "Phone_number":
-					$this->setBodyField($key, $value);
+					$this->setBodyField("Number", $value);
 					break;
 			}
 		}
@@ -72,7 +70,7 @@ class Np_Method_InquireNumber extends Np_Method {
 			$data = array(
 				'status' => 1,
 				'request_id' => $this->getHeaderField("REQUEST_ID"),
-				'number' => $this->getBodyField("NUMBER"),
+				'phone_number' => $this->getBodyField("NUMBER"),
 				'from_provider' => $this->getHeaderField("TO"),
 				'to_provider' => $this->getHeaderField("FROM"),
 				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
@@ -93,6 +91,17 @@ class Np_Method_InquireNumber extends Np_Method {
 		$msgType = $this->getHeaderField('MSG_TYPE');
 		$xml->$msgType->number = $this->getBodyField('NUMBER');
 		return $xml;
+	}
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		return array('NUMBER' => (string) $xmlObject->number);
 	}
 
 }

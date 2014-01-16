@@ -12,39 +12,17 @@ class Application_Form_Request extends Zend_Form {
 		$this->setMethod('POST');
 		$this->setAction(Application_Model_General::getBaseUrl() . "/monitor/send/");
 		$this->setAttrib('class', 'request-form');
-		$processTypeOptions = array(
-			'label' => 'PROCESS_TYPE',
-			'required' => true,
-			'multioptions' => array(
-				'PORT' => 'PORT',
-				'RETURN' => 'RETURN',
-				'QUERY' => 'QUERY',
-				'MAINT' => 'MAINT'
-			),
-		);
-		$this->addElement('select', 'PROCESS_TYPE', $processTypeOptions);
 
 		$msgTypeOptions = array(
-			'label' => 'MSG_TYPE',
+			'label' => 'Message',
 			'required' => true,
 			'multioptions' => array(
 				'Check' => 'Check',
-				'Check_response' => 'Check_response',
 				'Request' => 'Request',
-				'Request_response' => 'Request_response',
 				'Update' => 'Update',
-				'Update_response' => 'Update_response',
 				'Cancel' => 'Cancel',
+				'Inquire_number' => 'Inquire_number',
 				'KD_Update' => 'KD_Update',
-				'KD_update_response' => 'KD_update_response',
-				'Execute' => 'Execute',
-				'Execute_response' => 'Execute_response',
-				'Publish' => 'Publish',
-				'Publish_response' => 'Publish_response',
-				'Cancel_publish' => 'Cancel_publish',
-				'Cancel_publish_response' => 'Cancel_publish_response',
-				'Return' => 'Return',
-				'Return_response' => 'Return_response',
 			),
 		);
 

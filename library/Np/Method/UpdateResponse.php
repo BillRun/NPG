@@ -25,7 +25,7 @@ class Np_Method_UpdateResponse extends Np_MethodResponse {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 
@@ -84,6 +84,21 @@ class Np_Method_UpdateResponse extends Np_MethodResponse {
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 		$ret = $tbl->update($updateArray, $whereArray);
 
+		return $ret;
+	}
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		$ret = parent::convertArray($xmlObject);
+		if (isset($xmlObject->portingDateTime)) {
+			$ret['PORT_TIME'] = (string) $xmlObject->portingDateTime;
+		}
 		return $ret;
 	}
 

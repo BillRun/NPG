@@ -25,7 +25,7 @@ class Np_Method_Publish extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 
 		parent::__construct($options);
 		//SET BODY 
@@ -137,5 +137,38 @@ class Np_Method_Publish extends Np_Method {
 		}
 		return $xml;
 	}
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		$ret = array();
+		$ret['DONOR'] = (string) $xmlObject->donor;
+		$ret['CONNECT_TIME'] = (string) $xmlObject->connectDateTime;
+		$ret['PUBLISH_TYPE'] = (string) $xmlObject->publishType;
+		$ret['DISCONNECT_TIME'] = (string) $xmlObject->disconnectDateTime;
+		if (isset($xmlObject->fixed)) {
+			$ret['NUMBER_TYPE'] = (string) $xmlObject->fixed->fixedNumberSingle->numberType;
+			if (isset($xmlObject->fixed->fixedNumberRange)) {
+				$ret['NUMBER_TYPE'] = (string) $xmlObject->fixed->fixedNumberRange->numberType;
+				$ret['FROM_NUMBER'] = (string) $xmlObject->fixed->fixedNumberRange->fromNumber;
+				$ret['TO_NUMBER'] = (string) $xmlObject->fixed->fixedNumberRange->toNumber;
+			} else {
+				$ret['NUMBER'] = (string) $xmlObject->fixed->fixedNumberSingle->number;
+				$ret['PHONE_NUMBER'] = (string) $xmlObject->fixed->fixedNumberSingle->number;
+			}
+		} else {
+			$ret['NUMBER_TYPE'] = (string) $xmlObject->mobile->numberType;
+			$ret['NUMBER'] = (string) $xmlObject->mobile->number;
+			$ret['PHONE_NUMBER'] = (string) $xmlObject->mobile->number;
+		}
+		return $ret;
+
+	}
+
 
 }

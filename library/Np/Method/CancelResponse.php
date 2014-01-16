@@ -23,7 +23,7 @@ class Np_Method_CancelResponse extends Np_MethodResponse {
 	 * calls parent constructor , sets type "CancelResponse" 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 

@@ -25,7 +25,7 @@ class Np_Method_UpSystem extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 

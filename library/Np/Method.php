@@ -79,10 +79,14 @@ abstract class Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
-		Application_Model_General::writeToLog($options);
+	protected function __construct(&$options) {
 		$this->type = str_replace("Np_Method_", "", get_class($this));
 		$this->header = $this->body = array();
+		if (is_object($options)) {
+			// soap - let's  tranform to one dimension array
+			$options = $this->soapToArray($options);
+		}
+		Application_Model_General::writeToLog($options);
 		//SET HEADER - for all methods
 		foreach ($options as $key => $value) {
 			switch (ucwords(strtolower($key))) {
@@ -173,12 +177,13 @@ abstract class Np_Method {
 		return $this->getRejectReasonCode();
 	}
 
+	/**
+	 * method to retreive identification value if exists in request
+	 * 
+	 * @return string id value
+	 */
 	public function getIDValue() {
-		if ($this->getBodyField("IDENTIFICATION_VALUE")) {
-			return $this->getBodyField("IDENTIFICATION_VALUE");
-		} else {
-			return NULL;
-		}
+		return $this->getBodyField("IDENTIFICATION_VALUE");
 	}
 
 	/**
@@ -258,17 +263,24 @@ abstract class Np_Method {
 	 * @param array $data
 	 * @return mixed BOOL or Object 
 	 */
-	public static function getInstance($data) {
-		if (isset($data['MSG_TYPE'])) {
+	public static function getInstance(&$data) {
+		if (is_array($data) && isset($data['MSG_TYPE'])) {
 			$msgtype = $data['MSG_TYPE'];
+		} else if (is_object($data) && isset($data->NP_MESSAGE->HEADER->MSG_TYPE)) {
+			$msgtype = $data->NP_MESSAGE->HEADER->MSG_TYPE;
 		} else {
-			return NULL;
+			return FALSE;
 		}
 		$signature = md5(serialize($data));
 		if (!isset(self::$instances[$signature])) {
-			$adapter = 'Np_Method_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $msgtype)));
-			$instance = new $adapter($data);
-			self::$instances[$signature] = $instance;
+			try {
+				$adapter = 'Np_Method_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $msgtype)));
+				$instance = new $adapter($data);
+				self::$instances[$signature] = $instance;
+			} catch (Exception $e) {
+				error_log("Error instantiate Np_method class: " . $e->getMessage());
+			}
+			
 		}
 		return self::$instances[$signature];
 	}
@@ -327,9 +339,6 @@ abstract class Np_Method {
 		if (!$this->checkDirection()) {
 			return "Gen04";
 		}
-		//HOW TO CHECK Gen05
-		//  $this->checkIfJew();
-
 
 		if (!$this->ValidateDB()) {
 			return "Gen07";
@@ -351,8 +360,6 @@ abstract class Np_Method {
 			if (in_array($timer_ack, $timers_array)) {
 				Application_Model_General::writeToTimersActivity($this->getHeaders(), $timer_ack);
 			}
-
-
 			return $timer_ack;
 		}
 		return true;
@@ -517,11 +524,39 @@ abstract class Np_Method {
 		return "Ack00";
 	}
 
-	public function checkIfJew() {
-
-		$nowJew = jdtojewish(gregoriantojd(date('M'), date('D'), date('Y')));
-		var_dump($nowJew);
-		die;
+	/**
+	 * turns the soap array into a simple array for sending to internal.
+	 * sets  soap "signature" so array may be validated and sent back 
+	 * through soap after it reaches internal's proxy
+	 * 
+	 * @param		Array $params
+	 * @return		Array $params associative array 
+	 */
+	public function soapToArray($params) {
+		$xmlObj = simplexml_load_string($params->NP_MESSAGE->BODY); //loads xml object from xml string
+		$header = $params->NP_MESSAGE->HEADER;
+		$bodyConverted = $this->convertArray($xmlObj[0]->{$header->MSG_TYPE});
+		return array_merge($bodyConverted, (array) $header);
 	}
-
+	
+	/**
+	 * convert Xml data to associative array
+	 * see bridge classes for use cases
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		return array();
+	}
+	
+	/**
+	 * method triggered after internal response to NPG
+	 * 
+	 * @param object $internalResponseObject
+	 */
+	public function postInternalRequest($internalResponseObject) {
+		return TRUE;
+	}
 }

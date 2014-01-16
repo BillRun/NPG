@@ -12,22 +12,6 @@ class Application_Model_Monitor {
 	 */
 	protected $limit = 100;
 	
-	public function getDataPaging($date = FALSE, $stam = FALSE, $stam2 = FALSE, $stam3 = FALSE) {
-		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
-		$date = date('Y-m-d') . " 00:00:00";
-		$select = $tbl->select();
-		$select->from(array('r' => 'Requests'), array('r.id'))
-			->where('last_request_time > ?', $date)
-			->order('r.id DESC');
-		$result = $select->query()->fetchAll();   //take the last one
-
-		if ($result) {
-			return $result;
-		}
-
-		return FALSE;
-	}
-
 	public function getAllLogData($table, $date = false, $phone = FALSE, $reqId = FALSE, 
 		$stage = FALSE, $to = FALSE, $from = FALSE, $status = -1) {
 

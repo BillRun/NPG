@@ -25,7 +25,7 @@ abstract class Np_MethodResponse extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 
@@ -72,7 +72,7 @@ abstract class Np_MethodResponse extends Np_Method {
 	}
 	
 	protected function addApprovalXml(&$xml, $msgType) {
-		if ($this->getBodyField("APPROVAL_IND") === "Y") {
+		if ($this->checkApprove()) {
 			$xml->$msgType->positiveApproval;
 			$xml->$msgType->positiveApproval->approvalInd = "Y";
 		} else {
@@ -82,5 +82,26 @@ abstract class Np_MethodResponse extends Np_Method {
 			$xml->$msgType->negativeApproval->rejectReasonCode = ($rejectReasonCode !== NULL) ? $rejectReasonCode : '';
 		}
 	}
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		$ret = array();
+		if (isset($xmlObject->positiveApproval)) {
+			$ret['APPROVAL_IND'] = (string) $xmlObject->positiveApproval->approvalInd;
+		} else {
+			$ret['APPROVAL_IND'] = (string) $xmlObject->positiveApproval->approvalInd;
+			$ret['REJECT_REASON_CODE'] = (string) $xmlObject->negativeApproval->rejectReasonCode;
+		}
+		$ret['REQUEST_TRX_NO'] = (string) $xmlObject->requestTrxNo;
+		$ret['REQUEST_RETRY_DATE'] = (string) $xmlObject->requestRetryDate;
+		return $ret;
+	}
+
 
 }

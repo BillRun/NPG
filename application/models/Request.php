@@ -40,57 +40,57 @@ class Application_Model_Request {
 	 */
 	public function __construct($params) {
 		//check if this is a soap request
-		if (isset($params['SOAP'])) {
-
-			//from provider
-			//if does not have a number get it from request_id - for sending to internal
-			if (!isset($params['PHONE_NUMBER']) && ($params['MSG_TYPE'] != "Check") && isset($params['REQUEST_ID'])) {
-				$params['PHONE_NUMBER'] = Application_Model_General::getFieldFromRequests("phone_number", $params['REQUEST_ID']);
-			}
-
+		if (is_object($params) && isset($params->NP_MESSAGE)) {
+			$this->request = Np_Method::getInstance($params);
 			$this->data = $params;
-		} else if (isset($params['MANUAL']) && $params['MANUAL']) {
-			$fields = array(
-				'last_transaction',
-				'from_provider',
-				'to_provider',
-			);
-			$values = Application_Model_General::getFieldFromRequests($fields, $params['REQUEST_ID'], 'request_id');
-			if ($values['last_transaction'] != $params['MSG_TYPE'] && ($values['last_transaction']) != $params['MSG_TYPE'] . '_response') {
-				$response = array(
-					'success' => 0,
-					'error' => 1,
-					'manual' => 1,
-					'desc' => 'The request is not at the right stage',
+			if (!isset($this->data['PHONE_NUMBER'])) {
+				$this->data['PHONE_NUMBER'] = Application_Model_General::getFieldFromRequests("phone_number", $params['REQUEST_ID']);
+			}
+		} else if (is_array($params)) {
+			// this is internal and not external (soap)
+			if (isset($params['MANUAL']) && $params['MANUAL']) {
+				$fields = array(
+					'last_transaction',
+					'from_provider',
+					'to_provider',
 				);
-				die(json_encode($response));
+				$values = Application_Model_General::getFieldFromRequests($fields, $params['REQUEST_ID'], 'request_id');
+				if ($values['last_transaction'] != $params['MSG_TYPE'] && ($values['last_transaction']) != $params['MSG_TYPE'] . '_response') {
+					$response = array(
+						'success' => 0,
+						'error' => 1,
+						'manual' => 1,
+						'desc' => 'The request is not at the right stage',
+					);
+					die(json_encode($response));
+				}
+				if (!isset($params['FROM']) || !isset($params['TO'])) {
+					$params['FROM'] = $values['to_provider'];
+					$params['TO'] = $values['from_provider'];
+				}
+				if (!isset($params['TRX_NO'])) {
+					$transaction = Application_Model_General::getTransactions($params['REQUEST_ID'], $params['MSG_TYPE']);
+					$params['TRX_NO'] = $transaction[0]['trx_no'];
+					$params['RETRY_DATE'] = Application_Model_General::getDateTimeIso($transaction[0]['last_transaction_time']);
+				}
+				$this->data = $params;
+			} else if (is_array($params)) {
+				// we are receiving data => need to send to provider
+				if (!isset($params['REQUEST_ID']) && ($params['MSG_TYPE'] != "Check") && isset($params['PHONE_NUMBER'])) {
+					//CALL FROM INTERNAL WITH NO REQUEST ID
+					//if the type is check the request id will be added later- on insert to DB
+					$params['REQUEST_ID'] = Application_Model_General::getFieldFromRequests("request_id", $params['PHONE_NUMBER']);
+				}
+				$this->data = $params;
+			} else {
+				//no parameters
+				$this->data = NULL;
+				$this->request = NULL;
+				return;
 			}
-			if (!isset($params['FROM']) || !isset($params['TO'])) {
-				$params['FROM'] = $values['to_provider'];
-				$params['TO'] = $values['from_provider'];
-			}
-			if (!isset($params['TRX_NO'])) {
-				$transaction = Application_Model_General::getTransactions($params['REQUEST_ID'], $params['MSG_TYPE']);
-				$params['TRX_NO'] = $transaction[0]['trx_no'];
-				$params['RETRY_DATE'] = Application_Model_General::getDateTimeIso($transaction[0]['last_transaction_time']);
-			}
-			$this->data = $params;
-		} else if ($params) {
-			// we are receiving data => need to send to provider
-			if (!isset($params['REQUEST_ID']) && ($params['MSG_TYPE'] != "Check") && isset($params['PHONE_NUMBER'])) {
-				//CALL FROM INTERNAL WITH NO REQUEST ID
-				//if the type is check the request id will be added later- on insert to DB
-				$params['REQUEST_ID'] = Application_Model_General::getFieldFromRequests("request_id", $params['PHONE_NUMBER']);
-			}
-			$this->data = $params;
-		} else {
-			//no parameters
-			$this->data = NULL;
-			$this->request = NULL;
-			return;
-		}
 
-		$this->request = Np_Method::getInstance($this->data);
+			$this->request = Np_Method::getInstance($this->data);
+		}
 	}
 
 	/**
@@ -160,12 +160,11 @@ class Application_Model_Request {
 	 */
 	public function ExecuteRequest($manual = false) {
 		$validate = $this->request->PostValidate();
-		$request = new Application_Model_Internal($this->data);
+		$internalModel = new Application_Model_Internal($this->data);
 		if ($validate == TRUE) {
 			$this->saveDB();
-			$ack = $this->request->getAck();
 
-			$content = $request->SendRequestToInternal($ack, $this->request->getRejectReasonCode(), $this->request->getIDValue());
+			$content = $internalModel->SendRequestToInternal($this->request);
 			if (empty($content)) {
 				Application_Model_General::logRequest($this->request->getHeaderField('REQUEST_ID'), "ExecuteRequest: Internal CRM error");
 				return FALSE;
@@ -184,7 +183,7 @@ class Application_Model_Request {
 			$response->status = $validate;
 		}
 
-		$request->CreateMethodResponse($response, $manual);
+		$internalModel->CreateMethodResponse($response, $manual);
 	}
 
 	/**
@@ -203,23 +202,15 @@ class Application_Model_Request {
 			$this->request->setCorrectAck();
 			$this->saveDB();
 			$internalModel = new Application_Model_Internal($this->data);
-			$json = $internalModel->SendRequestToInternal($this->request->getAck(), $this->request->getRejectReasonCode(), $this->request->getIDValue());
+			$json = $internalModel->SendRequestToInternal($this->request);
 			$obj = json_decode($json);
 			$reject_reason_code = $this->request->getRejectReasonCode();
 			// send auto request only if no reject reason code
 			if (empty($reject_reason_code)) {
 				$internalModel->sendAutoRequest($this->request->type);
 			}
-			// set connect time from internal to the requests table
-			if ($this->request instanceof Np_Method_ExecuteResponse) {
-				if (isset($obj->more->connect_time)) {
-					$connect_time = $obj->more->connect_time;
-				} else if (isset($obj->connect_time)) {
-					$connect_time = $obj->connect_time;
-				} else {
-					$connect_time = time();
-				}
-				$this->request->setConnectTime($connect_time);
+			if (isset($obj->more)) {
+				$this->request->postInternalRequest($obj->more);
 			}
 
 			if (isset($obj->status)) {
@@ -275,6 +266,15 @@ class Application_Model_Request {
 			$validate = true;
 		}
 		$this->createResponse($validate); //create soap response and send it to provider
+	}
+	
+	/**
+	 * Get the request object
+	 * 
+	 * @return Np_Method object
+	 */
+	public function getRequest() {
+		return $this->request;
 	}
 
 	/**
@@ -403,10 +403,10 @@ class Application_Model_Request {
 //		error_log($xmlString);
 		$dom = new DOMDocument();
 		$dom->loadXML($xmlString);
+		$dom->formatOutput = true;
 		$isValid = $dom->schemaValidate('npMessageBody.xsd');
 		if ($isValid === TRUE || Application_Model_General::isProd()) {
 			// format the xml with indentation
-			$dom->formatOutput = true;
 			return $dom->saveXML();
 		} else {
 			error_log("xml doesn't validate");
@@ -421,23 +421,15 @@ class Application_Model_Request {
 	 * @return object SOAP result  
 	 */
 	protected function sendArray() {
-		$request_id = $this->request->getHeaderField("REQUEST_ID");
 		$lastTransaction = $this->request->getHeaderField("MSG_TYPE");
-		$from = $message_recipient_code = $this->request->getHeaderField("TO");
 		if (strtoupper($lastTransaction) == "DOWN_SYSTEM") {
 			Application_Model_General::saveShutDownDetails("GT", "DOWN");
 		} elseif (strtoupper($lastTransaction) == "UP_SYSTEM") {
 			Application_Model_General::saveShutDownDetails("GT", "UP");
 		}
 
-		$message_recipient_code = $this->request->getHeaderField("TO");
-
 		if (strtoupper($lastTransaction) == "PUBLISH") {
 			$url = $this->getRecipientUrl();
-			$trx_no = $this->request->getHeaderField("TRX_NO");
-			$request_id = $this->request->getHeaderField("REQUEST_ID");
-			// IN ORDER TO SAVE THE PUBLISHES TO EACH PROVIDER   
-			// TODO oc666: why need to save transaction here?
 			$client = $this->getSoapClient($url);
 			$ret = $this->sendAgain($client);
 		} else {

@@ -25,7 +25,7 @@ class Np_Method_Request extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 //		Application_Model_General::checkIfRetry($requestId,$lastTransaction);
 		//SET BODY 
@@ -102,6 +102,17 @@ class Np_Method_Request extends Np_Method {
 		;
 
 		return $xml;
+	}
+
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		return array('PORT_TIME' => (string) $xmlObject->portingDateTime);
 	}
 
 }

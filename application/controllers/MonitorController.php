@@ -15,7 +15,6 @@ class MonitorController extends Zend_Controller_Action {
 	}
 
 	/**
-	 * @method loggerAction 
 	 * in this screen we monitor the transactions,requests and logs 
 	 * tables . we do this by using the form at the top of the page
 	 * which filters the data by number , date and time. it shows date
@@ -61,7 +60,7 @@ class MonitorController extends Zend_Controller_Action {
 		}
 		$formDefaults['to'] = $to = $this->getRequest()->getParam('to');
 		$formDefaults['from'] = $from = $this->getRequest()->getParam('from');
-		$status = $formDefaults['status'] = $this->getRequest()->getParam('status');
+		$status = $formDefaults['status'] = $this->getRequest()->getParam('status', -1);
 		$this->view->form->setDefaults($formDefaults);
 		$this->view->requestsTable = $monitorModel->getAllLogData('Requests', $date, $phone, $request_id, $stage, $to, $from, $status);
 		$this->view->requestsTableFields = array(
@@ -77,7 +76,8 @@ class MonitorController extends Zend_Controller_Action {
 			'transfer_time' => 'transfer time',
 			'disconnect_time' => 'disconnect time',
 			'connect_time' => 'connect time',
-			'auto_check' => 'auto_check',
+			'auto_check' => 'auto check',
+			'cron_lock' => 'cron lock',
 		); 
 		$this->view->transactionsTable = $monitorModel->getAllLogData('Transactions', $date, $phone, $request_id, $stage, $to, $from, $status);
 		$this->view->logsTable = $monitorModel->getAllLogData('Logs', $date, $phone, $request_id, $stage, $to, $from, $status);

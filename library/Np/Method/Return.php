@@ -25,7 +25,7 @@ class Np_Method_Return extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 
@@ -106,5 +106,25 @@ class Np_Method_Return extends Np_Method {
 		}
 		return $xml;
 	}
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		$ret = array('NUMBER' => (string) $xmlObject->number);
+		if (isset($xmlObject->mobile)) {
+			$ret['NETWORK_TYPE'] = (string) $xmlObject->mobile->networkType;
+			$ret['NUMBER_TYPE'] = (string) $xmlObject->mobile->numberType;
+		} else {
+			$ret['NETWORK_TYPE'] = (string) $xmlObject->fixed->networkType;
+			$ret['NUMBER_TYPE'] = (string) $xmlObject->fixed->numberType;
+		}
+		return $ret;
+	}
+
 
 }

@@ -17,8 +17,6 @@
  */
 class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 
-	var $type = "InquireNumberResponse";
-
 	/**
 	 * Constructor
 	 * 
@@ -27,7 +25,7 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 		//SET BODY 
 		foreach ($options as $key => $value) {
@@ -38,7 +36,7 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 					$this->setBodyField($key, $value);
 					break;
 				case "Phone_number":
-					$this->setBodyField('Number', $value);
+					$this->setBodyField("Number", $value);
 					break;
 
 			}
@@ -70,7 +68,6 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 		if (parent::saveToDB()) {
 			//this is a request from provider!
 			//save a new row in Requests DB
-			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 
 			$flags = new stdClass();
 			$flags->inquire = $this->getBodyField("CURRENT_OPERATOR");
@@ -96,10 +93,10 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 	}
 	
 	protected function addApprovalXml(&$xml, $msgType) {
-		if ($this->getBodyField("APPROVAL_IND") === "Y") {
+		if ($this->checkApprove()) {
 			$xml->$msgType->positiveApproval;
 			$xml->$msgType->positiveApproval->approvalInd = "Y";
-			$xml->$msgType->positiveApproval->currentOperator = $this->data['CURRENT_OPERATOR'];
+			$xml->$msgType->positiveApproval->currentOperator = $this->getBodyField('CURRENT_OPERATOR');
 		} else {
 			$xml->$msgType->negativeApproval;
 			$xml->$msgType->negativeApproval->approvalInd = "N";
@@ -112,5 +109,20 @@ class Np_Method_InquireNumberResponse extends Np_MethodResponse {
 		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
 	}
 
-
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		$ret = parent::convertArray($xmlObject);
+		if (isset($xmlObject->positiveApproval) && isset($xmlObject->positiveApproval->currentOperator)) {
+			$ret['CURRENT_OPERATOR'] = (string) $xmlObject->positiveApproval->currentOperator;
+		}
+		return $ret;
+	}
+	
 }

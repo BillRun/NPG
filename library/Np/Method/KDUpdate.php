@@ -26,7 +26,7 @@ class Np_Method_KDUpdate extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 
@@ -147,4 +147,18 @@ class Np_Method_KDUpdate extends Np_Method {
 		return $xml;
 	}
 
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		return array(
+			'KD_UPDATE_TYPE' => (string) $xmlObject[0],
+			'REMARK' => (string) $xmlObject->remark,
+		);
+	}
+	
 }

@@ -31,7 +31,7 @@ class Np_Method_Check extends Np_Method {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 
@@ -191,6 +191,37 @@ class Np_Method_Check extends Np_Method {
 		}
 
 		return $xml;
+	}
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		$ret = array();
+		$networkTypeConfig = Application_Model_General::getSettings("NetworkType");
+		if ($networkTypeConfig === "M") {
+			$networkType = "mobile";
+			$ret['NETWORK_TYPE'] = (string) $networkTypeConfig;
+		} else {
+			$networkType = "fixed";
+			$ret['NETWORK_TYPE'] = (string) $networkTypeConfig;
+		}
+
+		if (!empty($xmlObject->$networkType->mobileNumberIdentified) && $xmlObject->$networkType->mobileNumberIdentified !== NULL) {
+			$ret['IDENTIFICATION_VALUE'] = (string) $xmlObject->$networkType->mobileNumberIdentified->identificationValue;
+			$ret['IDENTIFICATION_VALUE_2ND'] = (string) $xmlObject->$networkType->mobileNumberIdentified->identificationValue2nd;
+			$ret['IDENTIFICATION_VALUE_3RD'] = (string) $xmlObject->$networkType->mobileNumberIdentified->identificationValue3rd;
+			$ret['NUMBER_TYPE'] = (string) $xmlObject->$networkType->mobileNumberIdentified->numberType;
+			$ret['PHONE_NUMBER'] = (string) $xmlObject->$networkType->mobileNumberIdentified->number;
+		} else {
+			$ret['NUMBER_TYPE'] = (string) $xmlObject->$networkType->mobileNumberUnidentified->numberType;
+			$ret['PHONE_NUMBER'] = (string) $xmlObject->$networkType->mobileNumberUnidentified->number;
+		}
+		return $ret;
 	}
 
 }

@@ -25,7 +25,7 @@ class Np_Method_PublishResponse extends Np_MethodResponse {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 

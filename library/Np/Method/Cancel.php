@@ -18,18 +18,6 @@
 class Np_Method_Cancel extends Np_Method {
 
 	/**
-	 * Constructor
-	 * 
-	 * calls parent constructor , sets type "cancel" 
-	 * @param array $options 
-	 */
-	protected function __construct($options) {
-		parent::__construct($options);
-
-		//SET BODY - there is no Body in addition to Method
-	}
-
-	/**
 	 * extended function from parent Np_Method
 	 * checks if db object exists and last transaction is Request_response or
 	 * Update_response

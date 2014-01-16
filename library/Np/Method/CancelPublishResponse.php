@@ -24,7 +24,7 @@ class Np_Method_CancelPublishResponse extends Np_MethodResponse {
 	 * and places params in  body fields 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 

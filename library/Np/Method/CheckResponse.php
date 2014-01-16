@@ -24,7 +24,7 @@ class Np_Method_CheckResponse extends Np_MethodResponse {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 		parent::__construct($options);
 
 		//SET BODY 
@@ -87,6 +87,23 @@ class Np_Method_CheckResponse extends Np_MethodResponse {
 		$xml->$msgType->essentialInfo5;
 
 		return $xml;
+	}
+	
+	/**
+	 * convert Xml data to associative array
+	 * 
+	 * @param simple_xml $xmlObject simple xml object
+	 * 
+	 * @return array converted data from hierarchical xml to flat array
+	 */
+	public function convertArray($xmlObject) {
+		$ret = parent::convertArray($xmlObject);
+		$ret['ESSENTIAL_INFO_1'] = (string) $xmlObject->essentialInfo1;
+		$ret['ESSENTIAL_INFO_2'] = (string) $xmlObject->essentialInfo2;
+		$ret['ESSENTIAL_INFO_3'] = (string) $xmlObject->essentialInfo3;
+		$ret['ESSENTIAL_INFO_4'] = (string) $xmlObject->essentialInfo4;
+		$ret['ESSENTIAL_INFO_5'] = (string) $xmlObject->essentialInfo5;
+		return $ret;
 	}
 
 }

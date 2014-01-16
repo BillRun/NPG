@@ -53,6 +53,7 @@ class TestController extends Zend_Controller_Action {
 				$arr['more']['connect_time'] = time();
 				break;
 			case "inquire_number":
+			case "inquire_number_response":
 				$arr['more']['current_operator'] = 'PR';
 				break;
 		}

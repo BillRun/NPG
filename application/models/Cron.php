@@ -35,7 +35,7 @@ class Application_Model_Cron {
 	 */
 	public static function makeChangeProvider() {
 		$ret = array();
-		$minutes = 15;
+		$max_minutes = Application_Model_General::getSettings('execute-max', 15);
 
 		//select the row to Excute Transfer NOW
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
@@ -47,12 +47,12 @@ class Application_Model_Cron {
 		// the first two conditions will verify it will run only in the first 17 minutes
 		$select->where('transfer_time IS NOT NULL');
 		$select->where('transfer_time <= \'' . Application_Model_General::getDateTimeInSqlFormat(time()) . '\'');
-		$select->where('transfer_time > \'' . Application_Model_General::getDateTimeInSqlFormat(strtotime($minutes . ' minutes ago')) . '\'');
+		$select->where('transfer_time > \'' . Application_Model_General::getDateTimeInSqlFormat(strtotime($max_minutes . ' minutes ago')) . '\'');
 		$select->where('last_transaction IN (?)', $execute_statuses);
 		$select->where("to_provider LIKE '" . Application_Model_General::getSettings('InternalProvider') . "'");
 		$select->where('status = 1');
 		$select->where('cron_lock = 0');
-
+//		echo $select;
 		$rows = $select->query()->fetchAll();
 		foreach ($rows as $row) {
 			$ret[] = $row;
@@ -69,7 +69,6 @@ class Application_Model_Cron {
 	 * 
 	 */
 	public static function publishChangeProvider() {
-
 		$ret = array();
 		$providerArray = array_keys(Application_Model_General::getSettings('provider'));
 		$updateIDs = array();
@@ -119,7 +118,7 @@ class Application_Model_Cron {
 	 * @return void
 	 * 
 	 */
-	public static function checkPublishResponseFromProviders($force = FALSE) {
+	public static function checkPublishResponseFromProviders() {
 
 		$ret = array();
 		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
@@ -213,7 +212,7 @@ class Application_Model_Cron {
 	 * @param type $params reqyest params
 	 * @return int number of retries 
 	 */
-	function get_retry_no($params) {
+	protected function get_retry_no($params) {
 		$tbl = new Application_Model_DbTable_Transactions(Np_Db::slave());
 		$select = $tbl->select();
 		$select->from('Transactions', array('retry' => new Zend_Db_Expr('COUNT(*)')));
@@ -263,19 +262,10 @@ class Application_Model_Cron {
 	 * @param array $request 
 	 * @return void
 	 */
-	public function checkPublish($request, $publishForceAll = FALSE) {
+	public function checkPublish($request) {
 		$internalProvider = Application_Model_General::getSettings('InternalProvider');
-		// check if this not the internal provider publish
-		//TODO oc666: check if necessary
-		if (substr($request['request_id'], 2, 2) != $internalProvider) {
-			$where[] = "request_id = " . $resultFetch['request_id'] . "";
-			$where[] = "trx_no NOT LIKE '" . $internalProvider . "%'";
-			$req_tbl = new Application_Model_DbTable_Requests(Np_Db::master());
-			$res = $req_tbl->update(array('last_transaction' => 'Publish_response'), $where);
-			return $res;
-		}
 		$publish_response_providers = array();
-		if (!$publishForceAll) {
+		if (isset($request['forceAll']) && $request['forceAll']) {
 			$db = Np_Db::slave();
 			$select = $db->select();
 			$select->from('Transactions'); //, array('provider' => new Zend_Db_Expr('SUBSTR(trx_no,1,2)') ,'request_id')); //THERE IS NO FROM FIELD!!
@@ -302,11 +292,10 @@ class Application_Model_Cron {
 			}
 			return $ret;
 		} else {
-
-			//no problem - update publish_response
+			// all providers return response - update publish_response
 			$req_tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 			$req_tbl->update(array('last_transaction' => 'Publish_response', 'status' => 0), 'id=' . $request['id']);
-			//send to internal!
+			// @TODO: send to internal!
 		}
 		return TRUE;
 	}
@@ -395,24 +384,6 @@ class Application_Model_Cron {
 
 		$res = $tbl->update($update_arr, $where_arr);
 		return $res;
-	}
-
-	public function timersAggregate($dataArray) {
-		return FALSE;
-	}
-
-	public function checkifpublish() {
-		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
-		$select = $tbl->select();
-		$select->where('last_transaction= "Publish"')
-			->where('status =  1');
-
-		$result = $select->query();
-
-		while ($row = $result->fetch()) {
-
-			$goodpublish_result = Application_Model_Cron::checkifgoodpublish($row['request_id']);
-		}
 	}
 
 	public function checkifgoodpublish($reqId) {

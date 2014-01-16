@@ -25,7 +25,7 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 	 * 
 	 * @param array $options 
 	 */
-	protected function __construct($options) {
+	protected function __construct(&$options) {
 
 		parent::__construct($options);
 
@@ -89,7 +89,7 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 	}
 	
 	protected function addApprovalXml(&$xml, $msgType) {
-		if ($this->getBodyField("APPROVAL_IND") === "Y") {
+		if ($this->checkApprove()) {
 			$xml->$msgType->positiveApproval;
 			$xml->$msgType->positiveApproval->approvalInd = "Y";
 			$xml->$msgType->positiveApproval->disconnectDateTime = $this->getBodyField('DISCONNECT_TIME');
@@ -105,16 +105,27 @@ class Np_Method_ExecuteResponse extends Np_MethodResponse {
 		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
 	}
 
-	public function setConnectTime($connect_time) {
+	
+	/**
+	 * method triggered after internal response to NPG
+	 * 
+	 * @param object $internalResponseObject
+	 */
+	public function postInternalRequest($internalResponseObject) {
 		if ($this->getHeaderField("TO") == Application_Model_General::getSettings('InternalProvider')) {
+			if (isset($internalResponseObject->connect_time)) {
+				$connect_time = $internalResponseObject->connect_time;
+			} else {
+				$connect_time = time();
+			}
 			$updateArray = array('connect_time' => Application_Model_General::getDateTimeInSqlFormat($connect_time));
 			$whereArray = array(
 				'request_id =?' => $this->getHeaderField("REQUEST_ID"),
 			);
 			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 			return $tbl->update($updateArray, $whereArray);
-
 		}
+		return true;
 	}
 
 }
