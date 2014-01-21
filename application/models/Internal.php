@@ -348,7 +348,16 @@ class Application_Model_Internal {
 	/**
 	 * @TODO: implement send error to internal
 	 */
-	public function SendErrorToInternal() {
+	public function SendErrorToInternal($errorData) {
+		$request = Np_Method::getInstance($errorData);
+		if (isset($errorData['STATUS'])) {
+			$request->setRejectReasonCode($errorData['STATUS']);
+			$request->setAck($errorData['STATUS']);
+		} else {
+			$request->setRejectReasonCode(false);
+			$request->setAck(false);
+		}
+		$this->SendRequestToInternal($request);
 		return TRUE;
 	}
 
@@ -451,8 +460,14 @@ class Application_Model_Internal {
 			$ret['more']['disconnect_time'] = $this->params['DISCONNECT_TIME'];
 		}
 		if ($msg_type == "REQUEST" || $msg_type == "UPDATE") {
+			if (!is_numeric($this->params['PORT_TIME'])) {
+				// convert to unix timestamp in case is format as full datetime
+				$transfer_time = strtotime($this->params['PORT_TIME']);
+			} else {
+				$transfer_time = $this->params['PORT_TIME'];
+			}
 			// all the cases for backward compatibility
-			$ret['port_time'] = $ret['more']['port_time'] = $ret['transfer_time'] = $ret['more']['transfer_time'] = $this->params['PORT_TIME'];
+			$ret['port_time'] = $ret['more']['port_time'] = $ret['transfer_time'] = $ret['more']['transfer_time'] = $transfer_time;
 		}
 		if ($msg_type == "PUBLISH") {
 			$ret['more']['donor'] = $this->params['DONOR'];

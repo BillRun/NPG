@@ -105,12 +105,9 @@ class Np_Method_Publish extends Np_Method {
 					'phone_number' => $this->getBodyField("NUMBER"),
 					'disconnect_time' => Application_Model_General::getDateTimeInSqlFormat($this->getBodyField("DISCONNECT_TIME")),
 					'connect_time' => Application_Model_General::getDateTimeInSqlFormat($this->getBodyField("CONNECT_TIME")),
+					'transfer_time' => Application_Model_General::getDateTimeInSqlFormat(),
 					'flags' => json_encode($flags),
 				);
-
-				if (!empty($this->getBodyField("ROUTE_TIME"))) {
-					$data['CONNECT_TIME'] = Application_Model_General::getDateTimeInSqlFormat($this->getBodyField("ROUTE_TIME"));
-				}
 
 				return $tbl->insert($data);
 			} catch (Exception $e) {

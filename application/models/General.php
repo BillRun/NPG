@@ -215,7 +215,7 @@ class Application_Model_General {
 	 * @param type $strTime
 	 * @return string Date in SQL Format 
 	 */
-	public static function getDateTimeInSqlFormat($strTime) {
+	public static function getDateTimeInSqlFormat($strTime = null) {
 		$time = new Zend_Date($strTime, null, Application_Model_General::getLocale(null, true));
 		return $time->toString('yyyy-MM-ddTHH:mm:ss');
 	}
@@ -743,6 +743,48 @@ class Application_Model_General {
 			}
 		}
 		return self::$locales[$stamp];
+	}
+	
+	/**
+	 * retrieve all providers respond to publish
+	 * 
+	 * @param string $request_id the request id that need to be checked
+	 * 
+	 * @return array of providers
+	 */
+	public static function getProvidersRequestWithPublishResponse($request_id) {
+		$db = Np_Db::slave();
+		$select = $db->select();
+		$internalProvider = Application_Model_General::getSettings('InternalProvider');
+		$select->from('Transactions'); //, array('provider' => new Zend_Db_Expr('SUBSTR(trx_no,1,2)') ,'request_id')); //THERE IS NO FROM FIELD!!
+		$select->where('request_id = ?', $request_id)
+			->where('message_type = ?', 'Publish_response')
+			->where('target = ?', $internalProvider)
+			->where('reject_reason_code is NULL');
+		$result = $db->query($select);
+		$rows = $result->fetchAll();
+		$publish_response_providers = array();
+		foreach ($rows as $row) {
+			$publish_response_providers[] = substr($row['trx_no'], 0, 2);
+		}
+		return $publish_response_providers;
+	}
+	
+	/**
+	 * retrieve all providers not respond to publish
+	 * 
+	 * @param string $request_id the request id that need to be checked
+	 * @param string $from the source provider
+	 * @param string $to the destination provider
+	 * 
+	 * @return array of all providers without publish response
+	 */
+	public static function getProvidersRequestWithoutPublishResponse($request_id, $from, $to) {
+		$publish_response_providers = self::getProvidersRequestWithPublishResponse($request_id);
+		$providerArray = array_keys(Application_Model_General::getSettings('provider', array()));
+		//remove publish response, source & destination provider
+		$problem_providers = array_diff($providerArray, array_merge($publish_response_providers, array($from, $to)));
+		return $problem_providers;
 	}
 
 }

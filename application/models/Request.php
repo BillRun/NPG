@@ -528,6 +528,8 @@ class Application_Model_Request {
 				//update db - status OK
 				if ($ack->NP_ACK->ACK_CODE == "Ack00") {
 					Application_Model_General::updateTransactionsAck($this->request->getHeaderField('TRX_NO'), $ack->NP_ACK->ACK_CODE);
+				} else {
+					$this->SendErrorToInternal($ack->NP_ACK->ACK_CODE);
 				}
 			} else {
 				if (strtoupper($this->request->getHeaderField('MSG_TYPE')) == 'CHECK') {
@@ -537,10 +539,31 @@ class Application_Model_Request {
 				return false;
 			}
 		} else {
-			$response = new Application_Model_Internal($this->data);
-			$response->SendErrorToInternal();
+			// @TODO: check this on all scenarios
+//			$this->SendErrorToInternal(false);
 		}
 		return true;
+	}
+	
+	/**
+	 * send error to internal if happened directly 
+	 * @param type $errorCode
+	 * @return boolean
+	 */
+	protected function SendErrorToInternal($errorCode = false) {
+		if (Application_Model_General::isMsgResponse($this->request->getHeaderField('MSG_TYPE'))) {
+			// don't send error on response
+			return true;
+		}
+		$params = $this->data;
+		// send the error as response to internal
+		$params['MSG_TYPE'] = $this->request->getHeaderField('MSG_TYPE') . '_response';
+		$params['STATUS'] = $errorCode;
+		$params['APPROVAL_IND'] = 'N';
+		$params['FROM'] = $params['FROM_PROVIDER'];
+		$params['TO'] = $params['TO_PROVIDER'];
+		$response = new Application_Model_Internal($params);
+		$response->SendErrorToInternal($params);
 	}
 
 	/**

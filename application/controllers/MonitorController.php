@@ -114,6 +114,10 @@ class MonitorController extends Zend_Controller_Action {
 			}
 
 		}
+
+		if (strpos(strtolower($data['last_transaction']), 'publish') !== FALSE) {
+			$this->view->publishNotResponse = Application_Model_General::getProvidersRequestWithoutPublishResponse($data['request_id'], $data['from_provider'], $data['to_provider']);
+		}
 		$this->view->headLink()->appendStylesheet(Application_Model_General::getBaseUrl() . '/css/style.css');
 	}
 	

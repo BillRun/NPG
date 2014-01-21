@@ -1,3 +1,15 @@
 <h1>Edit</h1>
-<?php echo $this->editForm; ?>
-<?php echo $this->executeForm; ?>
+<?php 
+
+echo $this->editForm;
+
+echo $this->executeForm;
+
+if (isset($this->publishNotResponse) && is_array($this->publishNotResponse) && count($this->publishNotResponse)) : 
+	echo "<h3>Providers not respond to publish</h3>"
+	. "<table border=\"1\"><tr><td>Provider</td></tr>";
+	foreach ($this->publishNotResponse as $provider) :
+		echo "<tr><td>" . $provider . "</td></tr>";
+	endforeach;
+	echo "</table>";
+endif;

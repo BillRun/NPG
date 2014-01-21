@@ -131,10 +131,12 @@ class CronController extends Zend_Controller_Action {
 		$res = Application_Model_Cron::setTimeoutChecks('Check', 11);
 		$res = Application_Model_Cron::setTimeoutChecks('Check_response', 30);
 		$res = Application_Model_Cron::setTimeoutChecks('Request', 60, true);
-		// 1500 => more than 24 hrs
-//		$res = Application_Model_Cron::setTimeoutChecks('Request_response',1500);
-//		$res = Application_Model_Cron::setTimeoutChecks('Update', 60, true);
-//		$res = Application_Model_Cron::setTimeoutChecks('Update_response', 1500);
+		// 1500 => more than 48 hrs
+		$res = Application_Model_Cron::setTimeoutChecks('Request_response', 3000);
+		$res = Application_Model_Cron::setTimeoutChecks('Update', 60, true);
+		$res = Application_Model_Cron::setTimeoutChecks('Update_response', 3000);
+		$res = Application_Model_Cron::setTimeoutChecks('KD_Update', 3000);
+		$res = Application_Model_Cron::setTimeoutChecks('KD_Update_response', 3000);
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel_response', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Execute', 15);

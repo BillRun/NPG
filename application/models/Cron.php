@@ -263,25 +263,12 @@ class Application_Model_Cron {
 	 * @return void
 	 */
 	public function checkPublish($request) {
-		$internalProvider = Application_Model_General::getSettings('InternalProvider');
-		$publish_response_providers = array();
 		if (!isset($request['forceAll']) || !$request['forceAll']) {
-			$db = Np_Db::slave();
-			$select = $db->select();
-			$select->from('Transactions'); //, array('provider' => new Zend_Db_Expr('SUBSTR(trx_no,1,2)') ,'request_id')); //THERE IS NO FROM FIELD!!
-			$select->where('request_id = ?', $request['request_id'])
-				->where('message_type = ?', 'Publish_response')
-				->where('target = ?', $internalProvider)
-				->where('reject_reason_code is NULL');
-			$result = $db->query($select);
-			$rows = $result->fetchAll();
-			foreach ($rows as $row) {
-				$publish_response_providers[] = substr($row['trx_no'], 0, 2);
-			}
+			$problem_providers = Application_Model_General::getProvidersRequestWithoutPublishResponse($request['request_id'], $request['from_provider'], $request['to_provider']);
+		} else {
+			// if force all - send to all providers except source & destination
+			$problem_providers = array_diff(Application_Model_General::getProviderArray(), array($request['from_provider'], $request['to_provider']));
 		}
-		$providerArray = array_keys(Application_Model_General::getSettings('provider'));
-		//remove publish response, source & destination provider
-		$problem_providers = array_diff($providerArray, array_merge($publish_response_providers, array($request['from_provider'], $request['to_provider'])));
 		if ($problem_providers) {
 			//problem! - send providers again
 			$ret = array();
@@ -365,7 +352,7 @@ class Application_Model_Cron {
 	 * 
 	 * @return int number of affected rows 
 	 */
-	static public function setTimeoutChecks($msg_type = "Check", $time = 1, $checkTransferTimeExists = false) {
+	static public function setTimeoutChecks($msg_type = "Check", $time = 1, $checkTransferTimeNotExists = false) {
 //		$setTimeOutArray = array('Check'=>'30','Check_response'=>'30','Request'=>'30',);
 		$dateInTimeStamp = time() - ($time * 60);
 		$compareTime = Application_Model_General::getDateTimeInSqlFormat($dateInTimeStamp);
@@ -378,8 +365,8 @@ class Application_Model_Cron {
 			'status =?' => 1
 		);
 
-		if ($checkTransferTimeExists) {
-			$where_arr[] = "transfer_time IS NOT NULL OR transfer_time = ''";
+		if ($checkTransferTimeNotExists) {
+			$where_arr[] = "transfer_time IS NULL OR transfer_time = ''";
 		}
 
 		$res = $tbl->update($update_arr, $where_arr);
