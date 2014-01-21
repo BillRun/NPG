@@ -53,5 +53,6 @@ CREATE TABLE `Transactions` (
   `donor` char(2),
   PRIMARY KEY (`id`),
   KEY `request_id_idx` (`request_id`),
-  KEY `Trx_no_idx` (`trx_no`)
+  KEY `Trx_no_idx` (`trx_no`),
+  KEY `last_transaction_time_idx` (`last_transaction_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
