@@ -46,7 +46,11 @@ class CronController extends Zend_Controller_Action {
 			$this->view->transfer = Application_Model_Cron::makeChangeProvider();
 		}
 		$publish_verification_iteration = Application_Model_General::getSettings('publish-verification-iteration', 20);
-		if ($minute % $publish_verification_iteration == 0 || $forceAll) {
+		$hour = date('G'); // 24-hour format of an hour without leading zeros
+		$dayofweek = date('w'); // Numeric representation of the day of the week, 0 (for Sunday) through 6 (for Saturday)
+		$working_days = (bool) ($dayofweek >= 0 && $dayofweek <= 4 && $hour >= 8 && $hour < 23);
+		$friday = (bool) ($dayofweek == 5 && $hour >= 8 && $hour < 15);
+		if (($minute % $publish_verification_iteration == 0 && ($working_days || $friday)) || $forceAll) {
 			// verify all requests return publish
 			$this->view->publish_check = Application_Model_Cron::checkPublishResponseFromProviders();
 		}

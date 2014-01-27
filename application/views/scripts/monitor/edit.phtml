@@ -3,7 +3,14 @@
 
 echo $this->editForm;
 
-echo $this->executeForm;
+if (isset($this->executeForm)):
+	echo $this->executeForm;
+endif;
+
+if (isset($this->publishForm)):
+	echo $this->publishForm;
+endif;
+
 
 if (isset($this->publishNotResponse) && is_array($this->publishNotResponse) && count($this->publishNotResponse)) : 
 	echo "<h3>Providers not respond to publish</h3>"

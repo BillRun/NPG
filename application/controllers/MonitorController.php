@@ -7,7 +7,7 @@
  * @license         GNU Affero Public License version 3 or later; see LICENSE.txt
  */
 class MonitorController extends Zend_Controller_Action {
-	
+
 	public function init() {
 		$this->_helper->layout->setLayout('monitor');
 		$this->view->baseUrl = Application_Model_General::getBaseUrl();
@@ -39,6 +39,7 @@ class MonitorController extends Zend_Controller_Action {
 			$phone = FALSE;
 			$formDefaults['phone'] = '';
 		} else {
+			Application_Model_General::prefixPhoneNumber($phone);
 			$formDefaults['phone'] = $phone;
 		}
 		$date = $this->getRequest()->getParam('date');
@@ -78,7 +79,7 @@ class MonitorController extends Zend_Controller_Action {
 			'connect_time' => 'connect time',
 			'auto_check' => 'auto check',
 			'cron_lock' => 'cron lock',
-		); 
+		);
 		$this->view->transactionsTable = $monitorModel->getAllLogData('Transactions', $date, $phone, $request_id, $stage, $to, $from, $status);
 		$this->view->logsTable = $monitorModel->getAllLogData('Logs', $date, $phone, $request_id, $stage, $to, $from, $status);
 	}
@@ -97,32 +98,44 @@ class MonitorController extends Zend_Controller_Action {
 		$table = (string) $this->getRequest()->getParam('table');
 		$id = (int) $this->getRequest()->getParam('id');
 		$data = $model->getTableRow($table, $id);
+		$last_transaction = strtolower($data['last_transaction']);
 		if ($data) {
 			$model->createForm($editForm, $table, $data);
 			$this->view->editForm = $editForm;
 			if ($data['status']) {
-				$executeData = array(
-					'id' => $data['id'], 
-					'request_id' => $data['request_id'],
-					'from_provider' => $data['from_provider'],
-				);
-				$executeForm = new Application_Form_Execute();
-				$executeForm->setDefaults($executeData);
-				$this->view->executeForm = $executeForm;
+				if (!empty($data['transfer_time']) && $data['to_provider'] == Application_Model_General::getSettings('InternalProvider') && ($last_transaction == 'kd_update' || $last_transaction == 'kd_update_response' || $last_transaction == 'request' || $last_transaction == 'request_response' || $last_transaction == 'update' || $last_transaction == 'update_response')
+				) {
+					$executeData = array(
+						'id' => $data['id'],
+						'request_id' => $data['request_id'],
+						'from_provider' => $data['from_provider'],
+					);
+					$executeForm = new Application_Form_Execute();
+					$executeForm->setDefaults($executeData);
+					$this->view->executeForm = $executeForm;
+				}
+
+				if (!empty($data['transfer_time']) && $data['to_provider'] == Application_Model_General::getSettings('InternalProvider') && ($last_transaction == 'publish' || $last_transaction == 'execute_response')) {
+					$publishForm = new Application_Form_Publish();
+					$publishForm->setDefaults($data);
+					$this->view->publishForm = $publishForm;
+				}
 			} else {
 				$this->view->executeForm = '';
 			}
-
 		}
 
-		if (strpos(strtolower($data['last_transaction']), 'publish') !== FALSE) {
+		if (strpos($last_transaction, 'publish') !== FALSE) {
 			$this->view->publishNotResponse = Application_Model_General::getProvidersRequestWithoutPublishResponse($data['request_id'], $data['from_provider'], $data['to_provider']);
 		}
 		$this->view->headLink()->appendStylesheet(Application_Model_General::getBaseUrl() . '/css/style.css');
 	}
-	
+
 	public function executeAction() {
 		$params = $this->getRequest()->getParams();
+		if (isset($params['TO_PROVIDER'])) {
+			$params['TO'] = $params['TO_PROVIDER'];
+		}
 		$success = Application_Model_General::forkProcess('/cron/transfer', $params, true);
 		if ($success) {
 			$params['success'] = 1;
@@ -133,6 +146,26 @@ class MonitorController extends Zend_Controller_Action {
 		}
 		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/?' . http_build_query($params));
 	}
+
+	public function publishAction() {
+		$params = $this->getRequest()->getParams();
+
+		if ($params['last_transaction'] == 'Execute_response') {
+			$update = array('last_transaction' => 'Publish');
+			Application_Model_General::updateRequest($params['request_id'], $params['last_transaction'], $update);
+		}
+
+		$success = Application_Model_General::forkProcess('/cron/checkpublish', $params, true);
+		if ($success) {
+			$params['success'] = 1;
+			$params['message'] = 'Execute sent';
+		} else {
+			$params['success'] = 0;
+			$params['message'] = 'Execute failed';
+		}
+		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/?' . http_build_query($params));
+	}
+
 	public function requestAction() {
 		$form = new Application_Form_Request();
 		$params = $this->getRequest()->getParams();
@@ -146,11 +179,12 @@ class MonitorController extends Zend_Controller_Action {
 			$this->view->success = (int) $params['success'];
 		}
 	}
-	
+
 	public function sendAction() {
 		$params = $this->getRequest()->getParams();
 		$url = 'Internal';
 		$method = $params['MSG_TYPE'];
+		Application_Model_General::prefixPhoneNumber($params['NUMBER']);
 		$args = array(
 			'method' => Application_Model_Internal::getMethodName($method),
 			'msg_type' => $method,
@@ -173,7 +207,7 @@ class MonitorController extends Zend_Controller_Action {
 			$params['success'] = 0;
 			$params['message'] = 'Request failed';
 		}
-		
+
 		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/request?' . http_build_query($params));
 	}
 

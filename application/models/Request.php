@@ -384,11 +384,11 @@ class Application_Model_Request {
 	protected function updateDB_ack($status) {
 		//$status check?
 		if ($status) {
-			$result = Application_Model_General::updateRequests(
-					$this->request->getHeaderField("REQUEST_ID"), $this->request->getHeaderField("MSG_TYPE"));
+			$result = Application_Model_General::updateRequest(
+					$this->request->getHeaderField("REQUEST_ID"), $this->request->getHeaderField("MSG_TYPE"), array('status' => 1));
 		} else {
-			$result = Application_Model_General::updateRequests(
-					$this->request->getHeaderField("REQUEST_ID"), $this->request->getHeaderField("MSG_TYPE"), 0);
+			$result = Application_Model_General::updateRequest(
+					$this->request->getHeaderField("REQUEST_ID"), $this->request->getHeaderField("MSG_TYPE"), array('status' => 0));
 		}
 	}
 
@@ -533,7 +533,7 @@ class Application_Model_Request {
 				}
 			} else {
 				if (strtoupper($this->request->getHeaderField('MSG_TYPE')) == 'CHECK') {
-					Application_Model_General::updateRequests($this->request->getHeaderField('REQUEST_ID'), $this->request->getHeaderField('MSG_TYPE'), 0);
+					Application_Model_General::updateRequest($this->request->getHeaderField('REQUEST_ID'), $this->request->getHeaderField('MSG_TYPE'), array('status' => 0));
 				}
 				Application_Model_General::updateTransactionsAck($this->request->getHeaderField('TRX_NO'), 'Err');
 				return false;

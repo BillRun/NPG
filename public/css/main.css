@@ -30,3 +30,26 @@ dd {
 	width:0;
 	height:0;
 }
+
+.request-form #table-label,
+.publish-form #id-label,
+.publish-form #id-element,
+.publish-form #request_id-label,
+.publish-form #request_id-element,
+.publish-form #from_provider-label,
+.publish-form #from_provider-element,
+.publish-form #to_provider-label,
+.publish-form #to_provider-element,
+.publish-form #transfer_time-label,
+.publish-form #transfer_time-element,
+.publish-form #phone_number-element,
+.publish-form #phone_number-label,
+.publish-form #last_transaction-element,
+.publish-form #last_transaction-label,
+.publish-form #submit-label
+{
+	display:none;
+	width:0;
+	height:0;
+}
+

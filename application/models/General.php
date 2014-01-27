@@ -177,17 +177,19 @@ class Application_Model_General {
 	 * 
 	 * @param string $reqID
 	 * @param string $lastT
+	 * @param mixed $update
 	 * @return int Rows Affected
 	 */
-	public static function updateRequests($reqID, $lastT, $status = 1) {
-
-		$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
-		$update_arr = array('status' => $status);
+	public static function updateRequest($reqID, $lastT, $update = array()) {
+		if (empty($update)) {
+			return false;
+		}
 		$where_arr = array(
 			'request_id =?' => $reqID,
 			'last_transaction=?' => $lastT,
 		);
-		$res = $tbl->update($update_arr, $where_arr);
+		$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
+		$res = $tbl->update($update, $where_arr);
 		return $res;
 	}
 
@@ -785,6 +787,12 @@ class Application_Model_General {
 		//remove publish response, source & destination provider
 		$problem_providers = array_diff($providerArray, array_merge($publish_response_providers, array($from, $to)));
 		return $problem_providers;
+	}
+	
+	public static function prefixPhoneNumber(&$phone, $prefix = '0') {
+		if (!empty($phone) && substr($phone, 0, 1) != $prefix) {
+			$phone = $prefix . $phone;
+		}
 	}
 
 }
