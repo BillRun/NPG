@@ -127,7 +127,8 @@ class CronController extends Zend_Controller_Action {
 	}
 
 	/**
-	 * Gateway for Check Response Timeout Checks. http://SERVER/cron/checktimeout should be ran in daily cron .
+	 * Gateway for Check Response Timeout Checks. http://SERVER/cron/checktimeout should be run in daily cron
+	 * All time units are minutes
 	 * 
 	 */
 	public function checktimeoutAction() {
@@ -141,6 +142,8 @@ class CronController extends Zend_Controller_Action {
 		$res = Application_Model_Cron::setTimeoutChecks('Update_response', 3000);
 		$res = Application_Model_Cron::setTimeoutChecks('KD_Update', 3000);
 		$res = Application_Model_Cron::setTimeoutChecks('KD_Update_response', 3000);
+		$res = Application_Model_Cron::setTimeoutChecks('Inquire_number', 60);
+		$res = Application_Model_Cron::setTimeoutChecks('Inquire_number_response', 60);
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel_response', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Execute', 15);
@@ -149,8 +152,6 @@ class CronController extends Zend_Controller_Action {
 //		$res = Application_Model_Cron::setTimeoutChecks('Publish_response', 5);
 //		$res = Application_Model_Cron::setTimeoutChecks('Return', 10);
 //		$res = Application_Model_Cron::setTimeoutChecks('Return_response', 10);
-//		$res = Application_Model_Cron::setTimeoutChecks('Inquire_number', 1);
-//		$res = Application_Model_Cron::setTimeoutChecks('Inquire_number_respon', 0);
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel_publish', 15);
 //		$res = Application_Model_Cron::setTimeoutChecks('Cancel_publish_respon', 0);
 //		$res = Application_Model_Cron::setTimeoutChecks('Up_system', 0);
