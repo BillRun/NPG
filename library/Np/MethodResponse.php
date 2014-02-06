@@ -95,7 +95,7 @@ abstract class Np_MethodResponse extends Np_Method {
 		if (isset($xmlObject->positiveApproval)) {
 			$ret['APPROVAL_IND'] = (string) $xmlObject->positiveApproval->approvalInd;
 		} else {
-			$ret['APPROVAL_IND'] = (string) $xmlObject->positiveApproval->approvalInd;
+			$ret['APPROVAL_IND'] = (string) $xmlObject->negativeApproval->approvalInd;
 			$ret['REJECT_REASON_CODE'] = (string) $xmlObject->negativeApproval->rejectReasonCode;
 		}
 		$ret['REQUEST_TRX_NO'] = (string) $xmlObject->requestTrxNo;
