@@ -228,7 +228,7 @@ class Application_Model_General {
 	 * @param type $strTime
 	 * @return string Date in SQL Format 
 	 */
-	public static function getDateTimeInTimeStamp($strTime) {
+	public static function getDateTimeInTimeStamp($strTime = null) {
 		$time = new Zend_Date($strTime, null, Application_Model_General::getLocale(null, true));
 		return $time->getTimestamp();
 	}
@@ -391,6 +391,7 @@ class Application_Model_General {
 		}
 		$select = $tbl->select();
 		$select->where($filterField . ' = ?', $value)->order('id DESC')->limit(1);
+//		error_log($select);
 		$result = $select->query()->fetchObject();   //take the last one
 		if ($result) {
 			if (!is_array($fields)) {

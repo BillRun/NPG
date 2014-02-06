@@ -469,6 +469,12 @@ class Application_Model_Internal {
 			// all the cases for backward compatibility
 			$ret['port_time'] = $ret['more']['port_time'] = $ret['transfer_time'] = $ret['more']['transfer_time'] = $transfer_time;
 		}
+		if (isset($ret['more']['approval_ind']) && $ret['more']['approval_ind'] == 'Y' 
+			&& ($msg_type == "REQUEST_RESPONSE" || $msg_type == "UPDATE_RESPONSE")
+			&& Application_Model_General::getSettings('InternalProvider') == $this->params['TO']) {
+			$transfer_time = Application_Model_General::getFieldFromRequests('transfer_time', $this->params['REQUEST_ID'], 'request_id');
+			$ret['more']['transfer_time'] = Application_Model_General::getDateTimeInTimeStamp($transfer_time);
+		}
 		if ($msg_type == "PUBLISH") {
 			$ret['more']['donor'] = $this->params['DONOR'];
 			$ret['more']['publish_type'] = $this->params['PUBLISH_TYPE'];
