@@ -791,7 +791,7 @@ class Application_Model_General {
 	}
 	
 	public static function prefixPhoneNumber(&$phone, $prefix = '0') {
-		if (!empty($phone) && substr($phone, 0, 1) != $prefix) {
+		if (!empty($phone) && substr($phone, 0, strlen($prefix)) != $prefix) {
 			$phone = $prefix . $phone;
 		}
 	}
