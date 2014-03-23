@@ -144,7 +144,7 @@ class MonitorController extends Zend_Controller_Action {
 			$params['success'] = 0;
 			$params['message'] = 'Execute failed';
 		}
-		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/?' . http_build_query($params));
+		$this->_redirect(Application_Model_General::getBaseUrl() . '/monitor/?' . http_build_query($params));
 	}
 
 	public function publishAction() {
@@ -163,7 +163,7 @@ class MonitorController extends Zend_Controller_Action {
 			$params['success'] = 0;
 			$params['message'] = 'Execute failed';
 		}
-		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/?' . http_build_query($params));
+		$this->_redirect(Application_Model_General::getBaseUrl() . '/monitor/?' . http_build_query($params));
 	}
 
 	public function requestAction() {
@@ -208,7 +208,7 @@ class MonitorController extends Zend_Controller_Action {
 			$params['message'] = 'Request failed';
 		}
 
-		$this->redirect(Application_Model_General::getBaseUrl() . '/monitor/request?' . http_build_query($params));
+		$this->_redirect(Application_Model_General::getBaseUrl() . '/monitor/request?' . http_build_query($params));
 	}
 
 }

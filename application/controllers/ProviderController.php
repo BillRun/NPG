@@ -63,6 +63,11 @@ class ProviderController extends Zend_Controller_Action {
 		if (isset($params['SLEEP'])) {
 			sleep((int) $params['SLEEP']);
 		}
+		
+		if (isset($params['NUMBER'])) {
+			$params['PHONE_NUMBER'] = $params['NUMBER'];
+		}
+		
 //		error_log(print_R($params, 1));
 		$reqModel = new Application_Model_Request($params);
 		$manual = isset($params['MANUAL']) && $params['MANUAL'];
