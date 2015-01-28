@@ -51,7 +51,9 @@ class InternalController extends Zend_Controller_Action {
 		}
 		$desc = $model->getErrorMsg();
 		if (!empty($desc)) {
-			$obj->desc = $desc;
+			$obj->msgDesc = $obj->desc = $desc;
+		} else {
+			$obj->msgDesc = $obj->desc = '';
 		}
 		$this->view->ack = $obj;
 		// log the request and response

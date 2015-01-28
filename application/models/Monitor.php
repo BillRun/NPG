@@ -18,9 +18,7 @@ class Application_Model_Monitor {
 		$db = Np_Db::slave();
 		$select = $db->select()->from(array('t' => $table));
 
-		$tomorrowcalc = mktime(0, 0, 0, date("m"), date("d") + 1, date("Y"));
-		$tomorrow = date('Y-m-d', $tomorrowcalc);
-		$tomorrow .= ' 00:00:00';
+		$tomorrow = date('Y-m-d', strtotime('tomorrow')) . ' 00:00:00';
 
 		$stageMapping = array(
 			'Check' => array('Check', 'Check_response'),

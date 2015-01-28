@@ -511,6 +511,14 @@ class Application_Model_Internal {
 		if ($msg_type == "DB_SYNCH_RESPONSE") {
 			$ret['more']['file_name'] = $this->params['FILE_NAME'];
 		}
+
+		// let's keep on backward backward compatibility - all more fields should be also in the root
+		foreach ($ret['more'] as $k => $v) {
+			if (!isset($ret[$k])) {
+				$ret[$k] = $v;
+			}
+		}
+
 		return $ret;
 	}
 
@@ -547,7 +555,7 @@ class Application_Model_Internal {
 	 * 
 	 * @param bool $status
 	 * 
-	 * @todo refatoring to bridge classes
+	 * @todo refactoring to bridge classes
 	 */
 	public function CreateMethodResponse($status) {
 		//update DB ack!

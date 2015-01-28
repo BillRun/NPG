@@ -16,11 +16,21 @@ set_include_path(implode(PATH_SEPARATOR, array(
 	get_include_path(),
 )));
 
+// set timezone if not set
+if (empty(ini_get('date.timezone'))) {
+        $tz = 'Asia/Jerusalem';
+        date_default_timezone_set($tz);
+        ini_set('date.timezone', $tz);
+}
+
 /** Zend_Application */
 require_once 'Zend/Application.php';
 
 if (APPLICATION_ENV == 'development') {
 	$host = $_SERVER['HTTP_HOST'];
+	if (strpos($host, 'npg') === FALSE) {
+			$host = 'npg' . substr($_SERVER['SERVER_PORT'], -1);
+	}
 } else if (APPLICATION_ENV == 'testing') {
 	$host = strlen($_SERVER['REQUEST_URI']) > 3 ? substr($_SERVER['REQUEST_URI'], 1, 4) : 'testing';
 } else {

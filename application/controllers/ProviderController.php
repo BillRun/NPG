@@ -53,7 +53,7 @@ class ProviderController extends Zend_Controller_Action {
 	 * internal Action - "http://SERVER/Provider/internal"
 	 * 
 	 * Gets params from GET and puts them in a new Request Model Object .
-	 * then calls execteRequest() to send the message to internal. 
+	 * then calls executeRequest() to send the message to internal. 
 	 * 
 	 * @package		ApplicationController      
 	 * @subpackage	ProviderController
