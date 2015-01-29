@@ -79,7 +79,7 @@ class Np_Method_Return extends Np_Method {
 				'to_provider' => $this->getHeaderField("TO"),
 				'status' => 1,
 				'last_transaction' => $this->getHeaderField("MSG_TYPE"),
-				'number' => $this->getBodyField("NUMBER"),
+				'phone_number' => $this->getBodyField("NUMBER"),
 			);
 			$tbl = new Application_Model_DbTable_Requests(Np_Db::master());
 			return $tbl->insert($data);
