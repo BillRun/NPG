@@ -102,6 +102,9 @@ class Np_Method_KDUpdate extends Np_Method {
 		$msgType = $this->getHeaderField('MSG_TYPE');
 		$networkType = Application_Model_General::getSettings("NetworkType");
 		$numberType = $this->getBodyField('NUMBER_TYPE');
+		if (empty($numberType)) {
+			$numberType = Application_Model_General::getSettings("NumberType");
+		}
 		$requestId = $this->getHeaderField('REQUEST_ID');
 		$requestRecord = Application_Model_General::getFieldFromRequests(array('flags', 'transfer_time'), $requestId, 'request_id');
 		$number = $this->getBodyField('NUMBER');
