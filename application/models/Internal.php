@@ -431,6 +431,7 @@ class Application_Model_Internal {
 			'number' => $this->params['PHONE_NUMBER'], //check is set otherwise select phone number from DB from request_id
 			'provider' => $provider,
 			'msg_type' => $this->params['MSG_TYPE'],
+			'msgType' => $this->params['MSG_TYPE'], // b/c
 			'reqId' => $this->params['REQUEST_ID'],
 			'more' => array(
 				'identification_value' => $idValue,
@@ -439,12 +440,12 @@ class Application_Model_Internal {
 			),
 		);
 		if (isset($this->params['PHONE_NUMBER'])) {
-			$ret['number'] = $this->params['PHONE_NUMBER'];
+			$ret['number'] = $ret['phone_number'] = $this->params['PHONE_NUMBER'];
 		}
 		if (isset($this->params['NUMBER_TYPE'])) {
 			$ret['more']['number_type'] = $this->params['NUMBER_TYPE'];
 			if ($ret['more']['number_type'] == "R") {
-				unset($ret['number']);
+				unset($ret['number'], $ret['phone_number']);
 				$ret['more']['to_number'] = $this->params['TO_NUMBER'];
 				$ret['more']['from_number'] = $this->params['FROM_NUMBER'];
 			}
