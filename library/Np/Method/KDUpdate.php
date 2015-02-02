@@ -137,9 +137,9 @@ class Np_Method_KDUpdate extends Np_Method {
 		if ($numberType === "I") {
 			$path->$networkType->mobileNumberIdentified;
 			$path->$networkType->mobileNumberIdentified->numberType = $numberType;
-			$path->$networkType->mobileNumberIdentified->identificationValue = isset($flags['identification_value']) ? $flags['identification_value'] : '';
-			$path->$networkType->mobileNumberIdentified->identificationValue2nd = '';
-			$path->$networkType->mobileNumberIdentified->identificationValue3rd = '';
+			$path->$networkType->mobileNumberIdentified->identificationValue = isset($flags['identification_value']) ? $flags['identification_value'] : 'default';
+			$path->$networkType->mobileNumberIdentified->identificationValue2nd = 'default';
+			$path->$networkType->mobileNumberIdentified->identificationValue3rd = 'default';
 			$path->$networkType->mobileNumberIdentified->number = $number;
 		} else {
 			$path->$networkType->mobileNumberUnidentified;
