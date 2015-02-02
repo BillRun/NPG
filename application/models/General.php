@@ -278,6 +278,9 @@ class Application_Model_General {
 		if ($sleep) {
 			$params['SLEEP'] = (int) $sleep;
 		}
+		if (!self::isProd()) {
+			$params['XDEBUG_SESSION_START'] = 'netbeans-xdebug';
+		}
 		$forkUrl = self::getForkUrl();
 		$querystring = http_build_query($params);
 		if (!$post) {
