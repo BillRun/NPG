@@ -522,12 +522,23 @@ class Application_Model_Internal {
 			$ret['more']['file_name'] = $this->params['FILE_NAME'];
 		}
 
-		// let's keep on backward backward compatibility - all more fields should be also in the root
+		// let's keep on backward backward compatibility (b/c) - all more fields should be also in the root
 		foreach ($ret['more'] as $k => $v) {
 			if (!isset($ret[$k])) {
 				$ret[$k] = $v;
 			}
 		}
+		
+		// b/c
+		if (!isset($ret['msgDesc'])) {
+			$ret['desc'] = '';
+		}
+		
+		// b/c
+		if (!isset($ret['more']['msgDesc'])) {
+			$ret['more']['msgDesc'] = '';
+		}
+
 
 		return $ret;
 	}
