@@ -147,9 +147,9 @@ class Np_Timers {
 	 * @param String $timer
 	 * @param mixed $input_time the time (as date string or unix timestamp)to be compared
 	 * @param mixed $time the second time (as date string or unix timestamp) to be compared
-	 * @param Boolan $type how to compare the two dates
+	 * @param boolean $lt comprison type
 	 * 
-	 * @return bool true if request timed out
+	 * @return boolean true if timeout active, else false
 	 */
 	public static function isTimeout($timer, $input_time, $time = null, $lt = TRUE) {
 		if (!is_numeric($input_time)) {
@@ -161,7 +161,7 @@ class Np_Timers {
 			$time = strtotime($time);
 		}
 		$compare_time = $input_time + self::get($timer);
-		if (self::$debug) {
+		if (self::$debug || !Application_Model_General::isProd()) {
 			error_log("timer type:   " . $timer);
 			error_log("timer time:   " . self::get($timer));
 			error_log("input time:   " . $input_time);
