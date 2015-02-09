@@ -393,7 +393,7 @@ class Application_Model_General {
 			$filterField = (($fields !== 'phone_number') ? 'phone_number' : 'request_id');
 		}
 		$select = $tbl->select();
-		$select->where($filterField . ' = ?', $value)->order('id DESC')->limit(1);
+		$select->where($tbl->getAdapter()->quoteIdentifier($filterField) . ' = ?', $value)->order('id DESC')->limit(1);
 //		error_log($select);
 		$result = $select->query()->fetchObject();   //take the last one
 		if ($result) {
@@ -410,6 +410,84 @@ class Application_Model_General {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * method to get requests by field
+	 * @param type $by
+	 */
+	static public function getRequests($filterValue, $filterBy = 'request_id', $fields = array(), $where = array(), $orderBy = 'id DESC', $limit = 1) {
+		$tbl = new Application_Model_DbTable_Requests(Np_Db::slave());
+		$select = $tbl->select()->from($tbl->info(Zend_Db_Table_Abstract::NAME), $fields);
+
+		$select->where($tbl->getAdapter()->quoteIdentifier($filterBy) . ' = ?', $filterValue)
+			->order($orderBy)->limit(intval($limit));
+
+		foreach ($where as $cond => $value) {
+			$select->where($cond, $value);
+		}
+
+//		print($select);
+		return $select->query()->fetchAll();
+	}
+
+	/** 
+	 * method to get default provider of phone number
+	 * @param string $phone_number
+	 * @return mixed provider 2 letters if recognized else false
+	 */
+	static public function getDefaultProvider($phone_number) {
+		if (strlen($phone_number) < 4) {
+			return false;
+		}
+
+		$prefixes = array(
+			'/^0722\d{6}$/' => 'PR',
+			'/^0723\d{6}$/' => 'KZ',
+			'/^073[23]\d{6}$/' => 'CM',
+			'/^0747\d{6}$/' => 'PM',
+			'/^0765\d{6}$/' => 'BI',
+			'/^0768[0168]\d{5}$/' => 'BZ',
+			'/^077\d{7}$/' => 'MI',
+			'/^050\d{7}$/' => 'PL',
+			'/^052\d{7}$/' => 'CL',
+			'/^053\d{7}$/' => 'HT',
+			'/^054\d{7}$/' => 'PR',
+			'/^057\d{7}$/' => 'HT',
+			'/^058\d{7}$/' => 'GT',
+			'/^05522\d{5}$/' => 'HC',
+			'/^0556[67]\d{5}$/' => 'RL',
+			'/^05555\d{7}$/' => 't2t',
+			'/^05570\d{5}$/' => 'CT',
+			'/^0558[87]\d{5}$/' => 'AL',
+			'/^0559[97]\d{5}$/' => 'TZ',
+			'/^0\d[5-9]\d{6}$/' => 'BZ',
+			'/^3[0-2]\d{5}$/' => 'MI',
+			'/^0\d37[24]\d{4}$/' => 'PM',
+			'/^0\d373\d{4}$/' => 'CL',
+			'/^0\d376\d{4}$/' => 'BI',
+//			'/^059\d{7}$/' => 'jawal palestinian authority',
+//			'/^0737\d{6}$/' => 'veidan conferencing solutions',
+//			'/^05533\d{5}$/' => 'free telecom',
+//			'/^078333\d{4}$/' => 'free communication',
+//			'/^078555\d{4}$/' => 'sipme',
+//			'/^05544\d{5}$/' => 'ituran mobile communication',
+//			'/^05577\d{5}$/' => 'binat sameh (outsourcing)',
+//			'/^056\d{7}$/' => 'wataniya mobile palestinian authority',
+//			'/^05558\d{7}$/' => 'gally phone (Sipme)',
+//			'/^0\d2\d{6}$/' => 'platel (palestinial authority)',
+//			'/^0\d377\d{4}$/' => 'viedan',
+		);
+
+		if(!preg_match('/^0\d\d?\d{7}$/', $phone_number)) {
+		  return false;  
+		}
+		foreach($prefixes as $expression => $provider) {
+			if (preg_match($expression,$phone_number) ) {
+				return $provider;
+			}
+		}
+	    return false;
 	}
 
 	static public function getRouteTimeByReqId($requestID) {
@@ -750,7 +828,7 @@ class Application_Model_General {
 		}
 		return self::$locales[$stamp];
 	}
-	
+
 	/**
 	 * retrieve all providers respond to publish
 	 * 
@@ -775,7 +853,7 @@ class Application_Model_General {
 		}
 		return $publish_response_providers;
 	}
-	
+
 	/**
 	 * retrieve all providers not respond to publish
 	 * 
@@ -792,7 +870,7 @@ class Application_Model_General {
 		$problem_providers = array_diff($providerArray, array_merge($publish_response_providers, array($from, $to)));
 		return $problem_providers;
 	}
-	
+
 	public static function prefixPhoneNumber(&$phone, $prefix = '0') {
 		if (!empty($phone) && substr($phone, 0, strlen($prefix)) != $prefix) {
 			$phone = $prefix . $phone;
