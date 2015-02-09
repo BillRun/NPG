@@ -161,7 +161,7 @@ class Application_Model_Request {
 	public function ExecuteRequest($manual = false) {
 		$validate = $this->request->PostValidate();
 		$internalModel = new Application_Model_Internal($this->data);
-		if ($validate == TRUE) {
+		if ($validate === TRUE || strtolower($validate) === 'ack00') { // ack00 check is for b/c
 			$this->saveDB();
 
 			$content = $internalModel->SendRequestToInternal($this->request);
