@@ -102,14 +102,14 @@ class Np_Method_KDUpdate extends Np_Method {
 		$msgType = $this->getHeaderField('MSG_TYPE');
 		$networkType = Application_Model_General::getSettings("NetworkType");
 		$numberType = $this->getBodyField('NUMBER_TYPE');
-		if (empty($numberType)) {
-			$numberType = Application_Model_General::getSettings("NumberType");
-		}
 		$requestId = $this->getHeaderField('REQUEST_ID');
 		$requestRecord = Application_Model_General::getFieldFromRequests(array('flags', 'transfer_time'), $requestId, 'request_id');
+		$flags = json_decode($requestRecord['flags'], true);
+		if (empty($numberType)) {
+			$numberType = isset($flags['number_type']) ? $flags['number_type'] : Application_Model_General::getSettings("NumberType");
+		}
 		$number = $this->getBodyField('NUMBER');
 
-		$flags = json_decode($requestRecord['flags'], true);
 		$portTime = Application_Model_General::getDateTimeIso($requestRecord['transfer_time']);
 		$process_type = $this->getHeaderField('PROCESS_TYPE');
 		if ($process_type == "PORT") {

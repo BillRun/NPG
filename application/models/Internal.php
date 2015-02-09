@@ -120,8 +120,17 @@ class Application_Model_Internal {
 					'last_transaction' => $this->params["MSG_TYPE"],
 					'phone_number' => $this->params["PHONE_NUMBER"],
 				);
-				if (isset($this->params['MSG_TYPE']) == 'CHECK' && isset($this->params['IDENTIFICATION_VALUE'])) {
-					$row_insert['flags'] = json_encode(array('identification_value' => $this->params['IDENTIFICATION_VALUE']));
+				if (isset($this->params['MSG_TYPE']) == 'CHECK') {//  && isset($this->params['IDENTIFICATION_VALUE'])) {
+					$flags = array();
+					if (isset($this->params['identification_value'])) {
+						$this->params['identification_value'] = $this->params['IDENTIFICATION_VALUE'];
+					}
+					if (isset($this->params['NUMBER_TYPE'])) {
+						$flags['number_type'] = $this->params['NUMBER_TYPE'];
+					}
+					if (!empty($flags)) {
+						$row_insert['flags'] = json_encode($flags);
+					}
 				}
 			} else {
 				$row_insert = array(
