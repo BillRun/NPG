@@ -1,21 +1,34 @@
 <?php
-
 echo '<h1>NPG Monitor</h1>';
 echo $this->form;
+?>
+<div role="tabpanel">
 
-echo '<h2>The Requests Table</h2>';
+	<!-- Nav tabs -->
+	<ul class="nav nav-tabs" role="tablist">
+		<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Requests</a></li>
+		<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Transaction</a></li>
+		<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Logs</a></li>
+	</ul>
 
-$this->printTable($this->requestsTable, $this->requestsTableFields, 'Requests', true);
-// code prints out the transactions table
+	<!-- Tab panes -->
+	<div class="tab-content">
+		<div role="tabpanel" class="tab-pane active" id="home">
+			<?php $this->printTable($this->requestsTable, $this->requestsTableFields, 'Requests', true); ?>
+		</div>
+		<div role="tabpanel" class="tab-pane" id="profile">
+			<?php $this->printTable($this->transactionsTable); ?>
+		</div>
+		<div role="tabpanel" class="tab-pane" id="messages">
+			<?php $this->printTable($this->logsTable); ?>
+		</div>
+	</div>
 
-echo '<h2>The Transaction Table</h2>';
-$this->printTable($this->transactionsTable);
+</div>
 
-echo '<h2>The Logs Table</h2>';
-//print_R($this->logsTable);die;
-$this->printTable($this->logsTable);
 
+<?php
 if (!empty($this->reqlog)):
-echo '<h2>Request Log</h2>';
-echo "<pre>" . htmlentities($this->reqlog) . "</pre>";
+	echo '<div class="technical-log"><h2>Request Technical Log</h2>';
+	echo "<pre>" . htmlentities($this->reqlog) . "</pre></div>";
 endif;

@@ -37,7 +37,7 @@ class Application_Form_Request extends Zend_Form {
 		$this->addElement('text', 'NUMBER', $numberOptions);
 		$d = new Zend_Date(null, null, Application_Model_General::getLocale(null, false));
 		$dateOptions = array(
-			'label' => 'PORT TIME',
+			'label' => 'Port Time',
 			'id' => 'datetimepicker',
 			'required' => true,
 //			'validators' => array('Int'),
@@ -50,7 +50,7 @@ class Application_Form_Request extends Zend_Form {
 			unset($providers[$key]);
 		}
 		$toOptions = array(
-			'label' => 'TO',
+			'label' => 'To',
 			'multioptions' => array_combine($providers, $providers),
 		);
 		$this->addElement('select', 'TO', $toOptions);

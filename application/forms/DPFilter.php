@@ -11,7 +11,7 @@ class Application_Form_DPFilter extends Zend_Form {
 		$this->setAction('');
 		$this->addElement(
 			'text', 'request_id', array(
-			'label' => 'Request id',
+			'label' => 'Request Id',
 //			'value' => $this->getValue('request_id'),
 			)
 		);
@@ -57,7 +57,7 @@ class Application_Form_DPFilter extends Zend_Form {
 			'filters' => array('StringTrim')
 			)
 		);
-		
+
 		$providers = Application_Model_General::getProviderArray();
 		$currentProvider = Application_Model_General::getSettings('InternalProvider');
 		if (($key = array_search($currentProvider, $providers)) !== FALSE) {
@@ -71,7 +71,7 @@ class Application_Form_DPFilter extends Zend_Form {
 		$this->addElement('select', 'from', $toOptions);
 		$toOptions['label'] = 'To provider';
 		$this->addElement('select', 'to', $toOptions);
-		
+
 		$statusOptions = array(
 			'label' => 'Status',
 			'multioptions' => array(-1 => "All", 1 => "Active", 0 => "Inactive"),
@@ -82,6 +82,7 @@ class Application_Form_DPFilter extends Zend_Form {
 		$this->addElement('submit', 'submit', array(
 			'ignore' => true,
 			'label' => 'Search',
+			'class' => 'request-search-button',
 		));
 	}
 
