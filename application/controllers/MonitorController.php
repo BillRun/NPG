@@ -115,7 +115,7 @@ class MonitorController extends Zend_Controller_Action {
 					$this->view->executeForm = $executeForm;
 				}
 
-				if (!empty($data['transfer_time']) && $data['to_provider'] == Application_Model_General::getSettings('InternalProvider') && ($last_transaction == 'publish' || $last_transaction == 'execute_response')) {
+				if ((!empty($data['transfer_time']) || $last_transaction == 'return_response') && $data['to_provider'] == Application_Model_General::getSettings('InternalProvider') && ($last_transaction == 'publish' || $last_transaction == 'execute_response' || $last_transaction == 'return_response')) {
 					$publishForm = new Application_Form_Publish();
 					$publishForm->setDefaults($data);
 					$this->view->publishForm = $publishForm;
