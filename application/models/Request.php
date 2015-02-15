@@ -176,6 +176,7 @@ class Application_Model_Request {
 				$response->status = "";
 			}
 		} else {
+			$this->saveTransactionsDB();
 			if ($validate === FALSE) {
 				$validate = "Inv02";
 			}
