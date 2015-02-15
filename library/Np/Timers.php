@@ -161,7 +161,7 @@ class Np_Timers {
 			$time = strtotime($time);
 		}
 		$compare_time = $input_time + self::get($timer);
-		if (self::$debug || !Application_Model_General::isProd()) {
+		if (self::isDebug()) {
 			error_log("timer type:   " . $timer);
 			error_log("timer time:   " . self::get($timer));
 			error_log("input time:   " . $input_time);
@@ -177,6 +177,10 @@ class Np_Timers {
 			return TRUE;
 		}
 		return FALSE;
+	}
+	
+	protected static function isDebug() {
+		return self::$debug || !Application_Model_General::isProd();
 	}
 
 	/**
@@ -221,7 +225,7 @@ class Np_Timers {
 		if ($isTimeout === TRUE) {
 			Application_Model_General::writeToTimersActivity($request->getHeaders(), self::$failure);
 
-			if (self::$debug) {
+			if (self::isDebug()) {
 				error_log("Timer is not valid: " . $ret);
 			}
 			return "Gen07";
@@ -232,7 +236,7 @@ class Np_Timers {
 			if (self::$failure !== FALSE) {
 				$ret = ucfirst(strtolower(self::$failure));
 				Application_Model_General::writeToTimersActivity($request->getHeaders(), $ret);
-				if (self::$debug) {
+				if (self::isDebug()) {
 					error_log("Timer is not valid: " . $ret);
 				}
 				return $ret;
