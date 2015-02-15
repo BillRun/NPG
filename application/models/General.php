@@ -340,9 +340,7 @@ class Application_Model_General {
 			$row = array();
 			$row['request_id'] = isset($request['REQUEST_ID']) ? $request['REQUEST_ID'] : NULL;
 			$row['timer'] = isset($timer) ? $timer : NULL;
-			if (isset($request['RETRY_DATE'])) {
-//				$row['transaction_time'] = self::getDateTimeInSqlFormat($request['RETRY_DATE']);
-			}
+			$row['transaction_time'] = self::getDateTimeInSqlFormat();
 
 			$row['network_type'] = isset($request['PROCESS_TYPE']) ? $request['PROCESS_TYPE'] : NULL;
 			$tbl = new Application_Model_DbTable_ActivityTimers(Np_Db::master());
