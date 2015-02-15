@@ -70,7 +70,7 @@ class Np_Method_Publish extends Np_Method {
 			return "Gen07";
 		}
 		
-		$providers = Application_Model_General::getProviderArray();
+		$providers = Application_Model_General::getProviderArray(true);
 		if (!in_array($this->getBodyField('donor'), $providers)) {
 			return 'Pub05';
 		}

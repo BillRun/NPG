@@ -659,10 +659,14 @@ class Application_Model_General {
 
 	/**
 	 * get list of available providers from the configuration
+	 * @param boolean $includeSelf flag to return also the self (current) provider (default: false)
 	 * @return type
 	 */
-	public static function getProviderArray() {
+	public static function getProviderArray($includeSelf = false) {
 		$providers = array_keys(Application_Model_General::getSettings('provider'));
+		if ($includeSelf) {
+			return $providers;
+		}
 		$InternalProvider = Application_Model_General::getSettings('InternalProvider');
 		if (!in_array($InternalProvider, $providers)) {
 			$providers[] = $InternalProvider;
