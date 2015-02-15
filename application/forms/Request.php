@@ -22,7 +22,8 @@ class Application_Form_Request extends Zend_Form {
 				'Update' => 'Update',
 				'Cancel' => 'Cancel',
 				'Inquire_number' => 'Inquire_number',
-				'KD_Update' => 'KD_Update',
+//				'KD_Update' => 'KD_Update',
+				'Return' => 'Return',
 			),
 		);
 
