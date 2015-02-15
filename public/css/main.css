@@ -1,20 +1,23 @@
+h1, h2, h3 {
+	color: #428bca;
+}
 dl {
- width:100%;
- overflow:hidden;
+	width:100%;
+	overflow:hidden;
 }
 dt, dd {
-	margin-top:5px;
+	margin-top:10px;
 }
 dt {
- float:left;
- width:30%; /* adjust the width; make sure the total of both is 100% */
+	float:left;
+	width:30%; /* adjust the width; make sure the total of both is 100% */
 }
 dt label {
 	display: inline;
 }
 dd {
- float:left;
- width:70%; /* adjust the width; make sure the total of both is 100% */
+	float:left;
+	width:50%; /* adjust the width; make sure the total of both is 100% */
 }
 
 .request-form #table-label,
@@ -53,3 +56,29 @@ dd {
 	height:0;
 }
 
+table.monitor {
+	margin-top: 10px;
+}
+
+table.monitor th,
+table.monitor td {
+	text-align:center;
+	padding:2px;
+}
+div.technical-log {
+	margin-top:40px;
+}
+
+.zend_form, .request-form {
+	width:75%;
+}
+.zend_form dt, .request-form dt {
+	width:30%;
+}
+.zend_form input[type="text"],
+.zend_form select {
+	width:200px;
+}
+.zend_form input[type="submit"]{
+	float:right;
+}
