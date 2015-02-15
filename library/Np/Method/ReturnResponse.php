@@ -74,5 +74,9 @@ class Np_Method_ReturnResponse extends Np_MethodResponse {
 		}
 		return true;
 	}
+	
+	protected function addTrxNoXml(&$xml, $msgType) {
+		$xml->$msgType->requestTrxNo = $this->getBodyField('REQUEST_TRX_NO');
+	}
 
 }
