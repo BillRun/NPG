@@ -71,7 +71,7 @@ class Np_Method_Publish extends Np_Method {
 		}
 		
 		$providers = Application_Model_General::getProviderArray(true);
-		if (!in_array($this->getBodyField('donor'), $providers)) {
+		if (!in_array($this->getBodyField('DONOR'), $providers)) {
 			return 'Pub05';
 		}
 
