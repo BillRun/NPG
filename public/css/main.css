@@ -27,6 +27,10 @@ dd {
 .execute-form #request_id-element,
 .execute-form #from_provider-label,
 .execute-form #from_provider-element,
+.execute-form #to_provider-label,
+.execute-form #to_provider-element,
+.execute-form #phone_number-label,
+.execute-form #phone_number-element,
 .execute-form #submit-label
 {
 	display:none;

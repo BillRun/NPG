@@ -152,6 +152,9 @@ class Application_Model_Cron {
 	 * @return void
 	 */
 	public function executeTransfer($request) {
+		if (!isset($request['id'])) {
+			return false;
+		}
 		self::lockDBRow(1, $request['id']);
 		$params = array(
 			//FROM + TO

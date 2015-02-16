@@ -103,15 +103,20 @@ class MonitorController extends Zend_Controller_Action {
 			$model->createForm($editForm, $table, $data);
 			$this->view->editForm = $editForm;
 			if ($data['status']) {
-				if (!empty($data['transfer_time']) && $data['to_provider'] == Application_Model_General::getSettings('InternalProvider') && ($last_transaction == 'kd_update' || $last_transaction == 'kd_update_response' || $last_transaction == 'request' || $last_transaction == 'request_response' || $last_transaction == 'update' || $last_transaction == 'update_response')
-				) {
+				if (!empty($data['transfer_time'] && ($data['to_provider'] == Application_Model_General::getSettings('InternalProvider') || $data['from_provider'] == Application_Model_General::getSettings('InternalProvider'))) 
+					&& ($last_transaction == 'kd_update' || $last_transaction == 'kd_update_response' || $last_transaction == 'request' || $last_transaction == 'request_response' || $last_transaction == 'update' || $last_transaction == 'update_response' || $last_transaction == 'execute_response')) {
 					$executeData = array(
 						'id' => $data['id'],
 						'request_id' => $data['request_id'],
 						'from_provider' => $data['from_provider'],
+						'to_provider' => $data['to_provider'],
+						'phone_number' => $data['phone_number'],
 					);
 					$executeForm = new Application_Form_Execute();
 					$executeForm->setDefaults($executeData);
+					if ($data['from_provider'] == Application_Model_General::getSettings('InternalProvider')) {
+						$executeForm->getElement('submit')->setLabel('Receive execute');
+					}
 					$this->view->executeForm = $executeForm;
 				}
 
@@ -133,10 +138,32 @@ class MonitorController extends Zend_Controller_Action {
 
 	public function executeAction() {
 		$params = $this->getRequest()->getParams();
-		if (isset($params['TO_PROVIDER'])) {
-			$params['TO'] = $params['TO_PROVIDER'];
+		if (isset($params['from_provider']) && $params['from_provider'] == Application_Model_General::getSettings('InternalProvider')) {
+			$params['FROM_PROVIDER'] = $params['from_provider'];
+			$params['PROCESS_TYPE'] = 'PORT';
+			$params['MSG_TYPE'] = 'Execute';
+			$params['NUMBER'] = $params['phone_number'];
+			$params['MANUAL'] = 1;
+			$params['REQUEST_ID'] = $params['request_id'];
+			unset($params['phone_number']);
+			unset($params['from_provider']);
+			unset($params['to_provider']);
+			$url = '/provider/internal';
+		} else if (isset($params['from_provider']) && $params['to_provider'] == Application_Model_General::getSettings('InternalProvider')) {
+			if (isset($params['TO_PROVIDER'])) {
+				$params['TO'] = $params['TO_PROVIDER'];
+			} else if (isset($params['to_provider'])) {
+				$params['TO'] = $params['to_provider'];
+			}
+			$url = '/cron/transfer';
+		} else {
+			die("something got wrong");
 		}
-		$success = Application_Model_General::forkProcess('/cron/transfer', $params, true);
+		unset($params['controller']);
+		unset($params['action']);
+		unset($params['module']);
+
+		$success = Application_Model_General::forkProcess($url, $params, true);
 		if ($success) {
 			$params['success'] = 1;
 			$params['message'] = 'Execute sent';
