@@ -1,3 +1,8 @@
+Note
+======
+
+The project has been migrated to GitLab: https://git.bill.run/sdoc/npg.
+
 About
 ======
 
